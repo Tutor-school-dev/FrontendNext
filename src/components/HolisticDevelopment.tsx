@@ -1,28 +1,43 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { BookOpen, Code, Brain, GraduationCap } from "lucide-react";
+import { Clock, Users, Star } from "lucide-react";
+import codingImage from "@/assets/course-coding.jpg";
+import brainImage from "@/assets/course-brain.jpg";
+import gitaImage from "@/assets/course-gita.jpg";
+import teachingImage from "@/assets/course-teaching.jpg";
 
 const HolisticDevelopment = () => {
   const programs = [
     {
-      icon: BookOpen,
+      image: gitaImage,
       title: "Bhagavad Gita Lessons for Kids",
-      description: "Ancient wisdom simplified for young minds. Teach values, ethics, and life lessons through engaging stories from the Bhagavad Gita."
+      duration: "8h 30m",
+      students: 156,
+      rating: 4.8,
+      instructor: "Tutorschool@Dev"
     },
     {
-      icon: Code,
+      image: codingImage,
       title: "Basics of Coding",
-      description: "Introduce children to programming fundamentals. Learn Scratch, Python basics, and computational thinking through fun projects."
+      duration: "12h 30m",
+      students: 44,
+      rating: 4.17,
+      instructor: "Tutorschool@Dev"
     },
     {
-      icon: Brain,
-      title: "Brain Development Skills",
-      description: "Enhance cognitive abilities with memory games, logical reasoning, problem-solving activities, and critical thinking exercises."
+      image: brainImage,
+      title: "Brain Development Skills for Kids",
+      duration: "19h 30m",
+      students: 8,
+      rating: 5.0,
+      instructor: "Tutorschool@Dev"
     },
     {
-      icon: GraduationCap,
+      image: teachingImage,
       title: "Advanced Teaching Methods",
-      description: "For tutors: Master modern pedagogical techniques, classroom management, and student engagement strategies."
+      duration: "15h 45m",
+      students: 92,
+      rating: 4.6,
+      instructor: "Tutorschool@Dev"
     }
   ];
   
@@ -39,28 +54,43 @@ const HolisticDevelopment = () => {
           </p>
         </div>
         
-        <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-          {programs.map((program, index) => {
-            const Icon = program.icon;
-            return (
-              <Card key={index} className="border-2 hover:border-primary/50 transition-all hover:shadow-lg">
-                <CardContent className="pt-6">
-                  <div className="mb-4">
-                    <div className="h-14 w-14 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                      <Icon className="h-7 w-7 text-primary" />
-                    </div>
-                    <h3 className="text-xl font-bold text-foreground mb-2">
-                      {program.title}
-                    </h3>
-                    <p className="text-muted-foreground mb-4">
-                      {program.description}
-                    </p>
-                    <Button variant="outline" size="sm">Learn More</Button>
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {programs.map((program, index) => (
+            <Card key={index} className="overflow-hidden hover:shadow-lg transition-all cursor-pointer group">
+              <div className="relative h-48 overflow-hidden">
+                <img 
+                  src={program.image} 
+                  alt={program.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+              </div>
+              
+              <CardContent className="pt-4">
+                <h3 className="text-lg font-bold text-foreground mb-3">
+                  {program.title}
+                </h3>
+                
+                <div className="flex items-center gap-4 mb-4 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    <Clock className="h-4 w-4" />
+                    {program.duration}
                   </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+                  <div className="flex items-center gap-1">
+                    <Users className="h-4 w-4" />
+                    {program.students}
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-between pt-4 border-t">
+                  <span className="text-sm text-muted-foreground">{program.instructor}</span>
+                  <div className="flex items-center gap-1">
+                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                    <span className="text-sm font-semibold">({program.rating})</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </div>
     </section>
