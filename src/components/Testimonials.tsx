@@ -1,5 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import VideoTestimonials from "./VideoTestimonials";
 
 const Testimonials = () => {
   const testimonials = [
@@ -57,6 +58,8 @@ const Testimonials = () => {
             </Card>
           ))}
         </div>
+        
+        <VideoTestimonials />
       </div>
     </section>
   );

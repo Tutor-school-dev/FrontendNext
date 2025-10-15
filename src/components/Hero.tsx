@@ -16,47 +16,47 @@ const Hero = () => {
             
             <div className="space-y-4">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-foreground">
-                Join 1,800+ Tutors <br />
-                <span className="text-primary">Earning More</span>
+                Find the Perfect <br />
+                <span className="text-primary">Home Tutor</span> for Your Child
               </h1>
               
               <p className="text-lg text-muted-foreground max-w-xl">
-                Keep 100% of your earnings • No commission fees • Flexible scheduling • Verified platform
+                Expert tutors for Classes 1-12 • CBSE, ICSE & State Boards • Personalized learning at your doorstep
               </p>
             </div>
             
             <div className="flex flex-wrap gap-6">
               <div className="flex items-center gap-3">
-                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
                   <span className="text-lg font-bold text-primary">✓</span>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Zero Deductions</p>
+                  <p className="text-sm font-medium text-foreground">Verified Tutors</p>
                 </div>
               </div>
               
               <div className="flex items-center gap-3">
-                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
                   <span className="text-lg font-bold text-primary">✓</span>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Steady Students</p>
+                  <p className="text-sm font-medium text-foreground">Free Demo Class</p>
                 </div>
               </div>
               
               <div className="flex items-center gap-3">
-                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
                   <span className="text-lg font-bold text-primary">✓</span>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">24hr Approval</p>
+                  <p className="text-sm font-medium text-foreground">No Hidden Fees</p>
                 </div>
               </div>
             </div>
             
             <div className="flex flex-wrap gap-4">
               <Button size="lg" className="rounded-full font-semibold">
-                Apply as Tutor Now
+                Book Free Demo Now
               </Button>
               <Button size="lg" variant="outline" className="rounded-full font-semibold">
                 99420-12342
@@ -67,20 +67,18 @@ const Hero = () => {
           <div className="relative">
             <div className="grid grid-cols-3 gap-4 mb-8">
               <div className="bg-card rounded-2xl p-6 shadow-lg border">
-                <div className="text-3xl font-bold text-primary">₹0</div>
-                <p className="text-sm text-muted-foreground mt-1">Commission Fee</p>
+                <div className="text-3xl font-bold text-primary">2,567+</div>
+                <p className="text-sm text-muted-foreground mt-1">Happy Students</p>
               </div>
               
               <div className="bg-card rounded-2xl p-6 shadow-lg border">
-                <div className="text-3xl font-bold text-primary">100%</div>
-                <p className="text-sm text-muted-foreground mt-1">Your Earnings</p>
+                <div className="text-3xl font-bold text-primary">1,800+</div>
+                <p className="text-sm text-muted-foreground mt-1">Expert Tutors</p>
               </div>
               
               <div className="bg-card rounded-2xl p-6 shadow-lg border">
-                <div className="text-3xl font-bold text-primary flex items-center gap-1">
-                  4.9<Star className="h-5 w-5 fill-primary text-primary" />
-                </div>
-                <p className="text-sm text-muted-foreground mt-1">Tutor Rating</p>
+                <div className="text-3xl font-bold text-primary">98%</div>
+                <p className="text-sm text-muted-foreground mt-1">Success Rate</p>
               </div>
             </div>
             
