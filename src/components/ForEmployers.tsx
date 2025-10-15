@@ -1,53 +1,92 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Building2, Users, Clock, CheckCircle2, ArrowRight } from "lucide-react";
+import Image from "next/image";
 import employerImage from "@/assets/employer-banner.jpg";
 
 const ForEmployers = () => {
   return (
-    <section className="py-16 bg-gradient-to-r from-blue-600 to-blue-700">
+    <section id="teachers" className="py-20 bg-gradient-to-br from-secondary/30 to-background">
       <div className="container mx-auto px-4">
-        <div className="bg-gradient-to-r from-blue-700 to-blue-800 rounded-3xl overflow-hidden shadow-2xl">
-          <div className="grid md:grid-cols-2 gap-8 items-center p-8 md:p-12">
-            <div className="relative">
-              <img 
+        <div className="bg-white rounded-3xl overflow-hidden shadow-xl border border-primary/10">
+          <div className="grid md:grid-cols-2 gap-0 items-center">
+            <div className="relative order-2 md:order-1">
+              <Image
                 src={employerImage} 
-                alt="Professional employer"
-                className="w-full max-w-md mx-auto rounded-2xl"
+                alt="Professional education environment"
+                className="w-full h-full object-cover min-h-[400px]"
+                fill
+                priority
               />
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/5"></div>
             </div>
             
-            <div className="space-y-6 text-white">
-              <Badge variant="secondary" className="bg-blue-500/30 text-white border-white/20">
-                TUTORSCHOOL FOR SCHOOLS
-              </Badge>
-              
-              <h2 className="text-3xl md:text-4xl font-bold leading-tight">
-                Looking to hire qualified tutors and teachers?
-              </h2>
-              
-              <p className="text-blue-100 text-lg">
-                Access India's largest pool of 2,000+ verified tutors with AI-powered matching and smart filters to hire faster.
-              </p>
-              
-              <div className="flex flex-wrap gap-4">
-                <Button size="lg" className="bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-bold rounded-full">
-                  Post requirement for free →
-                </Button>
+            <div className="space-y-8 p-8 md:p-12 order-1 md:order-2">
+              <div className="space-y-4">
+                <Badge variant="secondary" className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-primary/10 text-primary border-primary/20">
+                  <Building2 className="h-4 w-4" />
+                  FOR SCHOOLS & INSTITUTIONS
+                </Badge>
+                
+                <h2 className="text-3xl md:text-4xl font-bold leading-tight text-foreground">
+                  Need <span className="text-primary">Qualified Educators</span> for Your Institution?
+                </h2>
+                
+                <p className="text-muted-foreground text-lg leading-relaxed">
+                  Access India's largest pool of verified tutors and teachers. Our AI-powered platform helps you find the perfect educators faster than traditional hiring.
+                </p>
               </div>
               
-              <div className="grid grid-cols-3 gap-6 pt-6 border-t border-white/20">
-                <div>
-                  <div className="text-2xl font-bold">2,000+</div>
-                  <p className="text-sm text-blue-200">Verified Tutors</p>
+              <div className="grid grid-cols-2 gap-6">
+                <div className="flex items-start gap-3">
+                  <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Users className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-foreground">2,000+ Verified</p>
+                    <p className="text-sm text-muted-foreground">Expert Educators</p>
+                  </div>
                 </div>
-                <div>
-                  <div className="text-2xl font-bold">24hr</div>
-                  <p className="text-sm text-blue-200">Quick Matching</p>
+                
+                <div className="flex items-start gap-3">
+                  <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Clock className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-foreground">24-Hour</p>
+                    <p className="text-sm text-muted-foreground">Quick Matching</p>
+                  </div>
                 </div>
-                <div>
-                  <div className="text-2xl font-bold">₹0</div>
-                  <p className="text-sm text-blue-200">Posting Fee</p>
+                
+                <div className="flex items-start gap-3">
+                  <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <CheckCircle2 className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-foreground">100% Free</p>
+                    <p className="text-sm text-muted-foreground">No Hidden Costs</p>
+                  </div>
                 </div>
+                
+                <div className="flex items-start gap-3">
+                  <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Building2 className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-foreground">Smart Filters</p>
+                    <p className="text-sm text-muted-foreground">AI-Powered Search</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <Button size="lg" className="w-full md:w-auto rounded-full font-semibold group">
+                  Post Your Requirement
+                  <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                </Button>
+                <p className="text-sm text-muted-foreground">
+                  ✨ Join 500+ schools already using TutorSchool for hiring
+                </p>
               </div>
             </div>
           </div>

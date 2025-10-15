@@ -1,5 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Clock, Users, Star } from "lucide-react";
+import Image from "next/image";
 import codingImage from "@/assets/course-coding.jpg";
 import brainImage from "@/assets/course-brain.jpg";
 import gitaImage from "@/assets/course-gita.jpg";
@@ -42,7 +43,7 @@ const HolisticDevelopment = () => {
   ];
   
   return (
-    <section className="py-20 bg-background">
+    <section id="courses" className="py-20 bg-gradient-to-br from-amber-50 via-orange-50 to-red-50">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <p className="text-sm font-medium text-primary mb-2">Holistic Development</p>
@@ -56,12 +57,13 @@ const HolisticDevelopment = () => {
         
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {programs.map((program, index) => (
-            <Card key={index} className="overflow-hidden hover:shadow-lg transition-all cursor-pointer group">
+            <Card key={index} className="overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group bg-white/90 backdrop-blur-sm border-2 hover:border-primary/30">
               <div className="relative h-48 overflow-hidden">
-                <img 
+                <Image
                   src={program.image} 
                   alt={program.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  fill
                 />
               </div>
               

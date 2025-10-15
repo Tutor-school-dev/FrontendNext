@@ -25,7 +25,7 @@ const AIFeatures = () => {
   ];
   
   return (
-    <section className="py-20 bg-gradient-to-br from-primary/5 to-secondary/30">
+    <section id="ai" className="py-20 bg-gradient-to-br from-purple-100 via-pink-50 to-orange-50">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 mb-4">
@@ -44,7 +44,7 @@ const AIFeatures = () => {
           {features.map((feature, index) => {
             const Icon = feature.icon;
             return (
-              <Card key={index} className="border-2 hover:border-primary/50 transition-all hover:shadow-lg">
+              <Card key={index} className="border-2 hover:border-primary/50 transition-all hover:shadow-xl duration-300 bg-white/90 backdrop-blur-sm">
                 <CardContent className="pt-6 text-center">
                   <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
                     <Icon className="h-8 w-8 text-primary" />

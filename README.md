@@ -1,8 +1,10 @@
-# Welcome to your Lovable project
+# TutorSchool - Next.js Application
 
 ## Project info
 
 **URL**: https://lovable.dev/projects/dcf5cfa6-9c7a-45d8-a86d-96a80a3e5f47
+
+TutorSchool is an AI-powered tutor matching platform built with Next.js 15, offering both home and online tutoring services.
 
 ## How can I edit this code?
 

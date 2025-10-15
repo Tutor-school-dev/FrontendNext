@@ -1,4 +1,5 @@
-import { GraduationCap } from "lucide-react";
+import Image from "next/image";
+import tutorSchoolLogo from "@/assets/tutorschool.jpeg";
 
 const Footer = () => {
   return (
@@ -7,8 +8,14 @@ const Footer = () => {
         <div className="grid md:grid-cols-4 gap-8 mb-8">
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <GraduationCap className="h-8 w-8 text-primary" />
-              <span className="text-xl font-bold">TutorBuddy</span>
+              <Image 
+                src={tutorSchoolLogo} 
+                alt="TutorSchool Logo" 
+                className="h-8 w-8 rounded-sm object-contain"
+                width={32}
+                height={32}
+              />
+              <span className="text-xl font-bold">TutorSchool</span>
             </div>
             <p className="text-sm text-background/70">
               Empowering students and tutors to achieve academic excellence together.
@@ -44,7 +51,7 @@ const Footer = () => {
         </div>
         
         <div className="border-t border-background/20 pt-8 text-center text-sm text-background/70">
-          <p>&copy; 2025 TutorBuddy. All rights reserved.</p>
+          <p>&copy; 2025 TutorSchool. All rights reserved.</p>
         </div>
       </div>
     </footer>
