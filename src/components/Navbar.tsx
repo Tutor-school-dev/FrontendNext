@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import Link from "next/link";
 import tutorSchoolLogo from "@/assets/tutorschool.jpeg";
 
 const Navbar = () => {
@@ -83,15 +84,18 @@ const Navbar = () => {
           </div>
           
           <div className="flex items-center gap-4">
-            <button 
-              onClick={() => scrollToSection('tutors')}
-              className="px-4 py-2 text-sm font-medium text-primary border border-primary/30 rounded-full hover:bg-primary/10 transition-all duration-200 hover:border-primary/50"
-            >
-              For Tutors
-            </button>
-            <Button className="rounded-full font-semibold">
-              Book Demo Classes
-            </Button>
+            <Link href="/onboarding/tutor">
+              <button 
+                className="px-4 py-2 text-sm font-medium text-primary border border-primary/30 rounded-full hover:bg-primary/10 transition-all duration-200 hover:border-primary/50"
+              >
+                For Tutors
+              </button>
+            </Link>
+            <Link href="/onboarding/learner">
+              <Button className="rounded-full font-semibold">
+                Book Demo Classes
+              </Button>
+            </Link>
           </div>
         </div>
       </div>

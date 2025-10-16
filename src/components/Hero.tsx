@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles, CheckCircle2, Clock, Users } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import heroImage from "@/assets/hero-home-online.jpg";
 
 const Hero = () => {
@@ -56,12 +57,16 @@ const Hero = () => {
             </div>
             
             <div className="flex flex-wrap gap-4">
-              <Button size="lg" className="rounded-full font-semibold">
-                Find Home Tutor
-              </Button>
-              <Button size="lg" variant="outline" className="rounded-full font-semibold">
-                Find Online Tutor
-              </Button>
+              <Link href="/onboarding/learner">
+                <Button size="lg" className="rounded-full font-semibold">
+                  Find Home Tutor
+                </Button>
+              </Link>
+              <Link href="/onboarding/learner">
+                <Button size="lg" variant="outline" className="rounded-full font-semibold">
+                  Find Online Tutor
+                </Button>
+              </Link>
             </div>
           </div>
           

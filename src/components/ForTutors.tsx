@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Star, Users, CheckCircle2, Clock } from "lucide-react";
+import Link from "next/link";
 
 const ForTutors = () => {
   const benefits = [
@@ -61,9 +62,11 @@ const ForTutors = () => {
         </div>
         
         <div className="text-center mb-12">
-          <Button size="lg" className="rounded-full font-semibold">
-            Apply as Tutor Now
-          </Button>
+          <Link href="/onboarding/tutor">
+            <Button size="lg" className="rounded-full font-semibold">
+              Apply as Tutor Now
+            </Button>
+          </Link>
         </div>
         
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
