@@ -30,7 +30,7 @@ const Process = () => {
   ];
   
   return (
-    <section className="py-20 bg-background">
+    <section className="py-20 bg-gradient-to-br from-cyan-50 via-sky-50 to-blue-50">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <p className="text-sm font-medium text-primary mb-2">Simple Process</p>
@@ -46,7 +46,7 @@ const Process = () => {
           {steps.map((step, index) => {
             const Icon = step.icon;
             return (
-              <Card key={index} className="relative border-2 hover:border-primary/50 transition-all hover:shadow-lg">
+              <Card key={index} className="relative border-2 hover:border-primary/50 transition-all hover:shadow-xl duration-300 bg-white/90 backdrop-blur-sm">
                 <CardContent className="pt-6">
                   <div className="absolute -top-4 left-6 bg-primary text-primary-foreground rounded-full h-12 w-12 flex items-center justify-center font-bold text-lg shadow-lg">
                     {step.number}

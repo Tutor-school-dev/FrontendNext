@@ -24,7 +24,7 @@ const Reviews = () => {
   ];
   
   return (
-    <section className="py-20 bg-secondary/30">
+    <section id="parents" className="py-20 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <p className="text-sm font-medium text-primary mb-2">Parent Reviews</p>
@@ -38,7 +38,7 @@ const Reviews = () => {
         
         <div className="grid md:grid-cols-3 gap-6">
           {reviews.map((review, index) => (
-            <Card key={index} className="border-2 hover:border-primary/50 transition-colors">
+            <Card key={index} className="border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-xl bg-white/80 backdrop-blur-sm">
               <CardContent className="pt-6">
                 <div className="flex items-center gap-4 mb-4">
                   <Avatar className="h-12 w-12 border-2 border-primary">

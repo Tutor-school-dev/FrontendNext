@@ -29,7 +29,7 @@ const ForTutors = () => {
   ];
   
   return (
-    <section className="py-20 bg-secondary/30">
+    <section id="tutors" className="py-20 bg-gradient-to-br from-indigo-50 via-violet-50 to-purple-50">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <p className="text-sm font-medium text-primary mb-2">For Tutors</p>
@@ -45,7 +45,7 @@ const ForTutors = () => {
           {benefits.map((benefit, index) => {
             const Icon = benefit.icon;
             return (
-              <Card key={index} className="border-2 text-center">
+              <Card key={index} className="border-2 text-center hover:border-primary/50 transition-all duration-300 hover:shadow-xl bg-white/90 backdrop-blur-sm">
                 <CardContent className="pt-6">
                   <Icon className="h-10 w-10 text-primary mx-auto mb-3" />
                   <h3 className="font-bold text-foreground mb-2">

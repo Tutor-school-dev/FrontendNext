@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles, CheckCircle2, Clock, Users } from "lucide-react";
+import Image from "next/image";
 import heroImage from "@/assets/hero-home-online.jpg";
 
 const Hero = () => {
@@ -66,10 +67,11 @@ const Hero = () => {
           
           <div className="relative">
             <div className="relative rounded-3xl overflow-hidden shadow-2xl">
-              <img 
+              <Image
                 src={heroImage} 
                 alt="Home tutoring and online tutoring illustration"
                 className="w-full h-auto object-cover"
+                priority
               />
             </div>
           </div>

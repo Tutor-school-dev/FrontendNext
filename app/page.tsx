@@ -1,6 +1,7 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import TrustedBy from "@/components/TrustedBy";
+import TrendingNow from "@/components/TrendingNow";
 import Reviews from "@/components/Reviews";
 import Process from "@/components/Process";
 import Testimonials from "@/components/Testimonials";
@@ -14,12 +15,13 @@ import AIFeatures from "@/components/AIFeatures";
 import ContactCTA from "@/components/ContactCTA";
 import Footer from "@/components/Footer";
 
-const Index = () => {
+export default function HomePage() {
   return (
     <div className="min-h-screen">
       <Navbar />
       <Hero />
       <TrustedBy />
+      <TrendingNow />
       <Reviews />
       <Process />
       <Testimonials />
@@ -34,6 +36,4 @@ const Index = () => {
       <Footer />
     </div>
   );
-};
-
-export default Index;
+}

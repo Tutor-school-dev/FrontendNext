@@ -1,17 +1,20 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Play } from "lucide-react";
+import Image from "next/image";
+import heroImage from "@/assets/hero-home-online.jpg";
+import tutorImage from "@/assets/hero-tutor.jpg";
 
 const VideoTestimonials = () => {
   const videos = [
     {
       name: "Rahul Kumar",
       class: "Class 11, CBSE",
-      thumbnail: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=300&fit=crop"
+      thumbnail: heroImage
     },
     {
       name: "Sneha Reddy",
-      class: "Class 9, ICSE",
-      thumbnail: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&h=300&fit=crop"
+      class: "Class 9, ICSE", 
+      thumbnail: tutorImage
     }
   ];
   
@@ -25,10 +28,11 @@ const VideoTestimonials = () => {
           <Card key={index} className="overflow-hidden border-2 hover:border-primary/50 transition-colors cursor-pointer group">
             <CardContent className="p-0">
               <div className="relative aspect-video">
-                <img 
+                <Image
                   src={video.thumbnail} 
                   alt={video.name}
                   className="w-full h-full object-cover"
+                  fill
                 />
                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/50 transition-colors">
                   <div className="h-16 w-16 rounded-full bg-primary flex items-center justify-center group-hover:scale-110 transition-transform">
