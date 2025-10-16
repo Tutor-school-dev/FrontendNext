@@ -6,13 +6,32 @@ import tutorSchoolLogo from "@/assets/tutorschool.jpeg";
 
 const Navbar = () => {
   const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ 
-        behavior: 'smooth',
-        block: 'start'
-      });
-    }
+    console.log('Scrolling to section:', sectionId);
+    
+    // Wait for next tick to ensure DOM is ready
+    setTimeout(() => {
+      const element = document.getElementById(sectionId);
+      console.log('Element found:', element);
+      if (element) {
+        element.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'start'
+        });
+      } else {
+        console.warn(`Element with id "${sectionId}" not found`);
+        // Try again after a short delay
+        setTimeout(() => {
+          const retryElement = document.getElementById(sectionId);
+          if (retryElement) {
+            console.log('Element found on retry:', retryElement);
+            retryElement.scrollIntoView({ 
+              behavior: 'smooth',
+              block: 'start'
+            });
+          }
+        }, 100);
+      }
+    }, 10);
   };
 
   return (
