@@ -1,3 +1,5 @@
+"use client";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Star, Users, CheckCircle2, Clock } from "lucide-react";
@@ -61,7 +63,11 @@ const ForTutors = () => {
         </div>
         
         <div className="text-center mb-12">
-          <Button size="lg" className="rounded-full font-semibold">
+          <Button 
+            size="lg" 
+            className="rounded-full font-semibold"
+            onClick={() => window.open('https://app.tutorschool.in', '_blank')}
+          >
             Apply as Tutor Now
           </Button>
         </div>

@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles, CheckCircle2, Clock, Users } from "lucide-react";
@@ -73,10 +75,19 @@ const Hero = () => {
             </div>
             
             <div className="flex flex-wrap gap-4">
-              <Button size="lg" className="rounded-full font-semibold">
+              <Button 
+                size="lg" 
+                className="rounded-full font-semibold"
+                onClick={() => window.open('https://app.tutorschool.in', '_blank')}
+              >
                 Find Home Tutor
               </Button>
-              <Button size="lg" variant="outline" className="rounded-full font-semibold">
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="rounded-full font-semibold"
+                onClick={() => window.open('https://app.tutorschool.in', '_blank')}
+              >
                 Find Online Tutor
               </Button>
             </div>
@@ -95,10 +106,15 @@ const Hero = () => {
         </div>
 
         {/* Partner Logos Slider */}
-        <div className="relative overflow-hidden">
-          <div 
-            className="flex items-center transition-opacity duration-300 animate-logo-scroll"
-          >
+        <div className="relative bg-gradient-to-r from-green-50 to-emerald-50 py-6 px-4 rounded-lg border border-green-100">
+          <div className="flex items-center gap-8">
+            <div className="flex-shrink-0">
+              <h3 className="text-lg font-semibold text-gray-700">Trusted by</h3>
+            </div>
+            <div className="flex-1 overflow-hidden">
+              <div 
+                className="flex items-center transition-opacity duration-300 animate-logo-scroll"
+              >
             {[...partnerLogos, ...partnerLogos, ...partnerLogos].map((logo, index) => (
               <div 
                 key={index}
@@ -116,6 +132,8 @@ const Hero = () => {
                 />
               </div>
             ))}
+              </div>
+            </div>
           </div>
         </div>
       </div>

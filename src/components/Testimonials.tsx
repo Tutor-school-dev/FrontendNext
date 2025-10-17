@@ -59,7 +59,9 @@ const Testimonials = () => {
           ))}
         </div>
         
-        <VideoTestimonials />
+        <div className="hidden">
+          <VideoTestimonials />
+        </div>
       </div>
     </section>
   );
