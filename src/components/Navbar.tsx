@@ -80,16 +80,25 @@ const Navbar = () => {
             >
               AI Features
             </button>
+            <button 
+              onClick={() => window.open('https://tutorschool.in/blog', '_blank')}
+              className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+            >
+              Blogs
+            </button>
           </div>
           
           <div className="flex items-center gap-4">
             <button 
-              onClick={() => scrollToSection('tutors')}
+              onClick={() => window.open('https://app.tutorschool.in', '_blank')}
               className="px-4 py-2 text-sm font-medium text-primary border border-primary/30 rounded-full hover:bg-primary/10 transition-all duration-200 hover:border-primary/50"
             >
               For Tutors
             </button>
-            <Button className="rounded-full font-semibold">
+            <Button 
+              className="rounded-full font-semibold"
+              onClick={() => window.open('https://app.tutorschool.in', '_blank')}
+            >
               Book Demo Classes
             </Button>
           </div>

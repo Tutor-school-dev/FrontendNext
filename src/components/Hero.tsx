@@ -1,14 +1,33 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles, CheckCircle2, Clock, Users } from "lucide-react";
 import Image from "next/image";
 import heroImage from "@/assets/hero-home-online.jpg";
+import startupIndiaHub from "@/assets/startup-india-hub.png";
+import startupBihar from "@/assets/startup-bihar.png";
+import brighterMinds from "@/assets/brighter-minds.webp";
+import gitopadesh from "@/assets/gitopadesh.png";
+import het from "@/assets/het.png";
+import cimpBiif from "@/assets/cimp-biif.jpg";
+import bhub from "@/assets/bhub.jpg";
 
 const Hero = () => {
+  const partnerLogos = [
+    { name: "Startup India Hub", src: startupIndiaHub },
+    { name: "Startup Bihar", src: startupBihar },
+    { name: "Brighter Minds", src: brighterMinds },
+    { name: "Gitopadesh", src: gitopadesh },
+    { name: "HET", src: het },
+    { name: "CIMP BIIF", src: cimpBiif },
+    { name: "Bhub", src: bhub }
+  ];
+
   return (
     <section className="relative overflow-hidden bg-[#E0F9F4]">
-      <div className="container mx-auto px-4 py-16 md:py-24">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+      <div className="container mx-auto px-4 pt-16 md:pt-24 pb-2">
+        <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
           <div className="space-y-8">
             <Badge variant="secondary" className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-primary/10 text-primary border-primary/20">
               <Sparkles className="h-4 w-4" />
@@ -56,10 +75,19 @@ const Hero = () => {
             </div>
             
             <div className="flex flex-wrap gap-4">
-              <Button size="lg" className="rounded-full font-semibold">
+              <Button 
+                size="lg" 
+                className="rounded-full font-semibold"
+                onClick={() => window.open('https://app.tutorschool.in', '_blank')}
+              >
                 Find Home Tutor
               </Button>
-              <Button size="lg" variant="outline" className="rounded-full font-semibold">
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="rounded-full font-semibold"
+                onClick={() => window.open('https://app.tutorschool.in', '_blank')}
+              >
                 Find Online Tutor
               </Button>
             </div>
@@ -73,6 +101,38 @@ const Hero = () => {
                 className="w-full h-auto object-cover"
                 priority
               />
+            </div>
+          </div>
+        </div>
+
+        {/* Partner Logos Slider */}
+        <div className="relative bg-gradient-to-r from-green-50 to-emerald-50 py-6 px-4 rounded-lg border border-green-100">
+          <div className="flex items-center gap-8">
+            <div className="flex-shrink-0">
+              <h3 className="text-lg font-semibold text-gray-700">Trusted by</h3>
+            </div>
+            <div className="flex-1 overflow-hidden">
+              <div 
+                className="flex items-center transition-opacity duration-300 animate-logo-scroll"
+              >
+            {[...partnerLogos, ...partnerLogos, ...partnerLogos].map((logo, index) => (
+              <div 
+                key={index}
+                className="flex-shrink-0 mx-6 h-12 w-24 flex items-center justify-center"
+              >
+                <Image
+                  src={logo.src} 
+                  alt={logo.name}
+                  className="max-h-full max-w-full object-contain transition-all duration-300 hover:scale-105"
+                  width={96}
+                  height={48}
+                  style={{
+                    filter: 'brightness(1.2) contrast(1.15) saturate(1.25)'
+                  }}
+                />
+              </div>
+            ))}
+              </div>
             </div>
           </div>
         </div>
