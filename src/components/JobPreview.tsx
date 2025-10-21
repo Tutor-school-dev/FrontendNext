@@ -3,14 +3,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import {
   ArrowLeft,
@@ -253,42 +245,13 @@ export function JobPreview({ job_id, jobsData, onBack }: JobPreviewProps) {
             <Card className="bg-card border-border">
               <CardContent className="pt-6">
                 <div className="space-y-3">
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button size="lg" className="w-full">Apply here!</Button>
-                    </DialogTrigger>
-                    <DialogContent className="p-10 sm:max-w-[425px]">
-                      <DialogHeader>
-                        <DialogTitle className="flex justify-between items-center">
-                          <div>Login Required</div>
-                        </DialogTitle>
-                        <DialogDescription>
-                          Please login or create an account to apply for this job.
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="space-y-4">
-                        <p className="text-sm text-muted-foreground">
-                          To apply for this position, you need to have a tutor account. 
-                          If you don't have an account yet, you can sign up first.
-                        </p>
-                        <div className="flex gap-2">
-                          <Button 
-                            onClick={() => window.open('/login', '_blank')}
-                            variant="outline"
-                            className="flex-1"
-                          >
-                            Login
-                          </Button>
-                          <Button 
-                            onClick={() => window.open('/signup', '_blank')}
-                            className="flex-1"
-                          >
-                            Sign Up
-                          </Button>
-                        </div>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
+                  <Button 
+                    size="lg" 
+                    className="w-full"
+                    onClick={() => window.open('https://tutorschool.in/app/LoginPage?flag=TEACHER', '_blank')}
+                  >
+                    Apply here!
+                  </Button>
                 </div>
               </CardContent>
             </Card>
