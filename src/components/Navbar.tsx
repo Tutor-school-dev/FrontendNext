@@ -94,6 +94,12 @@ const Navbar = () => {
             >
               AI Features
             </button>
+            <a 
+              href="/job-listings"
+              className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+            >
+              Job Listings
+            </a>
             <button 
               onClick={() => handleExternalLink('https://tutorschool.in/blog')}
               className="text-sm font-medium text-foreground hover:text-primary transition-colors"
