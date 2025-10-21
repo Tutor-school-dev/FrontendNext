@@ -5,6 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Sparkles, CheckCircle2, Clock, Users } from "lucide-react";
 import Image from "next/image";
 import heroImage from "@/assets/hero-home-online.jpg";
+import awsForStartups from "@/assets/aws-for-startups.png";
+import zohoForStartups from "@/assets/zoho-for-startups.png";
 import startupIndiaHub from "@/assets/startup-india-hub.png";
 import startupBihar from "@/assets/startup-bihar.png";
 import brighterMinds from "@/assets/brighter-minds.webp";
@@ -15,6 +17,8 @@ import bhub from "@/assets/bhub.jpg";
 
 const Hero = () => {
   const partnerLogos = [
+    { name: "AWS for Startups", src: awsForStartups },
+    { name: "Zoho for Startups", src: zohoForStartups },
     { name: "Startup India Hub", src: startupIndiaHub },
     { name: "Startup Bihar", src: startupBihar },
     { name: "Brighter Minds", src: brighterMinds },

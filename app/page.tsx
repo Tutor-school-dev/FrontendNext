@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
+import TrustedBy from "@/components/TrustedBy";
 import TrendingNow from "@/components/TrendingNow";
 import Reviews from "@/components/Reviews";
 import Process from "@/components/Process";
@@ -19,6 +20,7 @@ export default function HomePage() {
     <div className="min-h-screen">
       <Navbar />
       <Hero />
+      {/* <TrustedBy /> */}
       <TrendingNow />
       <Reviews />
       <Process />

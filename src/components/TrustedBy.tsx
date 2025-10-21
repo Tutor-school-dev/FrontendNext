@@ -1,4 +1,6 @@
 import Image from "next/image";
+import awsForStartups from "../assets/aws-for-startups.png";
+import zohoForStartups from "../assets/zoho-for-startups.png";
 import startupIndiaHub from "../assets/startup-india-hub.png";
 import startupBihar from "../assets/startup-bihar.png";
 import brighterMinds from "../assets/brighter-minds.webp";
@@ -9,6 +11,8 @@ import bhub from "../assets/bhub.jpg";
 
 const TrustedBy = () => {
   const logos = [
+    { name: "AWS for Startups", src: awsForStartups },
+    { name: "Zoho for Startups", src: zohoForStartups },
     { name: "Startup India Hub", src: startupIndiaHub },
     { name: "Startup Bihar", src: startupBihar },
     { name: "Brighter Minds", src: brighterMinds },
