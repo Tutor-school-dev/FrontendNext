@@ -12,6 +12,7 @@ import { SocialShare } from "@/components/SocialShare";
 import { BarLoader } from 'react-spinners';
 import { JobPreview } from "@/components/JobPreview";
 import { useJobListings } from "@/hooks/useJobListings";
+import { generateJobSlug, extractJobIdFromUrl } from "@/lib/seoUtils";
 
 export default function JobListingsContent() {
   const router = useRouter();
@@ -22,7 +23,7 @@ export default function JobListingsContent() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  const job_id = searchParams.get('id');
+  const job_id = extractJobIdFromUrl(searchParams);
 
   const { jobsData, loading, error } = useJobListings();
 
@@ -89,15 +90,17 @@ export default function JobListingsContent() {
   };
 
   const handleJobClick = (jobId: string) => {
+    const job = jobsData?.find(j => j.j_id === jobId);
+    if (!job) return;
+    
+    const slug = generateJobSlug(job);
     const params = new URLSearchParams(searchParams.toString());
     params.set('id', jobId);
-    router.push(`/job-listings?${params.toString()}`);
+    router.push(`/${slug}?${params.toString()}`);
   };
 
   const handleBackToList = () => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.delete('id');
-    router.push(`/job-listings?${params.toString()}`);
+    router.push('/job-listings');
   };
 
   if (error) {
@@ -238,7 +241,7 @@ export default function JobListingsContent() {
                           </div>
                           <div className="mt-4">
                             <SocialShare 
-                              job_id={job.j_id} 
+                              job={job}
                               title={`${job.j_title} in ${job.j_location}`}
                             />
                           </div>

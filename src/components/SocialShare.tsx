@@ -3,27 +3,19 @@
 import { Button } from "@/components/ui/button";
 import { MessageCircle, Link } from "lucide-react";
 import { toast } from "sonner";
+import { Job } from "@/hooks/useJobListings";
+import { generateJobUrl } from "@/lib/seoUtils";
 
 interface SocialShareProps {
-  job_id: string;
+  job: Job;
   url?: string;
   title?: string;
   className?: string;
 }
 
-export function SocialShare({ job_id, url, title = "Check out this tutoring opportunity!", className }: SocialShareProps) {
-  // Get the current domain dynamically
-  const getCurrentDomain = () => {
-    if (typeof window !== 'undefined') {
-      return window.location.origin;
-    }
-    // Fallback for SSR - will be replaced with actual domain on client
-    return 'https://tutorschool.vercel.app';
-  };
-
+export function SocialShare({ job, url, title = "Check out this tutoring opportunity!", className }: SocialShareProps) {
   const getJobUrl = () => {
-    const domain = getCurrentDomain();
-    return `${domain}/job-listings?id=${job_id}`;
+    return generateJobUrl(job);
   };
   
   const handleWhatsAppShare = (e: React.MouseEvent) => {
