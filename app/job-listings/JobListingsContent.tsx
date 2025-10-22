@@ -237,7 +237,10 @@ export default function JobListingsContent() {
                             </div>
                           </div>
                           <div className="mt-4">
-                            <SocialShare job_id={job.j_id} />
+                            <SocialShare 
+                              job_id={job.j_id} 
+                              title={`${job.j_title} in ${job.j_location}`}
+                            />
                           </div>
                         </div>
                       </div>

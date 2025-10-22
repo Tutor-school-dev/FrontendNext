@@ -7,6 +7,7 @@ import { QueryClientProvider } from '@/components/providers/query-client-provide
 import { ThemeProvider } from "@/components/providers/theme-provider";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_GO_APP_URL || 'https://tutorschool.vercel.app'),
   title: "TutorSchool - Find Your Perfect Tutor—Home or Online",
   description: "AI-powered tutor matching platform for home and online education. Choose between personalized in-person home tutors or flexible online education—all on one platform. Get AI-matched with verified tutors in 24 hours.",
   keywords: ["tutors", "education", "online learning", "home tutoring", "AI matching"],

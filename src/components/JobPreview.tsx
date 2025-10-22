@@ -17,6 +17,7 @@ import {
 import { useEffect } from "react";
 import { BarLoader } from 'react-spinners';
 import { Job } from "@/hooks/useJobListings";
+import { JobStructuredData } from "./JobStructuredData";
 
 interface JobPreviewProps {
   job_id: string;
@@ -99,6 +100,9 @@ export function JobPreview({ job_id, jobsData, onBack }: JobPreviewProps) {
 
   return (
     <div className="bg-background min-h-screen">
+      {/* Add structured data for SEO */}
+      <JobStructuredData job={job} />
+      
       <div className="mx-auto px-4 py-8 max-w-4xl">
         {/* Header with back button */}
         <div className="mb-8">

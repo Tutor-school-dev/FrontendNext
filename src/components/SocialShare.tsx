@@ -11,20 +11,54 @@ interface SocialShareProps {
   className?: string;
 }
 
-export function SocialShare({ job_id, url, title = "Check this out!", className }: SocialShareProps) {
-  const apiUrl = process.env.NEXT_PUBLIC_GO_APP_URL || 'https://api.tutorschool.in';
+export function SocialShare({ job_id, url, title = "Check out this tutoring opportunity!", className }: SocialShareProps) {
+  // Get the current domain dynamically
+  const getCurrentDomain = () => {
+    if (typeof window !== 'undefined') {
+      return window.location.origin;
+    }
+    // Fallback for SSR - will be replaced with actual domain on client
+    return 'https://tutorschool.vercel.app';
+  };
+
+  const getJobUrl = () => {
+    const domain = getCurrentDomain();
+    return `${domain}/job-listings?id=${job_id}`;
+  };
   
   const handleWhatsAppShare = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`${title} ${apiUrl}/admin/pub/jobs/${job_id}`)}`;
+    const jobUrl = getJobUrl();
+    
+    // Create engaging WhatsApp message
+    const shareText = `🎓 *Tutoring Opportunity Alert!*
+
+📝 *Position:* ${title}
+💼 *Posted by:* Professional Educator
+🎯 *Type:* ${title.includes('Online') ? 'Online Teaching' : 'Home/In-Person Tutoring'}
+
+✨ *Why Apply?*
+• Flexible schedule
+• Competitive compensation
+• Make a real impact on student's life
+• Join our trusted educator network
+
+� *Apply Now:* ${jobUrl}
+
+#TutoringJobs #Teaching #Education #FlexibleWork
+
+_Share this opportunity with fellow educators! 🤝_`;
+    
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
     window.open(whatsappUrl, "_blank");
   };
 
   const handleCopyLink = (e: React.MouseEvent) => {
     e.stopPropagation();
+    const jobUrl = getJobUrl();
     navigator.clipboard
-      .writeText(`${apiUrl}/admin/pub/jobs/${job_id}`)
-      .then(() => toast.info("Job URL Copied"));
+      .writeText(jobUrl)
+      .then(() => toast.success("Job URL copied to clipboard! 📋"));
   };
 
   return (
