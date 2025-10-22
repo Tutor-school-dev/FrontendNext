@@ -94,8 +94,10 @@ export default function JobListingsContent() {
     if (!job) return;
     
     const slug = generateJobSlug(job);
+    const url = `/${slug}?id=${jobId}`;
+    
     // Create clean URL with just the job ID
-    router.push(`/${slug}?id=${jobId}`);
+    router.push(url);
   };
 
   const handleBackToList = () => {
