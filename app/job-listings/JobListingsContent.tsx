@@ -94,9 +94,8 @@ export default function JobListingsContent() {
     if (!job) return;
     
     const slug = generateJobSlug(job);
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('id', jobId);
-    router.push(`/${slug}?${params.toString()}`);
+    // Create clean URL with just the job ID
+    router.push(`/${slug}?id=${jobId}`);
   };
 
   const handleBackToList = () => {
