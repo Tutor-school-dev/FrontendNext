@@ -26,7 +26,8 @@ export function useJobListings() {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_GO_APP_URL}/admin/pub/jobs`);
+      const apiUrl = process.env.NEXT_PUBLIC_GO_APP_URL || 'https://api.tutorschool.in';
+      const response = await axios.get(`${apiUrl}/admin/pub/jobs`);
       const activeJobs = response.data?.filter((job: Job) => job.j_active === true);
       setJobsData(activeJobs || []);
     } catch (err) {

@@ -12,16 +12,18 @@ interface SocialShareProps {
 }
 
 export function SocialShare({ job_id, url, title = "Check this out!", className }: SocialShareProps) {
+  const apiUrl = process.env.NEXT_PUBLIC_GO_APP_URL || 'https://api.tutorschool.in';
+  
   const handleWhatsAppShare = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`${title} ${process.env.NEXT_PUBLIC_GO_APP_URL}/admin/pub/jobs/${job_id}`)}`;
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`${title} ${apiUrl}/admin/pub/jobs/${job_id}`)}`;
     window.open(whatsappUrl, "_blank");
   };
 
   const handleCopyLink = (e: React.MouseEvent) => {
     e.stopPropagation();
     navigator.clipboard
-      .writeText(`${process.env.NEXT_PUBLIC_GO_APP_URL}/admin/pub/jobs/${job_id}`)
+      .writeText(`${apiUrl}/admin/pub/jobs/${job_id}`)
       .then(() => toast.info("Job URL Copied"));
   };
 
