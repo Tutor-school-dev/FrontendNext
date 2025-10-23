@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import gitopadeshSloka from "@/assets/gitopadesh-sloka.png";
 
 const TrendingNow = () => {
@@ -69,15 +70,17 @@ const TrendingNow = () => {
               {/* Content */}
               <div className="relative z-10 h-full flex flex-col flex-grow">
                 {index === 0 ? (
-                  // First card - only button
+                  // First card - Gitopadesh competition with link
                   <div className="mt-auto">
-                    <Button 
-                      variant="secondary"
-                      className="w-full bg-transparent text-white border-white/50 hover:bg-white/20 hover:text-white transition-all duration-300 backdrop-blur-sm"
-                    >
-                      Know more
-                      <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                    </Button>
+                    <Link href="/gitopadesh">
+                      <Button 
+                        variant="secondary"
+                        className="w-full bg-transparent text-white border-white/50 hover:bg-white/20 hover:text-white transition-all duration-300 backdrop-blur-sm"
+                      >
+                        Know more
+                        <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                      </Button>
+                    </Link>
                   </div>
                 ) : (
                   // Other cards - original content

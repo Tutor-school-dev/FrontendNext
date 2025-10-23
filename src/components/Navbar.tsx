@@ -118,7 +118,7 @@ const Navbar = () => {
             </button>
             <Button 
               className="rounded-full font-semibold text-sm px-4 py-2"
-              onClick={() => handleExternalLink('https://app.tutorschool.in')}
+              onClick={() => window.location.href = '/select-role'}
             >
               Book Demo
             </Button>
@@ -189,7 +189,7 @@ const Navbar = () => {
                 </button>
                 <Button 
                   className="w-full rounded-full font-semibold"
-                  onClick={() => handleExternalLink('https://app.tutorschool.in')}
+                  onClick={() => window.location.href = '/select-role'}
                 >
                   Book Demo Classes
                 </Button>

@@ -1,5 +1,6 @@
 @import '../src/index.css';
 
+@import "leaflet/dist/leaflet.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -14,6 +15,10 @@
     --popover-foreground: 222.2 84% 4.9%;
     --primary: 221.2 83.2% 53.3%;
     --primary-foreground: 210 40% 98%;
+    --primary-50: 151 75% 94%;
+    --primary-100: 151 75% 89%;
+    --primary-200: 151 75% 79%;
+    --primary-300: 151 75% 69%;
     --secondary: 210 40% 96%;
     --secondary-foreground: 222.2 84% 4.9%;
     --muted: 210 40% 96%;
