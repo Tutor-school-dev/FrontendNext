@@ -47,6 +47,34 @@ export default function TeacherNavbar() {
             <h1 className="text-2xl font-bold text-blue-600">TutorSchool</h1>
           </div>
 
+          {/* Navigation Links */}
+          <div className="hidden md:flex items-center space-x-6">
+            <button 
+              onClick={() => router.push("/dashboard/teacher")}
+              className="text-sm text-gray-700 hover:text-blue-600 transition-colors"
+            >
+              Dashboard
+            </button>
+            <button 
+              onClick={() => router.push("/dashboard/teacher/sessions")}
+              className="text-sm text-gray-700 hover:text-blue-600 transition-colors"
+            >
+              Sessions
+            </button>
+            <button 
+              onClick={() => router.push("/dashboard/teacher/subjects")}
+              className="text-sm text-gray-700 hover:text-blue-600 transition-colors"
+            >
+              Subjects
+            </button>
+            <button 
+              onClick={() => router.push("/dashboard/teacher/subscription")}
+              className="text-sm text-gray-700 hover:text-blue-600 transition-colors"
+            >
+              Subscription
+            </button>
+          </div>
+
           {/* Right side - User profile */}
           <div className="flex items-center space-x-4">
             {/* Profile Picture and Name */}

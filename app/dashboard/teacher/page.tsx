@@ -170,7 +170,15 @@ export default function TeacherDashboardPage() {
 
                 {/* Subscription Status */}
                 <div className="mt-6 pt-6 border-t border-gray-200">
-                  <h4 className="text-sm font-medium text-gray-900 mb-2">Subscription</h4>
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-sm font-medium text-gray-900">Subscription</h4>
+                    <button 
+                      onClick={() => router.push("/dashboard/teacher/subscription")}
+                      className="text-xs text-blue-600 hover:text-blue-800"
+                    >
+                      Manage
+                    </button>
+                  </div>
                   <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                     teacher_subscription?.name === 'Premium' 
                       ? 'bg-green-100 text-green-800' 
@@ -181,6 +189,12 @@ export default function TeacherDashboardPage() {
                   {teacher_subscription?.validity && (
                     <p className="text-xs text-gray-500 mt-1">
                       Valid until: {formatDate(teacher_subscription.validity)}
+                    </p>
+                  )}
+                  {!teacher_subscription?.name && (
+                    <p className="text-xs text-blue-600 mt-1 cursor-pointer" 
+                       onClick={() => router.push("/dashboard/teacher/subscription")}>
+                      Upgrade to Premium →
                     </p>
                   )}
                 </div>
