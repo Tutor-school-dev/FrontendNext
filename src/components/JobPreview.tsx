@@ -14,10 +14,16 @@ import {
   Phone,
   User,
 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { BarLoader } from 'react-spinners';
 import { Job } from "@/hooks/useJobListings";
 import { JobStructuredData } from "./JobStructuredData";
+import { JobApplicationDialog } from "./JobApplicationDialog";
+import { JobApplicationSuccessDialog } from "./JobApplicationSuccessDialog";
+import { useApplyJob } from "@/hooks/useApplyJob";
+import { isTeacherAuthenticated } from "@/lib/authUtils";
+import { useDashboardStore } from "@/hooks/useDashboardStore";
+import { toast } from "sonner";
 
 interface JobPreviewProps {
   job_id: string;
@@ -26,6 +32,13 @@ interface JobPreviewProps {
 }
 
 export function JobPreview({ job_id, jobsData, onBack }: JobPreviewProps) {
+  const [showLoginDialog, setShowLoginDialog] = useState(false);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [isApplying, setIsApplying] = useState(false);
+  
+  const { apply_job } = useApplyJob();
+  const { teacher } = useDashboardStore();
+  
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-IN", {
       year: "numeric",
@@ -53,6 +66,34 @@ export function JobPreview({ job_id, jobsData, onBack }: JobPreviewProps) {
       const diffInDays = Math.floor(diffInHours / 24);
       return `${diffInDays} days ago`;
     }
+  };
+
+  const handleApplyJob = async () => {
+    // Check if user is authenticated
+    if (!isTeacherAuthenticated() || !teacher) {
+      setShowLoginDialog(true);
+      return;
+    }
+
+    // User is authenticated, apply directly
+    setIsApplying(true);
+    try {
+      const result = await apply_job(job_id, teacher.id);
+      if (result.status === 201 || result.status === 200) {
+        // Show success dialog instead of just toast
+        setShowSuccessDialog(true);
+      }
+    } catch (error) {
+      console.error("Application error:", error);
+      toast.error("Failed to submit application");
+    } finally {
+      setIsApplying(false);
+    }
+  };
+
+  const handleApplicationSuccess = () => {
+    // Show success dialog for post-login application
+    setShowSuccessDialog(true);
   };
 
   const job = jobsData ? jobsData.find((job) => job.j_id === job_id) : null;
@@ -252,9 +293,10 @@ export function JobPreview({ job_id, jobsData, onBack }: JobPreviewProps) {
                   <Button 
                     size="lg" 
                     className="w-full"
-                    onClick={() => window.open('https://tutorschool.in/app/LoginPage?flag=TEACHER', '_blank')}
+                    onClick={handleApplyJob}
+                    disabled={isApplying}
                   >
-                    Apply here!
+                    {isApplying ? "Applying..." : "Apply here!"}
                   </Button>
                 </div>
               </CardContent>
@@ -285,6 +327,21 @@ export function JobPreview({ job_id, jobsData, onBack }: JobPreviewProps) {
           </div>
         </div>
       </div>
+
+      {/* Job Application Dialog */}
+      <JobApplicationDialog
+        open={showLoginDialog}
+        onOpenChange={setShowLoginDialog}
+        jobId={job_id}
+        onApplicationSuccess={handleApplicationSuccess}
+      />
+
+      {/* Job Application Success Dialog */}
+      <JobApplicationSuccessDialog
+        open={showSuccessDialog}
+        onOpenChange={setShowSuccessDialog}
+        jobTitle={job?.j_title}
+      />
     </div>
   );
 }
