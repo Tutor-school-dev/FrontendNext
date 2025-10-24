@@ -82,7 +82,7 @@ const Hero = () => {
               <Button 
                 size="lg" 
                 className="rounded-full font-semibold"
-                onClick={() => window.open('https://app.tutorschool.in', '_blank')}
+                onClick={() => window.location.href = '/select-role'}
               >
                 Find Home Tutor
               </Button>
@@ -90,7 +90,7 @@ const Hero = () => {
                 size="lg" 
                 variant="outline" 
                 className="rounded-full font-semibold"
-                onClick={() => window.open('https://app.tutorschool.in', '_blank')}
+                onClick={() => window.location.href = '/select-role'}
               >
                 Find Online Tutor
               </Button>

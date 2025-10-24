@@ -5,6 +5,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClientProvider } from '@/components/providers/query-client-provider';
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { GoogleAuthProvider } from "@/components/providers/GoogleAuthProvider";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_GO_APP_URL || 'https://tutorschool.vercel.app'),
@@ -74,13 +75,15 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <QueryClientProvider>
-            <TooltipProvider>
-              <Toaster />
-              <Sonner />
-              {children}
-            </TooltipProvider>
-          </QueryClientProvider>
+          <GoogleAuthProvider>
+            <QueryClientProvider>
+              <TooltipProvider>
+                <Toaster />
+                <Sonner />
+                {children}
+              </TooltipProvider>
+            </QueryClientProvider>
+          </GoogleAuthProvider>
         </ThemeProvider>
       </body>
     </html>

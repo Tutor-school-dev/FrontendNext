@@ -111,14 +111,14 @@ const Navbar = () => {
           {/* Desktop Action Buttons */}
           <div className="hidden md:flex items-center gap-3">
             <button 
-              onClick={() => handleExternalLink('https://app.tutorschool.in')}
+              onClick={() => window.location.href = '/select-role'}
               className="px-4 py-2 text-sm font-medium text-primary border border-primary/30 rounded-full hover:bg-primary/10 transition-all duration-200 hover:border-primary/50"
             >
               For Tutors
             </button>
             <Button 
               className="rounded-full font-semibold text-sm px-4 py-2"
-              onClick={() => handleExternalLink('https://app.tutorschool.in')}
+              onClick={() => window.location.href = '/select-role'}
             >
               Book Demo
             </Button>
@@ -189,7 +189,7 @@ const Navbar = () => {
                 </button>
                 <Button 
                   className="w-full rounded-full font-semibold"
-                  onClick={() => handleExternalLink('https://app.tutorschool.in')}
+                  onClick={() => window.location.href = '/select-role'}
                 >
                   Book Demo Classes
                 </Button>
