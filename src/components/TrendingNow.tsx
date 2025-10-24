@@ -72,7 +72,7 @@ const TrendingNow = () => {
                 {index === 0 ? (
                   // First card - Gitopadesh competition with link
                   <div className="mt-auto">
-                    <Link href="/gitopadesh">
+                    <Link href="/gsc">
                       <Button 
                         variant="secondary"
                         className="w-full bg-transparent text-white border-white/50 hover:bg-white/20 hover:text-white transition-all duration-300 backdrop-blur-sm"
