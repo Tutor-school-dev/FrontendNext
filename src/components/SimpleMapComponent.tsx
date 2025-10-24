@@ -146,8 +146,7 @@ const SimpleMapComponent = ({ formData, setFormData }: SimpleMapComponentProps) 
     if (!isClient || mapLoaded || !mapContainerRef.current) return;
 
     try {
-      // Import Leaflet CSS and library
-      await import("leaflet/dist/leaflet.css");
+      // Import Leaflet library only, CSS is handled globally
       const L = await import("leaflet");
 
       // Fix marker icons

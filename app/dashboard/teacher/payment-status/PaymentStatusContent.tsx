@@ -3,9 +3,9 @@
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CheckCircle, XCircle, RefreshCw, ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { usePaymentStatus } from "@/hooks/usePaymentStatus";
+import { Button } from "../../../../src/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "../../../../src/components/ui/card";
+import { usePaymentStatus } from "../../../../src/hooks/usePaymentStatus";
 import TeacherNavbar from "../../../../src/components/TeacherNavbar";
 
 export default function PaymentStatusContent() {

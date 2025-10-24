@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,20 +10,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ChevronRight, ChevronLeft, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-
-interface FormData {
-  parentName: string;
-  parentEmail: string;
-  parentPhone: string;
-  childName: string;
-  childAge: string;
-  theme: string;
-  videoLink: string;
-  slokaRecited: string;
-}
+import { VideoUpload } from "./VideoUpload";
+import { useFormSubmit, FormData } from "@/hooks/useFormSubmit";
+import { LoadingButton } from "@/components/ui/LoadingButton";
 
 const RegistrationForm = () => {
+  const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
+  const [selectedVideo, setSelectedVideo] = useState<File | null>(null);
   const [formData, setFormData] = useState<FormData>({
     parentName: "",
     parentEmail: "",
@@ -30,16 +25,23 @@ const RegistrationForm = () => {
     childName: "",
     childAge: "",
     theme: "",
-    videoLink: "",
+    video: null,
     slokaRecited: ""
   });
   const { toast } = useToast();
+  const { submitForm, loading, progress } = useFormSubmit();
 
   const totalSteps = 4;
-  const progress = (currentStep / totalSteps) * 100;
+
+  const progressPercentage = (currentStep / totalSteps) * 100;
 
   const updateFormData = (field: keyof FormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleVideoSelect = (file: File | null) => {
+    setSelectedVideo(file);
+    setFormData(prev => ({ ...prev, video: file }));
   };
 
   const getThemesByAge = (age: string) => {
@@ -89,7 +91,7 @@ const RegistrationForm = () => {
       case 3:
         return formData.theme && formData.slokaRecited;
       case 4:
-        return formData.videoLink;
+        return formData.video !== null;
       default:
         return false;
     }
@@ -111,15 +113,34 @@ const RegistrationForm = () => {
     setCurrentStep(Math.max(currentStep - 1, 1));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (validateStep(4)) {
-      // Here you would typically send the data to your backend
-      console.log("Form submitted:", formData);
-      toast({
-        title: "Registration Successful!",
-        description: "Your submission has been received. You'll hear from us soon!",
-      });
-      // Reset form or redirect user
+      const success = await submitForm(formData);
+      if (success) {
+        toast({
+          title: "Registration Successful! 🎉",
+          description: "Your Gitopadesh submission has been received. You'll hear from us soon!",
+        });
+        
+        // Reset form
+        setFormData({
+          parentName: "",
+          parentEmail: "",
+          parentPhone: "",
+          childName: "",
+          childAge: "",
+          theme: "",
+          video: null,
+          slokaRecited: ""
+        });
+        setSelectedVideo(null);
+        setCurrentStep(1);
+        
+        // Redirect to homepage after a short delay to allow user to see the success message
+        setTimeout(() => {
+          router.push('/');
+        }, 2000);
+      }
     } else {
       toast({
         title: "Please complete all fields",
@@ -144,12 +165,12 @@ const RegistrationForm = () => {
           <Card className="p-6 mb-8">
             <div className="flex justify-between items-center mb-4">
               <span className="text-sm font-medium text-muted-foreground">Step {currentStep} of {totalSteps}</span>
-              <span className="text-sm font-medium text-primary">{Math.round(progress)}%</span>
+              <span className="text-sm font-medium text-primary">{Math.round(progressPercentage)}%</span>
             </div>
             <div className="w-full bg-secondary/30 rounded-full h-2">
               <div 
                 className="bg-primary h-2 rounded-full transition-all duration-300" 
-                style={{ width: `${progress}%` }}
+                style={{ width: `${progressPercentage}%` }}
               />
             </div>
           </Card>
@@ -267,18 +288,15 @@ const RegistrationForm = () => {
                 <h3 className="text-2xl font-bold text-foreground mb-6">Video Submission</h3>
                 
                 <div>
-                  <Label htmlFor="videoLink" className="text-base font-medium">Video Link *</Label>
-                  <Input
-                    id="videoLink"
-                    type="url"
-                    value={formData.videoLink}
-                    onChange={(e) => updateFormData('videoLink', e.target.value)}
-                    placeholder="Paste your video link here (YouTube, Google Drive, etc.)"
-                    className="mt-2"
-                  />
+                  <Label className="text-base font-medium">Upload Video *</Label>
+                  <div className="mt-2">
+                    <VideoUpload 
+                      onFileSelect={handleVideoSelect}
+                      selectedFile={selectedVideo}
+                    />
+                  </div>
                   <p className="text-sm text-muted-foreground mt-2">
-                    Upload your video to YouTube, Google Drive, or any other platform and paste the link here. 
-                    Make sure the video is publicly accessible or has viewing permissions enabled.
+                    Upload your MP4 video file directly. Maximum file size: 50MB.
                   </p>
                 </div>
 
@@ -289,6 +307,7 @@ const RegistrationForm = () => {
                     <li>• Clear audio and video quality</li>
                     <li>• Include sloka recitation and explanation</li>
                     <li>• Ensure good lighting and minimal background noise</li>
+                    <li>• MP4 format only, max 50MB file size</li>
                   </ul>
                 </div>
               </div>
@@ -315,13 +334,16 @@ const RegistrationForm = () => {
                   <ChevronRight className="w-4 h-4" />
                 </Button>
               ) : (
-                <Button 
+                <LoadingButton 
                   onClick={handleSubmit}
+                  isLoading={loading}
+                  loadingText={`Submitting... ${progress}%`}
                   className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
+                  disabled={loading}
                 >
                   <Check className="w-4 h-4" />
                   Submit Registration
-                </Button>
+                </LoadingButton>
               )}
             </div>
           </Card>

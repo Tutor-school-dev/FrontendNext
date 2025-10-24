@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect } from "react";
-import { Check } from "lucide-react";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { useTeacherSubscription } from "@/hooks/useTeacherSubscription";
+import React from "react";
+import { toast } from "sonner";
+import { CheckCircle, Star, Zap, Check } from "lucide-react";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../../../../src/components/ui/card";
+import { Button } from "../../../../src/components/ui/button";
+import { useTeacherSubscription } from "../../../../src/hooks/useTeacherSubscription";
 import TeacherNavbar from "../../../../src/components/TeacherNavbar";
 
 interface SubscriptionTier {
