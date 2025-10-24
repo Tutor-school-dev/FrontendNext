@@ -22,12 +22,12 @@ export const useFormSubmit = () => {
       setLoading(true);
       setProgress(10);
       
-      // Get API URL from environment variables
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_APP_URL;
+      // Get API URL from environment variables with fallback
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 
+                     process.env.NEXT_PUBLIC_APP_URL || 
+                     'https://api.tutorschool.in'; // Fallback for production
       
-      if (!apiUrl) {
-        throw new Error("API URL not configured");
-      }
+      console.log('API URL:', apiUrl); // Debug log for production
 
       // Submit form data to match React repo exactly
       const response = await axios.post(`${apiUrl}/campaign/submission`, {
