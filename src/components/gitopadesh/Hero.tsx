@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { ChevronDown, Star } from "lucide-react";
-import Image from "next/image";
 
 const Hero = () => {
   const scrollToNext = () => {
@@ -35,43 +34,43 @@ const Hero = () => {
         <div className="max-w-4xl mx-auto text-center space-y-8 animate-fade-in">
           {/* Badge */}
           <div className="inline-flex items-center space-x-2 bg-white/90 backdrop-blur-sm px-6 py-3 rounded-full border-2 border-primary/30 shadow-lg animate-scale-in">
-            <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
-            <span className="text-primary font-semibold">Global Competition</span>
+            <Star className="w-5 h-5 text-primary fill-primary" />
+            <span className="text-primary font-bold text-sm tracking-wide">GLOBAL SLOKA COMPETITION 2025</span>
+            <Star className="w-5 h-5 text-primary fill-primary" />
           </div>
           
           {/* Main Heading */}
-          <h1 className="text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-primary via-pink-500 to-purple-600 leading-tight">
-            Gitopadesh
+          <h1 className="text-5xl md:text-7xl font-bold text-foreground leading-tight animate-fade-in-up">
+            Gitopadesh Global<br />Sloka Competition
           </h1>
-          
-          {/* Subtitle */}
-          <h2 className="text-2xl md:text-3xl font-bold text-foreground/90">
-            Global Sloka Competition
-          </h2>
-          
-          {/* Description */}
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Join thousands of students worldwide in reciting the sacred slokas of the Bhagavad Gita. 
-            Experience spiritual growth while competing for amazing prizes!
+
+          {/* Tagline */}
+          <p className="text-xl md:text-2xl text-foreground/80 font-light animate-fade-in" style={{ animationDelay: "0.2s" }}>
+            Inspired by the timeless wisdom of the Bhagavad Gita
           </p>
-          
+
           {/* CTA Button */}
-          <div className="pt-4">
+          <div className="pt-6 animate-fade-in" style={{ animationDelay: "0.3s" }}>
             <Button 
-              size="lg" 
-              onClick={() => scrollToSection('registration-form')}
-              className="bg-gradient-to-r from-primary to-pink-500 hover:from-primary/90 hover:to-pink-500/90 text-white px-12 py-4 text-lg font-semibold rounded-full shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
+              onClick={scrollToNext}
+              size="lg"
+              variant="outline"
+              className="bg-white/90 hover:bg-white border-2 text-foreground hover:text-primary text-lg px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 group"
             >
-              Register Now - It's Free!
+              Discover More
+              <ChevronDown className="ml-2 group-hover:translate-y-1 transition-transform" />
             </Button>
           </div>
         </div>
       </div>
       
       {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce cursor-pointer" onClick={scrollToNext}>
+      <button 
+        onClick={scrollToNext}
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce cursor-pointer"
+      >
         <ChevronDown className="w-8 h-8 text-primary" />
-      </div>
+      </button>
     </section>
   );
 };
