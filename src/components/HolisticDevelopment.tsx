@@ -2,8 +2,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Clock, Users, Star } from "lucide-react";
 import Image from "next/image";
 import codingImage from "@/assets/course-coding.jpg";
-import brainImage from "@/assets/course-brain.jpg";
-import gitaImage from "@/assets/course-gita.jpg";
+import brainImage from "@/assets/Brighter-Minds.png";
+import gitaImage from "@/assets/Bhagavad-Gita.png";
 import teachingImage from "@/assets/course-teaching.jpg";
 
 const HolisticDevelopment = () => {

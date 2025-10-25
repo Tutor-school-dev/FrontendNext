@@ -1,6 +1,8 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { GraduationCap, School, Phone, Mail, MapPin } from "lucide-react";
+import Image from "next/image";
+import tutorschoolLogo from "@/assets/tutorschool.jpeg";
 
 const ContactCTA = () => {
   return (
@@ -68,7 +70,15 @@ const ContactCTA = () => {
 
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 max-w-3xl mx-auto border-2 border-primary/10">
             <div className="flex items-center justify-center gap-2 mb-4">
-              <GraduationCap className="h-8 w-8 text-primary" />
+              <div className="relative h-8 w-8">
+                <Image
+                  src={tutorschoolLogo}
+                  alt="TutorSchool Logo"
+                  className="h-8 w-8 object-contain rounded"
+                  width={32}
+                  height={32}
+                />
+              </div>
               <h3 className="text-xl font-bold text-foreground">TutorSchool</h3>
             </div>
             <p className="text-muted-foreground mb-6">
@@ -84,7 +94,7 @@ const ContactCTA = () => {
               
               <div className="flex flex-col items-center gap-2">
                 <Mail className="h-6 w-6 text-primary" />
-                <p className="font-semibold text-foreground">info@tutorschool.in</p>
+                <p className="font-semibold text-foreground">support@tutorschool.in</p>
                 <p className="text-sm text-muted-foreground">24/7 Email Support</p>
               </div>
               

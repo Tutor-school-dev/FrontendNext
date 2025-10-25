@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Building2, Users, Clock, CheckCircle2, ArrowRight } from "lucide-react";
 import Image from "next/image";
-import employerImage from "@/assets/employer-banner.jpg";
+import employerImage from "@/assets/TS Teacher.jpg";
 
 const ForEmployers = () => {
   return (
@@ -10,12 +10,13 @@ const ForEmployers = () => {
       <div className="container mx-auto px-4">
         <div className="bg-white rounded-3xl overflow-hidden shadow-xl border border-primary/10">
           <div className="grid md:grid-cols-2 gap-0 items-center">
-            <div className="relative order-2 md:order-1">
+            <div className="relative order-2 md:order-1 min-h-[400px] md:min-h-[600px]">
               <Image
                 src={employerImage} 
                 alt="Professional education environment"
-                className="w-full h-full object-cover min-h-[400px]"
+                className="w-full h-full object-cover"
                 fill
+                sizes="(max-width: 768px) 100vw, 50vw"
                 priority
               />
               <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/5"></div>
@@ -85,7 +86,7 @@ const ForEmployers = () => {
                   <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
                 <p className="text-sm text-muted-foreground">
-                  ✨ Join 500+ schools already using TutorSchool for hiring
+                  ✨ Currently in beta testing, will be live soon
                 </p>
               </div>
             </div>

@@ -1,25 +1,34 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import VideoTestimonials from "./VideoTestimonials";
+import tutorschoolLogo from "@/assets/tutorschool.jpeg";
+import { StaticImageData } from "next/image";
 
 const Testimonials = () => {
-  const testimonials = [
+  interface Testimonial {
+    name: string;
+    class: string;
+    avatar: string | StaticImageData;
+    testimonial: string;
+  }
+
+  const testimonials: Testimonial[] = [
     {
       name: "Priya Sharma",
       class: "Class 10, CBSE",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Priya",
+      avatar: tutorschoolLogo,
       testimonial: "TutorSchool helped me improve my math scores from 65% to 92%! The personalized attention and clear explanations made all the difference."
     },
     {
       name: "Arjun Patel",
       class: "Class 12, ICSE",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Arjun",
+      avatar: tutorschoolLogo,
       testimonial: "The science tutors at TutorSchool are amazing. They made complex topics easy to understand and helped me ace my board exams!"
     },
     {
       name: "Ananya Singh",
       class: "Class 8, State Board",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Ananya",
+      avatar: tutorschoolLogo,
       testimonial: "I was struggling with English grammar, but my tutor's patience and teaching methods helped me gain confidence. Highly recommend!"
     }
   ];
@@ -43,7 +52,7 @@ const Testimonials = () => {
               <CardContent className="pt-6">
                 <div className="flex flex-col items-center text-center">
                   <Avatar className="h-20 w-20 mb-4 border-4 border-primary/20">
-                    <AvatarImage src={testimonial.avatar} alt={testimonial.name} />
+                    <AvatarImage src={typeof testimonial.avatar === 'string' ? testimonial.avatar : testimonial.avatar.src} alt={testimonial.name} />
                     <AvatarFallback className="bg-primary/10 text-primary font-semibold text-lg">
                       {testimonial.name.split(' ').map(n => n[0]).join('')}
                     </AvatarFallback>

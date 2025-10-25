@@ -3,31 +3,45 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import gitopadeshSloka from "@/assets/gitopadesh-sloka.png";
+import gitaCampaign from "@/assets/gitacampaign.jpeg";
+import skillTrainingJob from "@/assets/TutorSchool Skill Training & job.png";
+import { StaticImageData } from "next/image";
 
 const TrendingNow = () => {
-  const trendingItems = [
+  interface TrendingItem {
+    bgGradient?: string;
+    bgImage?: StaticImageData;
+    badge: string;
+    title: string;
+    subtitle: string;
+    description: string;
+    link?: string;
+  }
+
+  const trendingItems: TrendingItem[] = [
     {
-      bgGradient: "from-orange-500 to-red-500",
-      badge: "Placement courses",
-      title: "Big Diwali Sale",
-      subtitle: "Online Courses with Placement",
-      description: "Diwali Sale: Save up to ₹13,000!",
+      bgImage: gitaCampaign,
+      badge: "Competition",
+      title: "Global Sloka Competition",
+      subtitle: "Record 3-mins video",
+      description: "Age group 6-17 • Deadline: 15th Nov",
+      link: "/gsc",
     },
     {
-      bgGradient: "from-blue-500 to-purple-500", 
-      badge: "Certification courses",
-      title: "Special offer for your college!",
-      subtitle: "Get FLAT 80% OFF on all online trainings",
+      bgImage: skillTrainingJob,
+      badge: "Training courses",
+      title: "FREE Training and Job Opportunity",
+      subtitle: "By Dept. of Industries, Govt. of Bihar",
       description: "",
+      link: "https://tutorschool.in/app/training-application-form",
     },
-    {
-      bgGradient: "from-green-500 to-teal-500",
-      badge: "Campus Competition", 
-      title: "TATA CRUCIBLE",
-      subtitle: "THE CAMPUS QUIZ",
-      description: "Dream Internships at the Tata Group • ₹2.5L Grand Prize • Epic Rewards",
-    }
+    // {
+    //   bgGradient: "from-green-500 to-teal-500",
+    //   badge: "Campus Competition", 
+    //   title: "TATA CRUCIBLE",
+    //   subtitle: "THE CAMPUS QUIZ",
+    //   description: "Dream Internships at the Tata Group • ₹2.5L Grand Prize • Epic Rewards",
+    // }
   ];
 
   return (
@@ -43,24 +57,24 @@ const TrendingNow = () => {
           {trendingItems.map((item, index) => (
             <div 
               key={index} 
-              className={`${index === 0 ? 'relative' : `bg-gradient-to-br ${item.bgGradient}`} p-6 rounded-3xl text-white relative overflow-hidden group hover:shadow-2xl transition-all duration-300 hover:scale-105 min-h-[200px] flex flex-col`}
+              className={`${item.bgImage ? 'relative' : `bg-gradient-to-br ${item.bgGradient}`} p-6 rounded-3xl text-white relative overflow-hidden group hover:shadow-2xl transition-all duration-300 hover:scale-105 min-h-[200px] flex flex-col`}
             >
-              {/* Background image for first card */}
-              {index === 0 && (
+              {/* Background image (if provided) */}
+              {item.bgImage && (
                 <div className="absolute inset-0 rounded-3xl overflow-hidden">
                   <Image
-                    src={gitopadeshSloka}
-                    alt="Gitopadesh Sloka"
-                    className="w-full h-full object-cover object-top"
+                    src={item.bgImage}
+                    alt={item.title}
+                    className="w-full h-full object-cover object-center"
                     fill
                   />
-                  {/* Dark overlay for better button visibility */}
-                  <div className="absolute inset-0 bg-black/10"></div>
+                  {/* Dark overlay for better text visibility */}
+                  <div className="absolute inset-0 bg-black/40"></div>
                 </div>
               )}
               
-              {/* Decorative elements for other cards */}
-              {index !== 0 && (
+              {/* Decorative elements for gradient cards */}
+              {!item.bgImage && (
                 <>
                   <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -translate-y-10 translate-x-10"></div>
                   <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full translate-y-8 -translate-x-8"></div>
@@ -69,43 +83,29 @@ const TrendingNow = () => {
               
               {/* Content */}
               <div className="relative z-10 h-full flex flex-col flex-grow">
-                {index === 0 ? (
-                  // First card - Gitopadesh competition with link
-                  <div className="mt-auto">
-                    <Link href="/gsc">
-                      <Button 
-                        variant="secondary"
-                        className="w-full bg-transparent text-white border-white/50 hover:bg-white/20 hover:text-white transition-all duration-300 backdrop-blur-sm"
-                      >
-                        Know more
-                        <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                      </Button>
-                    </Link>
-                  </div>
-                ) : (
-                  // Other cards - original content
-                  <>
-                    <div className="mb-3">
-                      <Badge variant="secondary" className="bg-white/20 text-white border-white/30 text-xs">
-                        {item.badge}
-                      </Badge>
-                    </div>
-                    
-                    <h3 className="text-xl font-bold mb-2">
-                      {item.title}
-                    </h3>
-                    
-                    <h4 className="text-lg font-medium mb-3 opacity-90">
-                      {item.subtitle}
-                    </h4>
-                    
-                    {item.description && (
-                      <p className="text-sm opacity-80 mb-4">
-                        {item.description}
-                      </p>
-                    )}
-                    
-                    <div className="mt-auto">
+                <div className="mb-3">
+                  <Badge variant="secondary" className="bg-white/20 text-white border-white/30 text-xs">
+                    {item.badge}
+                  </Badge>
+                </div>
+                
+                <h3 className="text-xl font-bold mb-2">
+                  {item.title}
+                </h3>
+                
+                <h4 className="text-lg font-medium mb-3 opacity-90">
+                  {item.subtitle}
+                </h4>
+                
+                {item.description && (
+                  <p className="text-sm opacity-80 mb-4">
+                    {item.description}
+                  </p>
+                )}
+                
+                <div className="mt-auto">
+                  {item.link ? (
+                    <Link href={item.link}>
                       <Button 
                         variant="secondary"
                         className="w-full bg-white/20 text-white border-white/30 hover:bg-white hover:text-gray-800 transition-all duration-300"
@@ -113,9 +113,17 @@ const TrendingNow = () => {
                         Know more
                         <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
                       </Button>
-                    </div>
-                  </>
-                )}
+                    </Link>
+                  ) : (
+                    <Button 
+                      variant="secondary"
+                      className="w-full bg-white/20 text-white border-white/30 hover:bg-white hover:text-gray-800 transition-all duration-300"
+                    >
+                      Know more
+                      <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                    </Button>
+                  )}
+                </div>
               </div>
             </div>
           ))}
