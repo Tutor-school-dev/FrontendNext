@@ -80,17 +80,21 @@ export default function StudentAuth() {
         </LoadingButton>
       </form>
 
-      {/* OR divider */}
-      <div className="flex justify-center items-center mt-4 w-full">
-        <div className="flex-1 bg-gray-300 h-px" />
-        <span className="mx-2 text-gray-500 text-sm">OR</span>
-        <div className="flex-1 bg-gray-300 h-px" />
-      </div>
+      {/* Google Login - Only show if Client ID is available */}
+      {process.env.NEXT_PUBLIC_CLIENT_ID && (
+        <>
+          {/* OR divider */}
+          <div className="flex justify-center items-center mt-4 w-full">
+            <div className="flex-1 bg-gray-300 h-px" />
+            <span className="mx-2 text-gray-500 text-sm">OR</span>
+            <div className="flex-1 bg-gray-300 h-px" />
+          </div>
 
-      {/* Google Login */}
-      <div className="flex justify-center">
-        <GoogleLogin onSuccess={handleGoogleLogin} onError={() => console.log('Google login failed')} />
-      </div>
+          <div className="flex justify-center">
+            <GoogleLogin onSuccess={handleGoogleLogin} onError={() => console.log('Google login failed')} />
+          </div>
+        </>
+      )}
 
       {/* Switch between Login/Signup */}
       <div className="text-center text-sm">
