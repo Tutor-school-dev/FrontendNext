@@ -96,6 +96,8 @@ const Navbar = () => {
             </button>
             <a 
               href="/job-listings"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-sm font-medium text-foreground hover:text-primary transition-colors"
             >
               Job Listings
@@ -171,6 +173,12 @@ const Navbar = () => {
                 className="block w-full text-left px-3 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-gray-50 rounded-md transition-colors"
               >
                 AI Features
+              </button>
+              <button 
+                onClick={() => handleExternalLink('/job-listings')}
+                className="block w-full text-left px-3 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-gray-50 rounded-md transition-colors"
+              >
+                Job Listings
               </button>
               <button 
                 onClick={() => handleExternalLink('https://tutorschool.in/blog')}

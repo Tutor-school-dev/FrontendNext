@@ -4,7 +4,7 @@ import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import gitaCampaign from "@/assets/gitacampaign.jpeg";
-import skillTrainingJob from "@/assets/TutorSchool Skill Training & job.png";
+import skillTrainingJob from "@/assets/TutorSchoolSkillTrainingjob.png";
 import { StaticImageData } from "next/image";
 
 const TrendingNow = () => {
@@ -105,7 +105,7 @@ const TrendingNow = () => {
                 
                 <div className="mt-auto">
                   {item.link ? (
-                    <Link href={item.link}>
+                    <Link href={item.link} target="_blank" rel="noopener noreferrer">
                       <Button 
                         variant="secondary"
                         className="w-full bg-white/20 text-white border-white/30 hover:bg-white hover:text-gray-800 transition-all duration-300"
