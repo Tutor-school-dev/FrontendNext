@@ -104,28 +104,28 @@ const About = () => {
                   <div className="px-3 py-1 bg-green-200 rounded-md text-sm font-semibold text-green-800">06-08 years</div>
                   <div>
                     <p className="font-medium">Category 1 • Module 1: Themes 01-05</p>
-                    <a href="https://gitopadesh-global-sloka-competition.vercel.app/themes/module/1" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-sm">Click here</a>
+                    <a href="/pdf/gsc-themes-6-8-years.pdf" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-sm">Click here</a>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
                   <div className="px-3 py-1 bg-green-200 rounded-md text-sm font-semibold text-green-800">09-11 years</div>
                   <div>
                     <p className="font-medium">Category 2 • Module 2: Themes 06-10</p>
-                    <a href="https://gitopadesh-global-sloka-competition.vercel.app/themes/module/2" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-sm">Click here</a>
+                    <a href="/pdf/gsc-themes-9-11-years.pdf" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-sm">Click here</a>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
                   <div className="px-3 py-1 bg-green-200 rounded-md text-sm font-semibold text-green-800">12-14 years</div>
                   <div>
                     <p className="font-medium">Category 3 • Module 3: Themes 11-15</p>
-                    <a href="https://gitopadesh-global-sloka-competition.vercel.app/themes/module/3" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-sm">Click here</a>
+                    <a href="/pdf/gsc-themes-12-14-years.pdf" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-sm">Click here</a>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
                   <div className="px-3 py-1 bg-green-200 rounded-md text-sm font-semibold text-green-800">15-17 years</div>
                   <div>
                     <p className="font-medium">Category 4 • Module 4: Themes 16-20</p>
-                    <a href="https://gitopadesh-global-sloka-competition.vercel.app/themes/module/4" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-sm">Click here</a>
+                    <a href="/pdf/gsc-themes-15-17-years.pdf" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-sm">Click here</a>
                   </div>
                 </div>
               </div>

@@ -20,7 +20,7 @@ export default function GitopadeshLanding() {
       <Timeline />
       <Quote />
       <Prizes />
-      <Courses />
+      {/* <Courses /> */}
       <RegistrationForm />
       <FAQ />
       <FloatingSubmitButton />

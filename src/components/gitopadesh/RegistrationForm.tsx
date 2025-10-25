@@ -275,8 +275,9 @@ const RegistrationForm = () => {
                     id="slokaRecited"
                     value={formData.slokaRecited}
                     onChange={(e) => updateFormData('slokaRecited', e.target.value)}
-                    placeholder="Please write the sloka you will be reciting (Sanskrit text)"
+                    placeholder="e.g., Chapter 2, Verse 47 and Chapter 3, Verse 14"
                     className="mt-2 h-32"
+                    required
                   />
                 </div>
               </div>
