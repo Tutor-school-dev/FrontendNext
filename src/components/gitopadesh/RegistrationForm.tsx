@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +13,14 @@ import { useToast } from "@/hooks/use-toast";
 import { VideoUpload } from "./VideoUpload";
 import { useFormSubmit, FormData } from "@/hooks/useFormSubmit";
 import { LoadingButton } from "@/components/ui/LoadingButton";
+
+// TypeScript declarations for analytics
+declare global {
+  interface Window {
+    gtag?: (...args: any[]) => void;
+    dataLayer?: any[];
+  }
+}
 
 const RegistrationForm = () => {
   const router = useRouter();
@@ -34,6 +42,18 @@ const RegistrationForm = () => {
   const totalSteps = 4;
 
   const progressPercentage = (currentStep / totalSteps) * 100;
+
+  // Track form start on component mount
+  useEffect(() => {
+    // Only track form started
+    if (typeof window !== 'undefined' && window.dataLayer) {
+      console.log('Pushing to dataLayer:', { event: 'gsc_step_reached', step_number: 1 }); // Debug log
+      window.dataLayer.push({
+        event: 'gsc_step_reached',
+        step_number: 1
+      });
+    }
+  }, []);
 
   const updateFormData = (field: keyof FormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -99,7 +119,18 @@ const RegistrationForm = () => {
 
   const nextStep = () => {
     if (validateStep(currentStep)) {
-      setCurrentStep(Math.min(currentStep + 1, totalSteps));
+      const nextStepNumber = Math.min(currentStep + 1, totalSteps);
+      
+      setCurrentStep(nextStepNumber);
+
+      // Only track when user reaches next step
+      if (nextStepNumber <= totalSteps && typeof window !== 'undefined' && window.dataLayer) {
+        console.log('Pushing to dataLayer:', { event: 'gsc_step_reached', step_number: nextStepNumber }); // Debug log
+        window.dataLayer.push({
+          event: 'gsc_step_reached',
+          step_number: nextStepNumber
+        });
+      }
     } else {
       toast({
         title: "Please fill all required fields",
@@ -110,13 +141,21 @@ const RegistrationForm = () => {
   };
 
   const prevStep = () => {
-    setCurrentStep(Math.max(currentStep - 1, 1));
+    const prevStepNumber = Math.max(currentStep - 1, 1);
+    setCurrentStep(prevStepNumber);
   };
 
   const handleSubmit = async () => {
     if (validateStep(4)) {
       const success = await submitForm(formData);
       if (success) {
+        // Only track form completion
+        if (typeof window !== 'undefined' && window.dataLayer) {
+          window.dataLayer.push({
+            event: 'gsc_form_completed'
+          });
+        }
+
         toast({
           title: "Registration Successful! 🎉",
           description: "Your Gitopadesh submission has been received. You'll hear from us soon!",
