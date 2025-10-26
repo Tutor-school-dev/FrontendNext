@@ -104,8 +104,7 @@ const RegistrationForm = () => {
 
   const validateStep = (step: number) => {
     switch (step) {
-      case 1:
-        // Check if all fields are filled
+      case 1: {
         if (!formData.parentName || !formData.parentEmail || !formData.parentPhone) {
           return false;
         }
@@ -123,6 +122,7 @@ const RegistrationForm = () => {
         }
         
         return true;
+      }
       case 2:
         return formData.childName && formData.childAge;
       case 3:
