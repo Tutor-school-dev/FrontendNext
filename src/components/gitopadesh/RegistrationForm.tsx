@@ -85,7 +85,24 @@ const RegistrationForm = () => {
   const validateStep = (step: number) => {
     switch (step) {
       case 1:
-        return formData.parentName && formData.parentEmail && formData.parentPhone;
+        // Check if all fields are filled
+        if (!formData.parentName || !formData.parentEmail || !formData.parentPhone) {
+          return false;
+        }
+        
+        // Email validation - must have gmail.com domain
+        const emailRegex = /^[^\s@]+@gmail\.com$/;
+        if (!emailRegex.test(formData.parentEmail)) {
+          return false;
+        }
+        
+        // Phone validation - must be exactly 10 digits
+        const phoneRegex = /^\d{10}$/;
+        if (!phoneRegex.test(formData.parentPhone.replace(/\s+/g, ''))) {
+          return false;
+        }
+        
+        return true;
       case 2:
         return formData.childName && formData.childAge;
       case 3:
@@ -101,11 +118,44 @@ const RegistrationForm = () => {
     if (validateStep(currentStep)) {
       setCurrentStep(Math.min(currentStep + 1, totalSteps));
     } else {
-      toast({
-        title: "Please fill all required fields",
-        description: "Make sure to complete all fields before proceeding.",
-        variant: "destructive"
-      });
+      // Provide specific validation messages for Step 1
+      if (currentStep === 1) {
+        if (!formData.parentName || !formData.parentEmail || !formData.parentPhone) {
+          toast({
+            title: "Please fill all required fields",
+            description: "Make sure to complete all fields before proceeding.",
+            variant: "destructive"
+          });
+        } else {
+          // Check email validation
+          const emailRegex = /^[^\s@]+@gmail\.com$/;
+          if (!emailRegex.test(formData.parentEmail)) {
+            toast({
+              title: "Invalid Email Address",
+              description: "Please use a Gmail address (e.g., example@gmail.com)",
+              variant: "destructive"
+            });
+            return;
+          }
+          
+          // Check phone validation
+          const phoneRegex = /^\d{10}$/;
+          if (!phoneRegex.test(formData.parentPhone.replace(/\s+/g, ''))) {
+            toast({
+              title: "Invalid Phone Number",
+              description: "Please enter a valid 10-digit phone number",
+              variant: "destructive"
+            });
+            return;
+          }
+        }
+      } else {
+        toast({
+          title: "Please fill all required fields",
+          description: "Make sure to complete all fields before proceeding.",
+          variant: "destructive"
+        });
+      }
     }
   };
 
@@ -114,7 +164,45 @@ const RegistrationForm = () => {
   };
 
   const handleSubmit = async () => {
-    if (validateStep(4)) {
+    // Validate all steps before submission
+    let allStepsValid = true;
+    let errorMessage = "";
+
+    // Check Step 1 validation
+    if (!formData.parentName || !formData.parentEmail || !formData.parentPhone) {
+      allStepsValid = false;
+      errorMessage = "Please complete all parent/guardian information.";
+    } else {
+      const emailRegex = /^[^\s@]+@gmail\.com$/;
+      if (!emailRegex.test(formData.parentEmail)) {
+        allStepsValid = false;
+        errorMessage = "Please use a Gmail address (e.g., example@gmail.com)";
+      }
+      
+      const phoneRegex = /^\d{10}$/;
+      if (!phoneRegex.test(formData.parentPhone.replace(/\s+/g, ''))) {
+        allStepsValid = false;
+        errorMessage = "Please enter a valid 10-digit phone number";
+      }
+    }
+
+    // Check other steps
+    if (allStepsValid && (!formData.childName || !formData.childAge)) {
+      allStepsValid = false;
+      errorMessage = "Please complete all participant information.";
+    }
+
+    if (allStepsValid && (!formData.theme || !formData.slokaRecited)) {
+      allStepsValid = false;
+      errorMessage = "Please complete theme selection and sloka information.";
+    }
+
+    if (allStepsValid && !formData.video) {
+      allStepsValid = false;
+      errorMessage = "Please upload a video file.";
+    }
+
+    if (allStepsValid) {
       const success = await submitForm(formData);
       if (success) {
         toast({
@@ -143,8 +231,8 @@ const RegistrationForm = () => {
       }
     } else {
       toast({
-        title: "Please complete all fields",
-        description: "Make sure to fill in all required information before submitting.",
+        title: "Validation Error",
+        description: errorMessage,
         variant: "destructive"
       });
     }
@@ -193,27 +281,30 @@ const RegistrationForm = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="parentEmail" className="text-base font-medium">Email Address *</Label>
+                  <Label htmlFor="parentEmail" className="text-base font-medium">Email Address (Gmail only) *</Label>
                   <Input
                     id="parentEmail"
                     type="email"
                     value={formData.parentEmail}
                     onChange={(e) => updateFormData('parentEmail', e.target.value)}
-                    placeholder="Enter email address"
+                    placeholder="example@gmail.com"
                     className="mt-2"
                   />
+                  <p className="text-xs text-muted-foreground mt-1">Only Gmail addresses are accepted</p>
                 </div>
 
                 <div>
-                  <Label htmlFor="parentPhone" className="text-base font-medium">Phone Number *</Label>
+                  <Label htmlFor="parentPhone" className="text-base font-medium">Phone Number (10 digits) *</Label>
                   <Input
                     id="parentPhone"
                     type="tel"
                     value={formData.parentPhone}
                     onChange={(e) => updateFormData('parentPhone', e.target.value)}
-                    placeholder="Enter phone number"
+                    placeholder="9876543210"
                     className="mt-2"
+                    maxLength={10}
                   />
+                  <p className="text-xs text-muted-foreground mt-1">Enter 10-digit mobile number without spaces or special characters</p>
                 </div>
               </div>
             )}
