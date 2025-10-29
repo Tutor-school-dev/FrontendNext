@@ -13,8 +13,22 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'ts-public-data.s3.ap-south-1.amazonaws.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'tutor.school.bucket.s3.ap-south-1.amazonaws.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
     formats: ['image/avif', 'image/webp'],
+    // Disable image optimization for external domains in development
+    unoptimized: process.env.NODE_ENV === 'development',
   },
   typescript: {
     // !! WARN !!
