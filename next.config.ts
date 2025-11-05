@@ -2,6 +2,15 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
+  async redirects() {
+    return [
+      {
+        source: '/apply',
+        destination: '/auth?model=teacher',
+        permanent: true,
+      },
+    ];
+  },
   experimental: {
     optimizePackageImports: ['lucide-react'],
   },
