@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { useDashboardStore } from "./useDashboardStore";
+import { getAppUrl, getApiUrl } from "@/lib/utils";
 
 export const useOTPVerify = () => {
   const [loading, setLoading] = useState(false);
@@ -23,7 +24,7 @@ export const useOTPVerify = () => {
     try {
       setVerifyOTPLoading(true);
       // Use NEXT_PUBLIC_APP_URL for parent auth (matching React repo)
-      const apiUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://api.tutorschool.in';
+      const apiUrl = getAppUrl();
       const response = await axios.post(`${apiUrl}/auth/${model}/verify`, {
         phone: phoneNumber,
         otp: otp
@@ -63,7 +64,7 @@ export const useOTPVerify = () => {
   ) => {
     setLoading(true);
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_GO_APP_URL || 'https://api.tutorschool.in';
+      const apiUrl = getApiUrl();
       
       let endpoint, payload;
       

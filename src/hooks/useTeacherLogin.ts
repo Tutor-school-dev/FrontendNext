@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { useDashboardStore } from "./useDashboardStore";
 import { useApplyJob } from "./useApplyJob";
+import { getApiUrl } from "@/lib/utils";
 
 export const useTeacherLogin = (redirectFromJobListing?: string, job_id?: string) => {
   const [loading, setLoading] = useState(false);
@@ -19,7 +20,7 @@ export const useTeacherLogin = (redirectFromJobListing?: string, job_id?: string
     setLoading(true);
     
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_GO_APP_URL || 'https://api.tutorschool.in';
+      const apiUrl = getApiUrl();
       const response = await axios.post(`${apiUrl}/auth/teacher/login`, {
         phone: phoneNumber,
         password: password

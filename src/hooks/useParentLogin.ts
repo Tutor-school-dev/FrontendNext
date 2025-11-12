@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { useDashboardStore } from "./useDashboardStore";
+import { getApiUrl } from "@/lib/utils";
 
 export const useParentLogin = () => {
   const [loading, setLoading] = useState(false);
@@ -15,7 +16,7 @@ export const useParentLogin = () => {
     setLoading(true);
     
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_GO_APP_URL || 'https://api.tutorschool.in';
+      const apiUrl = getApiUrl();
       const response = await axios.post(`${apiUrl}/auth/parent/login`, {
         phone_number: phoneNumber,
         password: password

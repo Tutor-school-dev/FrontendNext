@@ -3,6 +3,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
+import { getApiUrl } from "@/lib/utils";
 
 export const useSendOTP = () => {
   const [loading, setLoading] = useState(false);
@@ -15,7 +16,7 @@ export const useSendOTP = () => {
 
     try {
       setLoading(true);
-      const apiUrl = process.env.NEXT_PUBLIC_GO_APP_URL || 'https://api.tutorschool.in';
+      const apiUrl = getApiUrl();
       const response = await axios.post(`${apiUrl}/auth/${model}/start`, {
         phone: phoneNumber,
       });

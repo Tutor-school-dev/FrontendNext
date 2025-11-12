@@ -5,6 +5,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
+import { getApiUrl } from "@/lib/utils";
 
 export const useCreateTeacherAccount = () => {
   const [loading, setLoading] = useState(false);
@@ -13,7 +14,7 @@ export const useCreateTeacherAccount = () => {
   const onSubmit = async (values: any) => {
     setLoading(true);
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_GO_APP_URL || 'https://api.tutorschool.in';
+      const apiUrl = getApiUrl();
       const access_hash = Cookies.get("access_hash");
       
       if (!access_hash) {

@@ -5,6 +5,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
+import { getApiUrl } from "@/lib/utils";
 
 export const useCreateTeacherBasic = () => {
   const [loading, setLoading] = useState(false);
@@ -13,7 +14,7 @@ export const useCreateTeacherBasic = () => {
   const createBasic = async (values: any, next: () => void) => {
     setLoading(true);
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_GO_APP_URL || 'https://api.tutorschool.in';
+      const apiUrl = getApiUrl();
       const authToken = Cookies.get("jwt_Token"); // Fixed: use jwt_Token for consistency
       
       if (!authToken) {

@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
+import { getAppUrl } from "@/lib/utils";
 
 export const usePaymentStatus = () => {
   const [paymentStatus, setPaymentStatus] = useState('LOADING');
@@ -36,7 +37,7 @@ export const usePaymentStatus = () => {
         return;
       }
 
-      const apiUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://api.tutorschool.in';
+      const apiUrl = getAppUrl();
       const jwtToken = Cookies.get("jwt_Token");
       
       if (!jwtToken) {

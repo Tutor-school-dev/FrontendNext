@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useState } from "react";
 import { toast } from "sonner";
+import { getAppUrl } from "@/lib/utils";
 
 export interface FormData {
   parentName: string;
@@ -23,9 +24,7 @@ export const useFormSubmit = () => {
       setProgress(10);
       
       // Get API URL from environment variables with fallback
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 
-                     process.env.NEXT_PUBLIC_APP_URL || 
-                     'https://api.tutorschool.in'; // Fallback for production
+      const apiUrl = getAppUrl();
       
       console.log('API URL:', apiUrl); // Debug log for production
 
