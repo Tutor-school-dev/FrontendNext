@@ -1,11 +1,12 @@
 import { Suspense } from "react";
 import { Metadata } from "next";
 import JobListingsContent from "./JobListingsContent";
+import { getApiUrl } from "@/lib/utils";
 
 // Function to fetch job data for metadata (server-side)
 async function getJobData(jobId: string) {
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_GO_APP_URL || 'https://api.tutorschool.in';
+    const apiUrl = getApiUrl();
     const response = await fetch(`${apiUrl}/admin/pub/jobs`, {
       cache: 'no-store', // Always fetch fresh data for SEO
     });

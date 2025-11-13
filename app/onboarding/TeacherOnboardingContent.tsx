@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import Cookies from "js-cookie";
 import axios from "axios";
 import DynamicMapComponent from "@/components/DynamicMapComponent";
+import { getAppUrl } from "@/lib/utils";
 
 export default function TeacherOnboardingContent() {
   const router = useRouter();
@@ -96,7 +97,7 @@ export default function TeacherOnboardingContent() {
       }
 
       const phoneNumber = localStorage.getItem("Phone");
-      const apiUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://api.tutorschool.in';
+      const apiUrl = getAppUrl();
 
       // 1. Create teacher account
       const response = await axios.post(`${apiUrl}/auth/teacher/createAcc`, {

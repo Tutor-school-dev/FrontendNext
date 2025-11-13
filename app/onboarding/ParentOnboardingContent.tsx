@@ -13,6 +13,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import Cookies from "js-cookie";
 import axios from "axios";
+import { getAppUrl, getApiUrl } from "@/lib/utils";
 import DynamicMapComponent from "@/components/DynamicMapComponent";
 
 export default function ParentOnboardingContent() {
@@ -104,7 +105,7 @@ export default function ParentOnboardingContent() {
       }
 
       const phoneNumber = localStorage.getItem("Phone");
-      const apiUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://api.tutorschool.in';
+      const apiUrl = getAppUrl();
 
       // 1. Create parent account (matching React repo)
       const response = await axios.post(`${apiUrl}/auth/parent/createAcc`, {
@@ -143,7 +144,7 @@ export default function ParentOnboardingContent() {
 
       // 3. Create job listing (matching React repo)
       try {
-        const goApiUrl = process.env.NEXT_PUBLIC_GO_APP_URL || 'https://api.tutorschool.in';
+        const goApiUrl = getApiUrl();
         await axios.post(`${goApiUrl}/admin/pub/jobs`, {
           j_title: `Class ${formData.grade}, ${formData.studentBoard} board`,
           j_desc: `Need Tutor for Class ${formData.grade}`,
