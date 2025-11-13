@@ -21,9 +21,9 @@ export function getApiUrl(): string {
   });
   
   if (nodeEnv === 'staging') {
-    console.log('Using staging API:', 'http://13.233.136.59:5000');
-    console.warn('CORS Note: Make sure the staging backend at http://13.233.136.59:5000 allows origin: http://localhost:3000');
-    return 'http://13.233.136.59:5000';
+    console.log('Using staging API:', 'https://stagingapi.tutorschool.in');
+    console.warn('CORS Note: Make sure the staging backend at https://stagingapi.tutorschool.in allows origin: http://localhost:3000');
+    return 'https://stagingapi.tutorschool.in';
   }
   
   // Default to production API
@@ -39,7 +39,7 @@ export function getAppUrl(): string {
   const nodeEnv = process.env.NEXT_PUBLIC_NODE_ENV || process.env.NODE_ENV || 'production';
   
   if (nodeEnv === 'staging') {
-    return 'http://13.233.136.59:5000';
+    return 'https://stagingapi.tutorschool.in';
   }
   
   // Default to production API
