@@ -1,4 +1,5 @@
 import Cookies from "js-cookie";
+import { AUTH_COOKIE, STORAGE_KEY } from "./constants";
 
 /**
  * Check if user is authenticated by verifying JWT token presence
@@ -6,7 +7,7 @@ import Cookies from "js-cookie";
 export function isAuthenticated(): boolean {
   if (typeof window === 'undefined') return false;
   
-  const token = Cookies.get("jwt_Token");
+  const token = Cookies.get(AUTH_COOKIE.JWT_TOKEN);
   return !!token;
 }
 
@@ -16,7 +17,7 @@ export function isAuthenticated(): boolean {
 export function getUserModel(): string | null {
   if (typeof window === 'undefined') return null;
   
-  return localStorage.getItem("model");
+  return localStorage.getItem(STORAGE_KEY.MODEL);
 }
 
 /**
@@ -25,9 +26,9 @@ export function getUserModel(): string | null {
 export function getCurrentUser() {
   if (typeof window === 'undefined') return null;
   
-  const model = localStorage.getItem("model");
-  const email = localStorage.getItem("email");
-  const name = localStorage.getItem("name");
+  const model = localStorage.getItem(STORAGE_KEY.MODEL);
+  const email = localStorage.getItem(STORAGE_KEY.EMAIL);
+  const name = localStorage.getItem(STORAGE_KEY.NAME);
   
   if (!model) return null;
   
@@ -35,8 +36,23 @@ export function getCurrentUser() {
 }
 
 /**
- * Check if user is authenticated as a teacher
+ * Check if user is authenticated as a tutor (teacher)
+ * Handles both old (Teacher) and new (Tutor) model values
  */
 export function isTeacherAuthenticated(): boolean {
-  return isAuthenticated() && getUserModel()?.toLowerCase() === "teacher";
+  if (!isAuthenticated()) return false;
+  
+  const model = getUserModel()?.toLowerCase();
+  return model === "teacher" || model === "tutor";
+}
+
+/**
+ * Check if user is authenticated as a learner (parent)
+ * Handles both old (Parent) and new (Learner) model values
+ */
+export function isParentAuthenticated(): boolean {
+  if (!isAuthenticated()) return false;
+  
+  const model = getUserModel()?.toLowerCase();
+  return model === "parent" || model === "learner";
 }

@@ -45,3 +45,21 @@ export function getAppUrl(): string {
   // Default to production API
   return process.env.NEXT_PUBLIC_APP_URL || 'https://api.tutorschool.in';
 }
+
+/**
+ * Get the Django Authentication API base URL
+ * Used for new unified authentication endpoints (OTP, Google Auth)
+ */
+export function getDjangoAuthUrl(): string {
+  const nodeEnv = process.env.NEXT_PUBLIC_NODE_ENV || process.env.NODE_ENV || 'production';
+  
+  if (nodeEnv === 'staging') {
+    console.log('Using Django Auth API (staging):', 'https://stagingapi.tutorschool.in/django/api/auth');
+    return 'https://stagingapi.tutorschool.in/django/api/auth';
+  }
+  
+  // Default to production Django API
+  const prodUrl = process.env.NEXT_PUBLIC_DJANGO_AUTH_URL || 'https://api.tutorschool.in/django/api/auth';
+  console.log('Using Django Auth API (production):', prodUrl);
+  return prodUrl;
+}

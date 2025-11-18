@@ -5,7 +5,10 @@ import axios from "axios";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
-import { getApiUrl } from "@/lib/utils";
+import { getDjangoAuthUrl } from "@/lib/utils";
+import { mapUserTypeToAPI, getUserTypeDisplay, OTP_USE_CASE, AUTH_COOKIE, STORAGE_KEY } from "@/lib/constants";
+import type { OTPVerifyPayload, OTPVerifyResponse } from "@/types/auth";
+import { isNewUserResponse } from "@/types/auth";
 
 export const useVerifyOTP = () => {
   const [VerifyOTPLoading, setVerifyOTPLoading] = useState(false);
@@ -19,17 +22,45 @@ export const useVerifyOTP = () => {
   ) => {
     try {
       setVerifyOTPLoading(true);
-      const apiUrl = getApiUrl();
-      const response = await axios.post(`${apiUrl}/auth/${model}/verify`, {
-        phone: phoneNumber,
-        otp: otp
-      });
+      const apiUrl = getDjangoAuthUrl();
+      const endpoint = '/otp/verify/';
       
-      toast.success(response.data.message);
-      Cookies.set('access_hash', response.data.access_hash, { expires: 1 }); // 1 day
+      // Map old model to new user_type
+      const apiUserType = mapUserTypeToAPI(model);
       
-      setOpen(false);
-      router.push(`/create-account?model=${model}&phone=${phoneNumber}`);
+      const payload: OTPVerifyPayload = {
+        phone_number: phoneNumber,
+        otp: otp,
+        user_type: apiUserType,
+        use_for: OTP_USE_CASE.PHONE_VERIFICATION
+      };
+
+      const response = await axios.post<OTPVerifyResponse>(
+        `${apiUrl}${endpoint}`,
+        payload
+      );
+      
+      const { data } = response;
+      
+      // Handle success message
+      if ('message' in data) {
+        toast.success(data.message);
+      } else {
+        toast.success("Verification successful!");
+      }
+      
+      // Only handle new user flow (for create account)
+      if (isNewUserResponse(data)) {
+        Cookies.set(AUTH_COOKIE.ACCESS_HASH, data.access_hash, { expires: 1 });
+        const displayModel = getUserTypeDisplay(data.user_type);
+        localStorage.setItem(STORAGE_KEY.MODEL, displayModel);
+        
+        setOpen(false);
+        router.push(`/create-account?model=${model}&phone=${phoneNumber}`);
+      } else {
+        toast.error('Account already exists. Please login instead.');
+        setOpen(false);
+      }
     } catch (error: any) {
       console.error('Verify OTP error:', error);
       const message = error.response?.data?.message || 'Something went wrong';

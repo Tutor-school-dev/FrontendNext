@@ -4,7 +4,10 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { useDashboardStore } from "./useDashboardStore";
-import { getApiUrl } from "@/lib/utils";
+import { getDjangoAuthUrl } from "@/lib/utils";
+import { USER_TYPE, getUserTypeDisplay, AUTH_COOKIE, STORAGE_KEY } from "@/lib/constants";
+import type { GoogleAuthPayload, GoogleAuthResponse } from "@/types/auth";
+import { isNewUserResponse, isExistingUserResponse } from "@/types/auth";
 
 export const useParentGoogleLogin = () => {
   const [loading, setLoading] = useState(false);
@@ -16,36 +19,53 @@ export const useParentGoogleLogin = () => {
     setLoading(true);
 
     try {
-      const apiUrl = getApiUrl();
-      const res = await axios.post(`${apiUrl}/auth/parent/google`, {
+      const apiUrl = getDjangoAuthUrl();
+      const endpoint = '/google/';
+      
+      const payload: GoogleAuthPayload = {
         id_token: token,
-      });
-
+        user_type: USER_TYPE.LEARNER
+      };
+      
+      const res = await axios.post<GoogleAuthResponse>(`${apiUrl}${endpoint}`, payload);
       const { data } = res;
-      toast.info(data.message || "Google login successful!");
+      
+      // Handle success message
+      if ('message' in data) {
+        toast.info(data.message);
+      } else {
+        toast.info("Google login successful!");
+      }
 
       // Handle new user registration flow
-      if (data.access_hash) {
-        Cookies.set("access_hash", data.access_hash, { expires: 1 }); // 1 day
-        // For now, show message instead of redirecting
-        // In future: router.push(`/onboarding?model=parent`);
+      if (isNewUserResponse(data)) {
+        Cookies.set(AUTH_COOKIE.ACCESS_HASH, data.access_hash, { expires: 1 });
+        const displayModel = getUserTypeDisplay(data.user_type);
+        localStorage.setItem(STORAGE_KEY.MODEL, displayModel);
         toast.info("Account creation required. Please complete registration.");
         return;
       }
 
-      // Set JWT token for existing user
-      Cookies.set("jwt_Token", data.jwt_token, { expires: 7 }); // Fixed: use jwt_Token for consistency
+      // Handle existing user
+      if (isExistingUserResponse(data)) {
+        // Set JWT token
+        Cookies.set(AUTH_COOKIE.JWT_TOKEN, data.jwt_token, { expires: 7 });
+        Cookies.set(AUTH_COOKIE.REFRESH_TOKEN, data.refresh, { expires: 7 });
 
-      // Store user data
-      if (typeof window !== 'undefined') {
-        localStorage.setItem("model", "Parent");
-        localStorage.setItem("name", data.parent.name);
+        // Store user data
+        const userData = data.user;
+        const displayModel = getUserTypeDisplay(data.user_type);
+        
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(STORAGE_KEY.MODEL, displayModel);
+          localStorage.setItem(STORAGE_KEY.NAME, userData.name);
+        }
+
+        set_dashboard_data(userData, "parent");
+
+        // Navigate to parent dashboard
+        router.push('/dashboard/parent');
       }
-
-      set_dashboard_data(data.parent, "parent");
-
-      // Navigate to parent dashboard
-      router.push('/dashboard/parent');
 
     } catch (err: any) {
       console.error('Google login error:', err);

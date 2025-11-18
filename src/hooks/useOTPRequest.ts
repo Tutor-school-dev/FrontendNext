@@ -3,7 +3,9 @@
 import { useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
-import { getAppUrl } from "@/lib/utils";
+import { getDjangoAuthUrl } from "@/lib/utils";
+import { mapUserTypeToAPI, OTP_USE_CASE } from "@/lib/constants";
+import type { OTPRequestPayload, OTPRequestResponse } from "@/types/auth";
 
 export const useOTPRequest = () => {
   const [loading, setLoading] = useState(false);
@@ -11,23 +13,32 @@ export const useOTPRequest = () => {
   const requestOTP = async (phoneNumber: string, userType: 'teacher' | 'parent') => {
     setLoading(true);
     try {
-      // Use different API base URLs for different user types (matching React repo)
-      const apiUrl = getAppUrl();
-      console.log(apiUrl);
-      const endpoint = userType === 'teacher' ? '/auth/teacher/start' : '/auth/parent/start';
+      const apiUrl = getDjangoAuthUrl();
+      const endpoint = '/otp/request/';
       
-      const response = await axios.post(`${apiUrl}${endpoint}`, {
-        phone: phoneNumber  // Match React repo field name
-      });
+      // Map old terminology to new API format
+      const apiUserType = mapUserTypeToAPI(userType);
+      
+      const payload: OTPRequestPayload = {
+        phone_number: phoneNumber,
+        user_type: apiUserType,
+        use_for: OTP_USE_CASE.LOGIN
+      };
+
+      const response = await axios.post<OTPRequestResponse>(
+        `${apiUrl}${endpoint}`, 
+        payload
+      );
 
       toast.success(response.data.message || "OTP sent successfully!");
       
-      // Log OTP for development (matching React repo pattern)
+      // Log OTP for development
       if (process.env.NODE_ENV !== 'production' && response.data.otp) {
         console.log(`OTP for testing: ${response.data.otp}`);
+        console.log(`Expires at: ${response.data.expires_at}`);
       }
       
-      return true; // Simple boolean return for success
+      return true;
     } catch (err: any) {
       console.error('OTP request error:', err);
       const message = err.response?.data?.message || "Failed to send OTP. Please try again.";

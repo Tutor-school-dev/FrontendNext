@@ -7,7 +7,10 @@ import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { useDashboardStore } from "./useDashboardStore";
 import { useApplyJob } from "./useApplyJob";
-import { getApiUrl } from "@/lib/utils";
+import { getDjangoAuthUrl } from "@/lib/utils";
+import { USER_TYPE, getUserTypeDisplay, AUTH_COOKIE, STORAGE_KEY } from "@/lib/constants";
+import type { GoogleAuthPayload, GoogleAuthResponse } from "@/types/auth";
+import { isNewUserResponse, isExistingUserResponse } from "@/types/auth";
 
 export const useTeacherGoogleLogin = (redirectFromJobListing?: string, job_id?: string) => {
   const [loading, setLoading] = useState(false);
@@ -20,60 +23,80 @@ export const useTeacherGoogleLogin = (redirectFromJobListing?: string, job_id?: 
     setLoading(true);
 
     try {
-      const apiUrl = getApiUrl();
-      const res = await axios.post(`${apiUrl}/auth/teacher/google`, {
+      const apiUrl = getDjangoAuthUrl();
+      const endpoint = '/google/';
+      
+      const payload: GoogleAuthPayload = {
         id_token: token,
-      });
+        user_type: USER_TYPE.TUTOR
+      };
+      
+      const res = await axios.post<GoogleAuthResponse>(`${apiUrl}${endpoint}`, payload);
 
       const { data } = res;
-      toast.info(data.message || "Google login successful!");
+      
+      // Handle success message
+      if ('message' in data) {
+        toast.info(data.message);
+      } else {
+        toast.info("Google login successful!");
+      }
 
       // Handle new user registration flow
-      if (data.access_hash) {
-        Cookies.set("access_hash", data.access_hash, { expires: 1 }); // 1 day
-        router.push(`/create-account?model=teacher&email=${data.email}`);
+      if (isNewUserResponse(data)) {
+        Cookies.set(AUTH_COOKIE.ACCESS_HASH, data.access_hash, { expires: 1 });
+        const displayModel = getUserTypeDisplay(data.user_type);
+        localStorage.setItem(STORAGE_KEY.MODEL, displayModel);
+        router.push(`/create-account?model=teacher`);
         return;
       }
 
-      // Set JWT token for existing user
-      Cookies.set("jwt_Token", data.jwt_token, { expires: 7 }); // Fixed: use jwt_Token for consistency
+      // Handle existing user
+      if (isExistingUserResponse(data)) {
+        // Set JWT token
+        Cookies.set(AUTH_COOKIE.JWT_TOKEN, data.jwt_token, { expires: 7 });
+        Cookies.set(AUTH_COOKIE.REFRESH_TOKEN, data.refresh, { expires: 7 });
 
-      // Store user data
-      if (typeof window !== 'undefined') {
-        localStorage.setItem("model", "Teacher");
-        localStorage.setItem("email", data.teacher.email);
-        localStorage.setItem("name", data.teacher.name);
-      }
-
-      set_dashboard_data(data.teacher, "teacher");
-
-      // Apply for job if coming from job listing
-      if (redirectFromJobListing === "fromJobListing" && job_id) {
-        console.log("Applying job...", job_id, data.teacher.id);
-        const job_message = await apply_job(job_id, data.teacher.id);
-        set_dashboard_data(job_message, "job_message");
-      }
-
-      // Navigation logic
-      if (data.go_to_dashboard && data.model === 'teacher') {
-        const redirect = redirectFromJobListing === "fromJobListing" 
-          ? `?redirectFromJobListing=${redirectFromJobListing}` 
-          : '';
+        // Store user data
+        const userData = data.user;
+        const displayModel = getUserTypeDisplay(data.user_type);
         
-        router.push(`/dashboard/teacher${redirect}`);
-        return;
-      }
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(STORAGE_KEY.MODEL, displayModel);
+          localStorage.setItem(STORAGE_KEY.EMAIL, userData.email);
+          localStorage.setItem(STORAGE_KEY.NAME, userData.name);
+        }
 
-      // Check profile completion status
-      const stepNames = {
-        basic_done: data.teacher.basic_done,
-        location_done: data.teacher.location_done
-      };
+        set_dashboard_data(userData, "teacher");
 
-      for (const [key, value] of Object.entries(stepNames)) {
-        if (!value) {
-          router.push(`/teacher-profile?step=${key}`);
+        // Apply for job if coming from job listing
+        if (redirectFromJobListing === "fromJobListing" && job_id) {
+          console.log("Applying job...", job_id, userData.id);
+          const job_message = await apply_job(job_id, userData.id);
+          set_dashboard_data(job_message, "job_message");
+        }
+
+        // Navigation logic
+        if (data.go_to_dashboard) {
+          const redirect = redirectFromJobListing === "fromJobListing" 
+            ? `?redirectFromJobListing=${redirectFromJobListing}` 
+            : '';
+          
+          router.push(`/dashboard/teacher${redirect}`);
           return;
+        }
+
+        // Check profile completion status
+        const stepNames = {
+          basic_done: userData.basic_done,
+          location_done: userData.location_done
+        };
+
+        for (const [key, value] of Object.entries(stepNames)) {
+          if (!value) {
+            router.push(`/teacher-profile?step=${key}`);
+            return;
+          }
         }
       }
 
