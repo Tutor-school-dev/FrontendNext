@@ -10,6 +10,7 @@ export default function TeacherNavbar() {
   const router = useRouter();
   const { teacher } = useDashboardStore();
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -20,15 +21,37 @@ export default function TeacherNavbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.dropdown-container')) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    if (isDropdownOpen) {
+      document.addEventListener('click', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [isDropdownOpen]);
+
   const handleLogout = () => {
-    console.log("TeacherNavbar: Logout function called");
-    // Clear all cookies and localStorage
-    Cookies.remove("authToken");
-    Cookies.remove("jwt_Token"); // Also remove the correct token name
-    Cookies.remove("refreshToken");
-    localStorage.removeItem("model");
-    localStorage.removeItem("email");
-    localStorage.removeItem("name");
+    // Clear all cookies
+    Cookies.remove("jwt_Token");
+    Cookies.remove("refresh_token");
+    Cookies.remove("access_hash");
+    
+    // Clear localStorage
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem("model");
+      localStorage.removeItem("email");
+      localStorage.removeItem("name");
+      localStorage.removeItem("Phone");
+      localStorage.removeItem("redirectFromJobListing");
+    }
     
     // Redirect to home
     router.push("/");
@@ -96,32 +119,37 @@ export default function TeacherNavbar() {
             </div>
 
             {/* Dropdown Menu */}
-            <div className="relative">
+            <div className="relative dropdown-container">
               <button 
                 className="flex items-center space-x-1 px-3 py-1 rounded-md hover:bg-gray-100"
-                onClick={() => {}}
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               >
                 <ChevronDown className="w-4 h-4" />
               </button>
-              {/* Simple dropdown for now */}
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50 hidden">
-                <div className="py-1">
-                  <button 
-                    onClick={() => router.push("/profile")}
-                    className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    <Settings className="mr-2 h-4 w-4" />
-                    Profile Settings
-                  </button>
-                  <button 
-                    onClick={handleLogout}
-                    className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Logout
-                  </button>
+              {/* Dropdown */}
+              {isDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50">
+                  <div className="py-1">
+                    <button 
+                      onClick={() => {
+                        setIsDropdownOpen(false);
+                        router.push("/teacher-profile");
+                      }}
+                      className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      <Settings className="mr-2 h-4 w-4" />
+                      Profile Settings
+                    </button>
+                    <button 
+                      onClick={handleLogout}
+                      className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Logout
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
