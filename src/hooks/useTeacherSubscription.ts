@@ -4,6 +4,7 @@ import { useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 import Cookies from "js-cookie";
+import { getAppUrl } from "@/lib/utils";
 
 export const useTeacherSubscription = () => {
   const [loading, setLoading] = useState(false);
@@ -12,7 +13,7 @@ export const useTeacherSubscription = () => {
   const getSubscriptions = async () => {
     try {
       setLoading(true);
-      const apiUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://api.tutorschool.in';
+      const apiUrl = getAppUrl();
       const jwtToken = Cookies.get("jwt_Token");
       
       if (!jwtToken) {
@@ -36,7 +37,7 @@ export const useTeacherSubscription = () => {
   const startPayment = async (tierId: number, duration: number) => {
     try {
       setLoading(true);
-      const apiUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://api.tutorschool.in';
+      const apiUrl = getAppUrl();
       const jwtToken = Cookies.get("jwt_Token");
       
       if (!jwtToken) {

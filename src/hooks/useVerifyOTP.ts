@@ -5,6 +5,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
+import { getApiUrl } from "@/lib/utils";
 
 export const useVerifyOTP = () => {
   const [VerifyOTPLoading, setVerifyOTPLoading] = useState(false);
@@ -18,7 +19,7 @@ export const useVerifyOTP = () => {
   ) => {
     try {
       setVerifyOTPLoading(true);
-      const apiUrl = process.env.NEXT_PUBLIC_GO_APP_URL || 'https://api.tutorschool.in';
+      const apiUrl = getApiUrl();
       const response = await axios.post(`${apiUrl}/auth/${model}/verify`, {
         phone: phoneNumber,
         otp: otp

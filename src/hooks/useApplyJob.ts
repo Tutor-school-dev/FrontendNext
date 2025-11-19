@@ -2,11 +2,12 @@
 
 import axios from "axios";
 import { toast } from "sonner";
+import { getApiUrl } from "@/lib/utils";
 
 export const useApplyJob = () => {
   const apply_job = async (job_id: string, teacher_id: string) => {
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_GO_APP_URL || 'https://api.tutorschool.in';
+      const apiUrl = getApiUrl();
       const response = await axios.post(`${apiUrl}/admin/pub/job-applications`, {
         ja_job_id: job_id,
         ja_teacher_id: teacher_id,

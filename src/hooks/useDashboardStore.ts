@@ -3,6 +3,7 @@
 import { create } from "zustand";
 import { toast } from "sonner";
 import axios from "axios";
+import { getApiUrl } from "@/lib/utils";
 
 interface Teacher {
   id: string;
@@ -154,7 +155,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
 
       set({ loading: true, error: null });
       
-      const apiUrl = process.env.NEXT_PUBLIC_GO_APP_URL || 'https://api.tutorschool.in';
+      const apiUrl = getApiUrl();
       const res = await axios.get(`${apiUrl}/dashboard`, {
         headers: { authorization: `Bearer ${jwt_Token}` }
       });
@@ -250,7 +251,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
 
       set({ loading: true, error: null });
       
-      const apiUrl = process.env.NEXT_PUBLIC_GO_APP_URL || 'https://api.tutorschool.in';
+      const apiUrl = getApiUrl();
       const res = await axios.get(`${apiUrl}/subject/teacher`, {
         headers: {
           Authorization: `Bearer ${jwt_Token}`
@@ -270,7 +271,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     try {
       set({ loading: true, error: null });
       
-      const apiUrl = process.env.NEXT_PUBLIC_GO_APP_URL || 'https://api.tutorschool.in';
+      const apiUrl = getApiUrl();
       const res = await axios.post(`${apiUrl}/subject/teacher`, data, {
         headers: {
           Authorization: `Bearer ${jwt_Token}`
@@ -291,7 +292,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     try {
       set({ loading: true, error: null });
       
-      const apiUrl = process.env.NEXT_PUBLIC_GO_APP_URL || 'https://api.tutorschool.in';
+      const apiUrl = getApiUrl();
       const res = await axios.get(`${apiUrl}/teacher/profile/pic`, {
         headers: { authorization: `Bearer ${jwt_Token}` }
       });
@@ -341,7 +342,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
 
       set({ loading: true, error: null });
       
-      const apiUrl = process.env.NEXT_PUBLIC_GO_APP_URL || 'https://api.tutorschool.in';
+      const apiUrl = getApiUrl();
       const res = await axios.get(`${apiUrl}/payment`, {
         headers: { authorization: `Bearer ${jwt_Token}` }
       });
@@ -360,7 +361,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
       if (get().loading) return;
       set({ loading: true, error: null });
 
-      const apiUrl = process.env.NEXT_PUBLIC_GO_APP_URL || 'https://api.tutorschool.in';
+      const apiUrl = getApiUrl();
       const response = await axios.post(`${apiUrl}/onboarding/teacher/pricing`, {
         lesson_price: price
       }, { headers: { authorization: `bearer ${jwt_token}` } });

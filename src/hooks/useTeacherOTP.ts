@@ -3,6 +3,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
+import { getApiUrl } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 
@@ -13,7 +14,8 @@ export const useTeacherOTP = () => {
   const sendOTP = async (phoneNumber: string, setStep: (step: string) => void) => {
     try {
       setLoading(true);
-      const apiUrl = process.env.NEXT_PUBLIC_GO_APP_URL || 'https://api.tutorschool.in';
+      const apiUrl = getApiUrl();
+      console.log(apiUrl);
       const response = await axios.post(`${apiUrl}/auth/teacher/start`, {
         phone: phoneNumber,
       });
@@ -47,7 +49,7 @@ export const useTeacherOTP = () => {
   const verifyOTP = async (phoneNumber: string, otp: string) => {
     try {
       setLoading(true);
-      const apiUrl = process.env.NEXT_PUBLIC_GO_APP_URL || 'https://api.tutorschool.in';
+      const apiUrl = getApiUrl();
       const response = await axios.post(`${apiUrl}/auth/teacher/verify`, {
         phone: phoneNumber,
         otp: otp

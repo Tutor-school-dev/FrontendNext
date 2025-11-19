@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'sonner';
+import { getApiUrl } from '@/lib/utils';
 
 export interface Job {
   j_id: string;
@@ -26,7 +27,7 @@ export function useJobListings() {
     try {
       setLoading(true);
       setError(null);
-      const apiUrl = process.env.NEXT_PUBLIC_GO_APP_URL || 'https://api.tutorschool.in';
+      const apiUrl = getApiUrl();
       const response = await axios.get(`${apiUrl}/admin/pub/jobs`);
       const activeJobs = response.data?.filter((job: Job) => job.j_active === true);
       setJobsData(activeJobs || []);

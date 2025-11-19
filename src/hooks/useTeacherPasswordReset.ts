@@ -3,6 +3,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
+import { getApiUrl } from "@/lib/utils";
 
 export const useTeacherPasswordReset = () => {
   const [loading, setLoading] = useState(false);
@@ -10,7 +11,7 @@ export const useTeacherPasswordReset = () => {
   const sendResetOTP = async (phoneNumber: string, setOTPSent: (sent: boolean) => void) => {
     try {
       setLoading(true);
-      const apiUrl = process.env.NEXT_PUBLIC_GO_APP_URL || 'https://api.tutorschool.in';
+      const apiUrl = getApiUrl();
       const response = await axios.get(`${apiUrl}/auth/teacher/reset_password?phone=${phoneNumber}`);
       
       toast.info(response.data.message);
@@ -38,7 +39,7 @@ export const useTeacherPasswordReset = () => {
   ) => {
     try {
       setLoading(true);
-      const apiUrl = process.env.NEXT_PUBLIC_GO_APP_URL || 'https://api.tutorschool.in';
+      const apiUrl = getApiUrl();
       const response = await axios.post(`${apiUrl}/auth/teacher/change_password`, {
         phone: phoneNumber,
         otp: otp,

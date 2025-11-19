@@ -51,7 +51,19 @@ export default function ParentDashboard() {
             <h1 className="text-2xl font-bold text-blue-600">TutorSchool</h1>
             <button
               onClick={() => {
-                Cookies.remove("authToken");
+                // Clear all cookies
+                Cookies.remove("jwt_Token");
+                Cookies.remove("refresh_token");
+                Cookies.remove("access_hash");
+                
+                // Clear localStorage
+                if (typeof window !== 'undefined') {
+                  localStorage.removeItem("model");
+                  localStorage.removeItem("email");
+                  localStorage.removeItem("name");
+                  localStorage.removeItem("Phone");
+                }
+                
                 router.push("/");
               }}
               className="text-sm text-gray-600 hover:text-gray-800"

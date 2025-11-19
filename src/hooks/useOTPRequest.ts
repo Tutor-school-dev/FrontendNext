@@ -3,6 +3,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
+import { getAppUrl } from "@/lib/utils";
 
 export const useOTPRequest = () => {
   const [loading, setLoading] = useState(false);
@@ -11,7 +12,8 @@ export const useOTPRequest = () => {
     setLoading(true);
     try {
       // Use different API base URLs for different user types (matching React repo)
-      const apiUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://api.tutorschool.in';
+      const apiUrl = getAppUrl();
+      console.log(apiUrl);
       const endpoint = userType === 'teacher' ? '/auth/teacher/start' : '/auth/parent/start';
       
       const response = await axios.post(`${apiUrl}${endpoint}`, {
