@@ -13,7 +13,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import Cookies from "js-cookie";
 import axios from "axios";
-import { getAppUrl, getApiUrl } from "@/lib/utils";
+import { getAppUrl, getApiUrl, getDjangoAuthUrl } from "@/lib/utils";
 import DynamicMapComponent from "@/components/DynamicMapComponent";
 
 export default function ParentOnboardingContent() {
@@ -105,10 +105,10 @@ export default function ParentOnboardingContent() {
       }
 
       const phoneNumber = localStorage.getItem("Phone");
-      const apiUrl = getAppUrl();
+      const apiUrl = getDjangoAuthUrl();
 
       // 1. Create parent account (matching React repo)
-      const response = await axios.post(`${apiUrl}/auth/parent/createAcc`, {
+      const response = await axios.post(`${apiUrl}/learner/create-account/`, {
         access_hash: accessHash,
         data: formData
       });

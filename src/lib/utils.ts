@@ -47,19 +47,19 @@ export function getAppUrl(): string {
 }
 
 /**
- * Get the Django Authentication API base URL
- * Used for new unified authentication endpoints (OTP, Google Auth)
+ * Get the Django API base URL
+ * Used for new Django endpoints (auth, tutor, learner, etc.)
  */
 export function getDjangoAuthUrl(): string {
   const nodeEnv = process.env.NEXT_PUBLIC_NODE_ENV || process.env.NODE_ENV || 'production';
   
   if (nodeEnv === 'staging') {
-    console.log('Using Django Auth API (staging):', 'https://stagingapi.tutorschool.in/django/api/auth');
-    return 'https://stagingapi.tutorschool.in/django/api/auth';
+    console.log('Using Django API (staging):', 'https://stagingapi.tutorschool.in/django/api');
+    return 'https://stagingapi.tutorschool.in/django/api';
   }
   
   // Default to production Django API
-  const prodUrl = process.env.NEXT_PUBLIC_DJANGO_AUTH_URL || 'https://api.tutorschool.in/django/api/auth';
-  console.log('Using Django Auth API (production):', prodUrl);
+  const prodUrl = process.env.NEXT_PUBLIC_DJANGO_AUTH_URL || 'https://api.tutorschool.in/django/api';
+  console.log('Using Django API (production):', prodUrl);
   return prodUrl;
 }

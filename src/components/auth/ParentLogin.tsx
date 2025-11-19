@@ -26,7 +26,7 @@ const ParentLogin = () => {
       return;
     }
     
-    const success = await requestOTP(phoneNumber, "parent");
+    const success = await requestOTP(phoneNumber, "parent", false);
     if (success) {
       setStep("otp");
     }
@@ -38,9 +38,8 @@ const ParentLogin = () => {
       return;
     }
     
-    // For parent auth, use the same verification flow as React repo
-    // The backend determines if this is login or signup based on existing user
-    await VerifyOTP(() => {}, phoneNumber, otp, "parent");
+    // For parent login, set isSignup=false to use LOGIN
+    await VerifyOTP(() => {}, phoneNumber, otp, "parent", false);
   };
 
   const handleFailure = (error: any) => {

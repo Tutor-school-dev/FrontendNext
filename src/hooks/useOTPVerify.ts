@@ -18,7 +18,13 @@ export const useOTPVerify = () => {
   const { set_dashboard_data } = useDashboardStore();
 
   // Simple method for create account flow
-  const VerifyOTP = async (setOpen: (open: boolean) => void, phoneNumber: string, otp: string, model: string) => {
+  const VerifyOTP = async (
+    setOpen: (open: boolean) => void, 
+    phoneNumber: string, 
+    otp: string, 
+    model: string,
+    isSignup: boolean = false
+  ) => {
     if (!otp || otp.length !== 6) {
       toast.error("Please enter a valid 6-digit OTP");
       return;
@@ -27,7 +33,7 @@ export const useOTPVerify = () => {
     try {
       setVerifyOTPLoading(true);
       const apiUrl = getDjangoAuthUrl();
-      const endpoint = '/otp/verify/';
+      const endpoint = '/auth/otp/verify/';
       
       // Map old model to new user_type
       const apiUserType = mapUserTypeToAPI(model);
@@ -36,7 +42,7 @@ export const useOTPVerify = () => {
         phone_number: phoneNumber,
         otp: otp,
         user_type: apiUserType,
-        use_for: OTP_USE_CASE.LOGIN
+        use_for: isSignup ? OTP_USE_CASE.PHONE_VERIFICATION : OTP_USE_CASE.LOGIN
       };
 
       const response = await axios.post<OTPVerifyResponse>(
@@ -100,7 +106,7 @@ export const useOTPVerify = () => {
     setLoading(true);
     try {
       const apiUrl = getDjangoAuthUrl();
-      const endpoint = '/otp/verify/';
+      const endpoint = '/auth/otp/verify/';
       
       // Map old userType to new API format
       const apiUserType = mapUserTypeToAPI(userType);

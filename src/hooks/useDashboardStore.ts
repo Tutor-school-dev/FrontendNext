@@ -4,6 +4,7 @@ import { create } from "zustand";
 import { toast } from "sonner";
 import axios from "axios";
 import { getApiUrl } from "@/lib/utils";
+import { STORAGE_KEY } from "@/lib/constants";
 
 interface Teacher {
   id: string;
@@ -126,9 +127,9 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
       });
 
       if (typeof window !== 'undefined') {
-        localStorage.setItem("model", "Teacher");
-        localStorage.setItem("email", teacher.email);
-        localStorage.setItem("name", teacher.name);
+        localStorage.setItem(STORAGE_KEY.MODEL, "Tutor");
+        localStorage.setItem(STORAGE_KEY.EMAIL, teacher.email);
+        localStorage.setItem(STORAGE_KEY.NAME, teacher.name);
       }
     }
     if (model === "parent") {
@@ -142,9 +143,9 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
       });
 
       if (typeof window !== 'undefined') {
-        localStorage.setItem("model", "Parent");
-        localStorage.setItem("email", parent.email);
-        localStorage.setItem("name", parent.name);
+        localStorage.setItem(STORAGE_KEY.MODEL, "Learner");
+        localStorage.setItem(STORAGE_KEY.EMAIL, parent.email);
+        localStorage.setItem(STORAGE_KEY.NAME, parent.name);
       }
     }
   },
@@ -183,9 +184,9 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
         };
 
         if (typeof window !== 'undefined') {
-          localStorage.setItem("model", "Teacher");
-          localStorage.setItem("email", teacher.email);
-          localStorage.setItem("name", teacher.name);
+          localStorage.setItem(STORAGE_KEY.MODEL, "Tutor");
+          localStorage.setItem(STORAGE_KEY.EMAIL, teacher.email);
+          localStorage.setItem(STORAGE_KEY.NAME, teacher.name);
         }
 
         return { stepNames, go_to_dashboard: res.data.go_to_dashboard, model: res.data.model };
@@ -202,9 +203,9 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
         });
 
         if (typeof window !== 'undefined') {
-          localStorage.setItem("model", "Parent");
-          localStorage.setItem("email", parent.email);
-          localStorage.setItem("name", parent.name);
+          localStorage.setItem(STORAGE_KEY.MODEL, "Learner");
+          localStorage.setItem(STORAGE_KEY.EMAIL, parent.email);
+          localStorage.setItem(STORAGE_KEY.NAME, parent.name);
         }
 
         return { go_to_dashboard: res.data.go_to_dashboard, model: res.data.model };

@@ -12,9 +12,20 @@ const steps = [
   "Location",
 ];
 
+export interface EducationFormData {
+  highestQualification: string;
+  otherQualification?: string;
+  university: string;
+  class: number;
+  status: string;
+  teachingMethod: string;
+  referralSource?: string;
+}
+
 export default function TeacherProfileContent() {
   const [currentStep, setCurrentStep] = useState(0);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [educationData, setEducationData] = useState<EducationFormData | null>(null);
   const searchParams = useSearchParams();
   
   const currentStepName = searchParams?.get('step') || null;
@@ -47,9 +58,9 @@ export default function TeacherProfileContent() {
   const renderStep = () => {
     switch (currentStep) {
       case 0:
-        return <Education onNext={nextStep} />;
+        return <Education onNext={nextStep} onDataChange={setEducationData} />;
       case 1:
-        return <Location onNext={nextStep} model="teacher" />;
+        return <Location onNext={nextStep} model="teacher" educationData={educationData} />;
       default:
         return null;
     }

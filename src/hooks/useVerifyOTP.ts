@@ -23,7 +23,7 @@ export const useVerifyOTP = () => {
     try {
       setVerifyOTPLoading(true);
       const apiUrl = getDjangoAuthUrl();
-      const endpoint = '/otp/verify/';
+      const endpoint = '/auth/otp/verify/';
       
       // Map old model to new user_type
       const apiUserType = mapUserTypeToAPI(model);

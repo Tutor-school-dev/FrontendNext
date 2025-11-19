@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { useDashboardStore } from "./useDashboardStore";
 import { getApiUrl } from "@/lib/utils";
+import { AUTH_COOKIE, STORAGE_KEY } from "@/lib/constants";
 
 export const useParentLogin = () => {
   const [loading, setLoading] = useState(false);
@@ -25,15 +26,15 @@ export const useParentLogin = () => {
       const { data } = response;
       
       // Set JWT token in cookies
-      Cookies.set("jwt_Token", data.jwt_token, { expires: 7 }); // 7 days
+      Cookies.set(AUTH_COOKIE.JWT_TOKEN, data.jwt_token, { expires: 7 });
       
       toast.success(data.message || "Login successful!");
 
       // Store user data in localStorage and store
       if (typeof window !== 'undefined') {
-        localStorage.setItem("model", "Parent");
-        localStorage.setItem("email", data.parent.email);
-        localStorage.setItem("name", data.parent.name);
+        localStorage.setItem(STORAGE_KEY.MODEL, "Learner");
+        localStorage.setItem(STORAGE_KEY.EMAIL, data.parent.email);
+        localStorage.setItem(STORAGE_KEY.NAME, data.parent.name);
       }
 
       set_dashboard_data(data.parent, "parent");

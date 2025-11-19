@@ -5,7 +5,8 @@ import axios from "axios";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
-import { getApiUrl } from "@/lib/utils";
+import { getDjangoAuthUrl } from "@/lib/utils";
+import { AUTH_COOKIE, STORAGE_KEY, getUserTypeDisplay, USER_TYPE } from "@/lib/constants";
 
 export const useCreateTeacherAccount = () => {
   const [loading, setLoading] = useState(false);
@@ -14,8 +15,8 @@ export const useCreateTeacherAccount = () => {
   const onSubmit = async (values: any) => {
     setLoading(true);
     try {
-      const apiUrl = getApiUrl();
-      const access_hash = Cookies.get("access_hash");
+      const apiUrl = getDjangoAuthUrl();
+      const access_hash = Cookies.get(AUTH_COOKIE.ACCESS_HASH);
       
       if (!access_hash) {
         toast.error("Session expired. Please try again.");
@@ -23,21 +24,22 @@ export const useCreateTeacherAccount = () => {
         return;
       }
 
-      const response = await axios.post(`${apiUrl}/auth/teacher/create`, { 
+      const response = await axios.post(`${apiUrl}/tutor/create-account/`, { 
         ...values, 
         access_hash: access_hash 
       });
       
-      Cookies.set("jwt_Token", response.data.jwt_token, { expires: 7 }); // Fixed: use jwt_Token for consistency
-      Cookies.remove("access_hash"); // Remove access hash after successful account creation
+      Cookies.set(AUTH_COOKIE.JWT_TOKEN, response.data.jwt_token, { expires: 7 });
+      Cookies.remove(AUTH_COOKIE.ACCESS_HASH); // Remove access hash after successful account creation
       
-      toast.success('Teacher account created successfully');
+      toast.success('Tutor account created successfully');
       
       // Store user data
       if (typeof window !== 'undefined') {
-        localStorage.setItem("model", "Teacher");
-        localStorage.setItem("email", values.email);
-        localStorage.setItem("name", values.name);
+        const displayModel = getUserTypeDisplay(USER_TYPE.TUTOR);
+        localStorage.setItem(STORAGE_KEY.MODEL, displayModel);
+        localStorage.setItem(STORAGE_KEY.EMAIL, values.email);
+        localStorage.setItem(STORAGE_KEY.NAME, values.name);
       }
       
       router.push('/teacher-profile');

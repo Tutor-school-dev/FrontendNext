@@ -10,11 +10,15 @@ import type { OTPRequestPayload, OTPRequestResponse } from "@/types/auth";
 export const useOTPRequest = () => {
   const [loading, setLoading] = useState(false);
 
-  const requestOTP = async (phoneNumber: string, userType: 'teacher' | 'parent') => {
+  const requestOTP = async (
+    phoneNumber: string, 
+    userType: 'teacher' | 'parent',
+    isSignup: boolean = false
+  ) => {
     setLoading(true);
     try {
       const apiUrl = getDjangoAuthUrl();
-      const endpoint = '/otp/request/';
+      const endpoint = '/auth/otp/request/';
       
       // Map old terminology to new API format
       const apiUserType = mapUserTypeToAPI(userType);
@@ -22,7 +26,7 @@ export const useOTPRequest = () => {
       const payload: OTPRequestPayload = {
         phone_number: phoneNumber,
         user_type: apiUserType,
-        use_for: OTP_USE_CASE.LOGIN
+        use_for: isSignup ? OTP_USE_CASE.PHONE_VERIFICATION : OTP_USE_CASE.LOGIN
       };
 
       const response = await axios.post<OTPRequestResponse>(

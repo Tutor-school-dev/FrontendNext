@@ -23,10 +23,10 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useCreateTeacherBasic } from "@/hooks/useCreateTeacherBasic";
 import { LoadingButton } from "@/components/ui/LoadingButton";
 import { ChevronRight } from "lucide-react";
 import Image from "next/image";
+import { EducationFormData } from "./TeacherProfileContent";
 
 export const formSchema = z.object({
   highestQualification: z.enum([
@@ -60,9 +60,10 @@ export const formSchema = z.object({
 
 interface EducationProps {
   onNext: () => void;
+  onDataChange: (data: EducationFormData) => void;
 }
 
-export default function Education({ onNext }: EducationProps) {
+export default function Education({ onNext, onDataChange }: EducationProps) {
   const [showOtherQualification, setShowOtherQualification] = useState(false);
 
   const form = useForm({
@@ -78,7 +79,12 @@ export default function Education({ onNext }: EducationProps) {
     },
   });
 
-  const { createBasic, loading } = useCreateTeacherBasic();
+  const handleFormSubmit = (data: any) => {
+    // Store the form data
+    onDataChange(data);
+    // Move to next step without calling API
+    onNext();
+  };
 
   return (
     <Card className="p-4 md:rounded-md rounded-t-none w-full max-w-2xl">
@@ -101,9 +107,7 @@ export default function Education({ onNext }: EducationProps) {
       <CardContent>
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit((data) => {
-              createBasic(data, onNext);
-            })}
+            onSubmit={form.handleSubmit(handleFormSubmit)}
             className="space-y-6"
           >
             <FormField
@@ -302,7 +306,7 @@ export default function Education({ onNext }: EducationProps) {
             <div className="flex justify-end mt-8">
               <LoadingButton
                 className="bg-green-700 hover:bg-green-900"
-                isLoading={loading}
+                isLoading={false}
                 type="submit"
               >
                 Next <ChevronRight className="ml-2 w-4 h-4" />

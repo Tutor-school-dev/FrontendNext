@@ -39,7 +39,7 @@ export default function OTPAuth({ userType, isSignup = false, signupData, onBack
       return;
     }
 
-    const result = await requestOTP(phoneNumber, userType);
+    const result = await requestOTP(phoneNumber, userType, isSignup);
     if (result) {
       setShowOTPInput(true);
       setCountdown(30); // 30 seconds countdown
@@ -62,7 +62,7 @@ export default function OTPAuth({ userType, isSignup = false, signupData, onBack
   const handleResendOTP = async () => {
     if (countdown > 0) return;
     
-    const result = await requestOTP(phoneNumber, userType);
+    const result = await requestOTP(phoneNumber, userType, isSignup);
     if (result) {
       setCountdown(30);
       setOtp(""); // Clear previous OTP

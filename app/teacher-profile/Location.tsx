@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 import {
   Form,
   FormControl,
@@ -15,8 +16,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useUploadLocation } from "@/hooks/useUploadLocation";
+import { useCreateTeacherDetails } from "@/hooks/useCreateTeacherDetails";
 import { LoadingButton } from "@/components/ui/LoadingButton";
 import { ChevronRight, MapPin } from "lucide-react";
+import { EducationFormData } from "./TeacherProfileContent";
 
 const MapFormSchema = z.object({
   area: z.string().min(1, "Area is required"),
@@ -28,13 +31,18 @@ interface LocationProps {
   onNext: () => void;
   model?: string;
   fromSettings?: boolean;
+  educationData?: EducationFormData | null;
 }
 
-export default function Location({ onNext, model = "teacher", fromSettings = false }: LocationProps) {
+export default function Location({ onNext, model = "teacher", fromSettings = false, educationData }: LocationProps) {
   const [position, setPosition] = useState({ lat: 20.5937, lng: 78.9629 }); // Default to India's coordinates
   const [locationAccess, setLocationAccess] = useState(false);
   
-  const { handleMapForm, loading } = useUploadLocation(fromSettings);
+  const { handleMapForm, loading: oldLoading } = useUploadLocation(fromSettings);
+  const { createTeacherDetails, loading: newLoading } = useCreateTeacherDetails();
+  
+  // Use old hook for settings page, new hook for onboarding
+  const loading = fromSettings ? oldLoading : newLoading;
 
   const form = useForm({
     resolver: zodResolver(MapFormSchema),
@@ -94,9 +102,34 @@ export default function Location({ onNext, model = "teacher", fromSettings = fal
   }, []);
 
   const onSubmit = async (values: any) => {
-    await handleMapForm(values, position, model);
-    if (!fromSettings) {
+    if (fromSettings) {
+      // Old flow for settings page - just update location
+      await handleMapForm(values, position, model);
       onNext();
+    } else {
+      // New unified flow for onboarding - combine basic + location data
+      if (!educationData) {
+        toast.error("Education data is missing. Please go back and complete the previous step.");
+        return;
+      }
+
+      await createTeacherDetails({
+        // Basic info from education form
+        degree: educationData.highestQualification === "Others" 
+          ? educationData.otherQualification || educationData.highestQualification
+          : educationData.highestQualification,
+        class_field: educationData.class,
+        university: educationData.university,
+        current_status: educationData.status,
+        teaching_mode: educationData.teachingMethod,
+        referral: educationData.referralSource || "",
+        // Location info from this form
+        area: values.area,
+        latitude: position.lat,
+        longitude: position.lng,
+        pincode: values.pincode,
+        state: values.state,
+      });
     }
   };
 

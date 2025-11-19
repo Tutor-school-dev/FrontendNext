@@ -17,6 +17,7 @@ import ShowPasswordSvg from "@/components/svg/ShowPasswordSvg";
 export default function TeacherAuth() {
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState("SIGNIN");
+  const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -32,8 +33,8 @@ export default function TeacherAuth() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!phoneNumber || !password) return;
-    login(e, phoneNumber, password);
+    if (!email || !password) return;
+    login(e, email, password);
   };
 
   const handleSignup = () => {
@@ -79,11 +80,10 @@ export default function TeacherAuth() {
           <div className="flex flex-col justify-between items-center gap-10 p-2 md:p-10 w-full h-full">
             <div className="flex flex-col justify-start items-center gap-5 w-full h-full">
               <Input
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, "").slice(0, 10))}
-                maxLength={10}
-                type="tel"
-                placeholder="Number (without +91)"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                type="email"
+                placeholder="Email"
                 className="bg-green-100 border-2 border-black rounded-lg h-10 overflow-hidden text-black"
                 style={{ borderRadius: "12px" }}
               />
@@ -113,7 +113,7 @@ export default function TeacherAuth() {
                     isLoading={loginLoading}
                     className="bg-blue-950 p-2 sm:p-3 rounded-lg w-full sm:w-2/3 md:w-1/2 lg:w-1/2 h-9 sm:h-8 md:h-9 text-white text-lg sm:text-xl"
                     style={{ borderRadius: "12px" }}
-                    disabled={!phoneNumber || !password}
+                    disabled={!email || !password}
                   >
                     Sign In
                   </LoadingButton>

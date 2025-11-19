@@ -55,7 +55,7 @@ export default function TeacherSignup() {
           style={{ borderRadius: "12px" }}
         />
         <LoadingButton
-          onClick={() => SendOTP(number, setOpen, "teacher")}
+          onClick={() => SendOTP(number, setOpen, "teacher", true)}
           isLoading={loading}
           disabled={!number || number.length !== 10 || loading}
           className="bg-blue-950 rounded-lg h-10 text-white sm:text-base md:text-xl"

@@ -10,7 +10,12 @@ import type { OTPRequestPayload, OTPRequestResponse } from "@/types/auth";
 export const useSendOTP = () => {
   const [loading, setLoading] = useState(false);
 
-  const SendOTP = async (phoneNumber: string, setOpen: (open: boolean) => void, model: string) => {
+  const SendOTP = async (
+    phoneNumber: string, 
+    setOpen: (open: boolean) => void, 
+    model: string,
+    isSignup: boolean = false
+  ) => {
     if (!phoneNumber || phoneNumber.trim() === '') {
       toast.error("Please enter valid Phone Number or Register via Google");
       return;
@@ -19,7 +24,7 @@ export const useSendOTP = () => {
     try {
       setLoading(true);
       const apiUrl = getDjangoAuthUrl();
-      const endpoint = '/otp/request/';
+      const endpoint = '/auth/otp/request/';
       
       // Map old model terminology to new API format
       const apiUserType = mapUserTypeToAPI(model);
@@ -27,7 +32,7 @@ export const useSendOTP = () => {
       const payload: OTPRequestPayload = {
         phone_number: phoneNumber,
         user_type: apiUserType,
-        use_for: OTP_USE_CASE.LOGIN
+        use_for: isSignup ? OTP_USE_CASE.PHONE_VERIFICATION : OTP_USE_CASE.LOGIN
       };
 
       const response = await axios.post<OTPRequestResponse>(

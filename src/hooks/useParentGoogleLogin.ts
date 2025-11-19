@@ -20,7 +20,7 @@ export const useParentGoogleLogin = () => {
 
     try {
       const apiUrl = getDjangoAuthUrl();
-      const endpoint = '/google/';
+      const endpoint = '/auth/google/';
       
       const payload: GoogleAuthPayload = {
         id_token: token,

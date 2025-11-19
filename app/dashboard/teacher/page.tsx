@@ -6,6 +6,7 @@ import { useDashboardStore } from "../../../src/hooks/useDashboardStore";
 import TeacherNavbar from "../../../src/components/TeacherNavbar";
 import { User, Calendar, DollarSign, BookOpen, Clock, MapPin } from "lucide-react";
 import Cookies from "js-cookie";
+import { STORAGE_KEY } from "../../../src/lib/constants";
 
 export default function TeacherDashboardPage() {
   const router = useRouter();
@@ -18,6 +19,9 @@ export default function TeacherDashboardPage() {
     get_dashboard_data,
     get_teacher_subs,
   } = useDashboardStore();
+
+  // Fallback to localStorage if teacher data not loaded yet
+  const teacherName = teacher?.name || (typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEY.NAME) : null) || "Teacher";
 
   useEffect(() => {
     const authToken = Cookies.get("jwt_Token"); // Fixed: use jwt_Token consistently
@@ -61,7 +65,7 @@ export default function TeacherDashboardPage() {
           {/* Header */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900">
-              Welcome back, {teacher?.name || "Teacher"}!
+              Welcome back, {teacherName}!
             </h1>
             <p className="mt-2 text-lg text-gray-600">
               Here's an overview of your teaching activities

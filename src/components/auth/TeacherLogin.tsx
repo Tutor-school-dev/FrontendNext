@@ -12,7 +12,7 @@ import ShowPasswordSvg from "@/components/svg/ShowPasswordSvg";
 import { TeacherResetPassword } from "./TeacherResetPassword";
 
 export default function TeacherLogin() {
-  const [number, setNumber] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const searchParams = useSearchParams();
@@ -30,14 +30,9 @@ export default function TeacherLogin() {
     job_id || undefined
   );
 
-  const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/\D/g, "").slice(0, 10);
-    setNumber(value);
-  };
-
   const handleManualLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    login(e, number, password);
+    login(e, email, password);
   };
 
   if (googleLoading) {
@@ -55,11 +50,10 @@ export default function TeacherLogin() {
     <div className="flex flex-col justify-between items-center gap-10 p-2 md:p-10 w-full h-full">
       <div className="flex flex-col justify-start items-center gap-5 w-full h-full">
         <Input
-          value={number}
-          onChange={handleNumberChange}
-          maxLength={10}
-          type="tel"
-          placeholder="Number (without +91)"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          type="email"
+          placeholder="Email"
           className="bg-green-100 border-2 border-black rounded-lg h-10 overflow-hidden text-black"
           style={{ borderRadius: "12px" }}
         />

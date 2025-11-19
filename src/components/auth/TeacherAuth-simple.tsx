@@ -13,7 +13,7 @@ import ShowPasswordSvg from "@/components/svg/ShowPasswordSvg";
 export default function TeacherAuth() {
   const searchParams = useSearchParams();
   const [isLogin, setIsLogin] = useState(true);
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
@@ -27,7 +27,7 @@ export default function TeacherAuth() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (isLogin) {
-      login(e, phoneNumber, password);
+      login(e, email, password);
     } else {
       // Handle signup - we'll implement this later
       console.log("Teacher signup not implemented yet");
@@ -50,11 +50,10 @@ export default function TeacherAuth() {
     <div className="space-y-4">
       <form onSubmit={handleSubmit} className="space-y-4 w-full">
         <Input
-          value={phoneNumber}
-          onChange={(e) => setPhoneNumber(e.target.value)}
-          maxLength={10}
-          type="tel"
-          placeholder="Number (without +91)"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          type="email"
+          placeholder="Email"
           className="bg-green-100 border-2 border-black rounded-lg h-10 text-black"
         />
 
@@ -80,7 +79,7 @@ export default function TeacherAuth() {
           isLoading={manualLoading}
           type="submit"
           className="bg-blue-700 hover:bg-blue-800 rounded-lg w-full h-10 text-white font-medium transition-colors"
-          disabled={!phoneNumber || !password}
+          disabled={!email || !password}
         >
           {isLogin ? 'Login' : 'Sign Up'}
         </LoadingButton>
