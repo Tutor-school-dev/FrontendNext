@@ -27,8 +27,8 @@ export default function TeacherAuth() {
   const redirectFromJobListing = searchParams.get('redirect');
   const job_id = searchParams.get('job_id');
 
-  const { login, loading: loginLoading } = useTeacherLogin(redirectFromJobListing || undefined, job_id || undefined);
-  const { handleGoogleLogin, loading: googleLoading } = useTeacherGoogleLogin(redirectFromJobListing || undefined, job_id || undefined);
+  const { login, loading: loginLoading } = useTeacherLogin();
+  const { handleGoogleLogin, loading: googleLoading } = useTeacherGoogleLogin();
   const { SendOTP, loading: otpLoading } = useSendOTP();
 
   const handleLogin = (e: React.FormEvent) => {

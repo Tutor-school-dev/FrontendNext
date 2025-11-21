@@ -50,7 +50,6 @@ export default function TeacherNavbar() {
       localStorage.removeItem("email");
       localStorage.removeItem("name");
       localStorage.removeItem("Phone");
-      localStorage.removeItem("redirectFromJobListing");
     }
     
     // Redirect to home
@@ -79,16 +78,10 @@ export default function TeacherNavbar() {
               Dashboard
             </button>
             <button 
-              onClick={() => router.push("/dashboard/teacher/sessions")}
+              onClick={() => router.push("/dashboard/teacher/opportunities")}
               className="text-sm text-gray-700 hover:text-blue-600 transition-colors"
             >
-              Sessions
-            </button>
-            <button 
-              onClick={() => router.push("/dashboard/teacher/subjects")}
-              className="text-sm text-gray-700 hover:text-blue-600 transition-colors"
-            >
-              Subjects
+              Opportunities
             </button>
             <button 
               onClick={() => router.push("/dashboard/teacher/subscription")}
@@ -133,7 +126,7 @@ export default function TeacherNavbar() {
                     <button 
                       onClick={() => {
                         setIsDropdownOpen(false);
-                        router.push("/teacher-profile");
+                        router.push("/dashboard/teacher/settings");
                       }}
                       className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >

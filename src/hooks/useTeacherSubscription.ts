@@ -4,28 +4,22 @@ import { useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 import Cookies from "js-cookie";
-import { getAppUrl } from "@/lib/utils";
+import { getDjangoAuthUrl } from "@/lib/utils";
 
 export const useTeacherSubscription = () => {
   const [loading, setLoading] = useState(false);
+  const [loadingPlanId, setLoadingPlanId] = useState<number | null>(null);
   const [subscriptionDetail, setSubscriptionDetail] = useState([]);
 
   const getSubscriptions = async () => {
     try {
       setLoading(true);
-      const apiUrl = getAppUrl();
-      const jwtToken = Cookies.get("jwt_Token");
-      
-      if (!jwtToken) {
-        toast.error("Authentication required. Please login again.");
-        return;
-      }
+      const djangoUrl = getDjangoAuthUrl();
 
-      const response = await axios.get(`${apiUrl}/subscriptions`, {
-        headers: { authorization: `bearer ${jwtToken}` }
-      });
+      // Django API doesn't require authentication for listing plans
+      const response = await axios.get(`${djangoUrl}/subscriptions/`);
       
-      setSubscriptionDetail(response.data.data);
+      setSubscriptionDetail(response.data.plans);
     } catch (err: any) {
       console.error("Get subscriptions error:", err);
       toast.error(err.response?.data?.message || "Failed to fetch subscription plans");
@@ -36,26 +30,29 @@ export const useTeacherSubscription = () => {
 
   const startPayment = async (tierId: number, duration: number) => {
     try {
-      setLoading(true);
-      const apiUrl = getAppUrl();
+      setLoadingPlanId(tierId);
+      const djangoUrl = getDjangoAuthUrl();
       const jwtToken = Cookies.get("jwt_Token");
       
       if (!jwtToken) {
         toast.error("Authentication required. Please login again.");
+        setLoadingPlanId(null);
         return;
       }
 
-      const response = await axios.post(`${apiUrl}/payment/start`, {
+      const response = await axios.post(`${djangoUrl}/subscriptions/start-payment/`, {
         sub_id: tierId,
         duration: duration
       }, { 
-        headers: { authorization: `bearer ${jwtToken}` } 
+        headers: { Authorization: `Bearer ${jwtToken}` } 
       });
 
       // Store order details for payment verification
       if (typeof window !== 'undefined') {
         localStorage.setItem('order_id', response.data.order_id);
         localStorage.setItem('tier_id', tierId.toString());
+        localStorage.setItem('subscription_name', response.data.subscription);
+        localStorage.setItem('amount', response.data.amount.toString());
       }
 
       // Redirect to payment gateway
@@ -65,8 +62,7 @@ export const useTeacherSubscription = () => {
     } catch (err: any) {
       console.error("Payment start error:", err);
       toast.error(err.response?.data?.message || "Failed to start payment process");
-    } finally {
-      setLoading(false);
+      setLoadingPlanId(null);
     }
   };
 
@@ -74,6 +70,7 @@ export const useTeacherSubscription = () => {
     getSubscriptions, 
     subscriptionDetail, 
     startPayment, 
-    loading 
+    loading,
+    loadingPlanId
   };
 };

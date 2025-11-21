@@ -1,305 +1,479 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useDashboardStore } from "../../../src/hooks/useDashboardStore";
 import TeacherNavbar from "../../../src/components/TeacherNavbar";
-import { User, Calendar, DollarSign, BookOpen, Clock, MapPin } from "lucide-react";
+import {
+  User,
+  Briefcase,
+  CheckCircle,
+  Clock,
+  XCircle,
+  MapPin,
+  BookOpen,
+  GraduationCap,
+  TrendingUp,
+  Award,
+  DollarSign,
+  Mail,
+  Phone,
+} from "lucide-react";
 import Cookies from "js-cookie";
-import { STORAGE_KEY } from "../../../src/lib/constants";
+import axios from "axios";
+import { getDjangoAuthUrl } from "../../../src/lib/utils";
+import { useAppliedJobs } from "../../../src/hooks/useAppliedJobs";
+import { Card, CardContent, CardHeader, CardTitle } from "../../../src/components/ui/card";
+import { Badge } from "../../../src/components/ui/badge";
+import { Button } from "../../../src/components/ui/button";
+
+interface TutorData {
+  id: string;
+  name: string;
+  email: string;
+  primary_contact: string;
+  state: string;
+  area: string;
+  pincode: string;
+  profile_pic: string;
+  lesson_price: string;
+  teaching_mode: string;
+  class_level: string;
+  current_status: string;
+  degree: string;
+  university: string;
+  introduction: string;
+}
 
 export default function TeacherDashboardPage() {
   const router = useRouter();
-  const {
-    teacher,
-    teacher_sessions,
-    teacher_subscription,
-    teacher_subjects,
-    loading,
-    get_dashboard_data,
-    get_teacher_subs,
-  } = useDashboardStore();
-
-  // Fallback to localStorage if teacher data not loaded yet
-  const teacherName = teacher?.name || (typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEY.NAME) : null) || "Teacher";
+  const [tutorData, setTutorData] = useState<TutorData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const { applications, loading: appsLoading, fetchAppliedJobs } = useAppliedJobs();
 
   useEffect(() => {
-    const authToken = Cookies.get("jwt_Token"); // Fixed: use jwt_Token consistently
-    
+    const authToken = Cookies.get("jwt_Token");
+
     if (!authToken) {
       router.push("/auth?model=teacher");
       return;
     }
 
-    // Load dashboard data
-    get_dashboard_data(authToken).catch(error => {
-      console.error("Teacher dashboard: Error loading dashboard data:", error);
-    });
-    get_teacher_subs(authToken).catch(error => {
-      console.error("Teacher dashboard: Error loading teacher subs:", error);
-    });
+    fetchTutorData(authToken);
+    fetchAppliedJobs();
   }, []);
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
+  const fetchTutorData = async (token: string) => {
+    try {
+      setLoading(true);
+      const djangoUrl = getDjangoAuthUrl();
+      const response = await axios.get(`${djangoUrl}/tutor/`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setTutorData(response.data.teacher);
+    } catch (error: any) {
+      console.error("Fetch tutor data error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "accepted":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "pending":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "rejected":
+        return "bg-red-100 text-red-800 border-red-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "accepted":
+        return <CheckCircle className="w-4 h-4" />;
+      case "pending":
+        return <Clock className="w-4 h-4" />;
+      case "rejected":
+        return <XCircle className="w-4 h-4" />;
+      default:
+        return <Clock className="w-4 h-4" />;
+    }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent"></div>
+          <p className="text-gray-600 text-lg">Loading your dashboard...</p>
+        </div>
       </div>
     );
   }
 
+  const stats = [
+    {
+      title: "Total Applications",
+      value: applications.length,
+      icon: Briefcase,
+      color: "from-blue-500 to-cyan-500",
+      bgColor: "bg-blue-50",
+    },
+    {
+      title: "Accepted",
+      value: applications.filter((app) => app.status.toLowerCase() === "accepted").length,
+      icon: CheckCircle,
+      color: "from-green-500 to-emerald-500",
+      bgColor: "bg-green-50",
+    },
+    {
+      title: "Pending",
+      value: applications.filter((app) => app.status.toLowerCase() === "pending").length,
+      icon: Clock,
+      color: "from-yellow-500 to-orange-500",
+      bgColor: "bg-yellow-50",
+    },
+    {
+      title: "Teaching Rate",
+      value: `₹${tutorData?.lesson_price || 0}/hr`,
+      icon: DollarSign,
+      color: "from-purple-500 to-pink-500",
+      bgColor: "bg-purple-50",
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       <TeacherNavbar />
-      
-      <div className="pt-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="py-8">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">
-              Welcome back, {teacherName}!
-            </h1>
-            <p className="mt-2 text-lg text-gray-600">
-              Here's an overview of your teaching activities
-            </p>
-          </div>
 
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {/* Active Sessions */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <Calendar className="h-8 w-8 text-blue-600" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500">Active Sessions</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {teacher_sessions?.filter(session => session.admin_side_status === 'accepted' && !session.removed_at).length || 0}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Total Sessions */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <Clock className="h-8 w-8 text-green-600" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500">Total Sessions</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {teacher_sessions?.length || 0}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Subjects */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <BookOpen className="h-8 w-8 text-purple-600" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500">Subjects</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {teacher_subjects?.length || 0}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Lesson Price */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <DollarSign className="h-8 w-8 text-yellow-600" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500">Lesson Price</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    ₹{teacher?.lesson_price || 0}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Main Content Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Profile Card */}
-            <div className="lg:col-span-1">
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Profile Overview</h2>
-                
-                <div className="flex items-center space-x-4 mb-6">
-                  {teacher?.profile_pic ? (
-                    <img
-                      src={teacher.profile_pic}
-                      alt={teacher.name}
-                      className="w-16 h-16 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
-                      <User className="w-8 h-8 text-blue-600" />
-                    </div>
-                  )}
+      <div className="pt-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto pb-12">
+        {/* Hero Section */}
+        <div className="mb-8">
+          <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-3xl shadow-2xl p-8 md:p-12">
+            <div className="absolute top-0 right-0 -mt-4 -mr-4 w-72 h-72 bg-white opacity-10 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-0 left-0 -mb-4 -ml-4 w-72 h-72 bg-white opacity-10 rounded-full blur-3xl"></div>
+            
+            <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between">
+              <div className="flex-1 mb-6 md:mb-0">
+                <div className="flex items-center space-x-3 mb-3">
+                  <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg overflow-hidden">
+                    {tutorData?.profile_pic ? (
+                      <img
+                        src={tutorData.profile_pic}
+                        alt={tutorData.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <GraduationCap className="w-8 h-8 text-indigo-600" />
+                    )}
+                  </div>
                   <div>
-                    <h3 className="text-lg font-medium text-gray-900">{teacher?.name}</h3>
-                    <p className="text-sm text-gray-500">{teacher?.email}</p>
+                    <h1 className="text-3xl md:text-4xl font-bold text-white">
+                      Welcome back, {tutorData?.name}!
+                    </h1>
+                    <p className="text-blue-100 text-lg mt-1">
+                      Ready to inspire minds today?
+                    </p>
                   </div>
                 </div>
+                <div className="flex flex-wrap gap-3 mt-4">
+                  <Badge className="bg-white/20 text-white border-white/30 px-3 py-1">
+                    <MapPin className="w-3 h-3 mr-1" />
+                    {tutorData?.area}, {tutorData?.state}
+                  </Badge>
+                  <Badge className="bg-white/20 text-white border-white/30 px-3 py-1">
+                    <BookOpen className="w-3 h-3 mr-1" />
+                    {tutorData?.teaching_mode}
+                  </Badge>
+                  <Badge className="bg-white/20 text-white border-white/30 px-3 py-1">
+                    <Award className="w-3 h-3 mr-1" />
+                    {tutorData?.degree}
+                  </Badge>
+                </div>
+              </div>
+              
+              <div className="flex gap-3">
+                <Button
+                  onClick={() => router.push("/dashboard/teacher/opportunities")}
+                  className="bg-white text-indigo-600 hover:bg-blue-50 font-semibold px-6 py-6 rounded-xl shadow-lg"
+                >
+                  <Briefcase className="w-5 h-5 mr-2" />
+                  Browse Jobs
+                </Button>
+                <Button
+                  onClick={() => router.push("/dashboard/teacher/settings")}
+                  variant="outline"
+                  className="border-white text-white hover:bg-white/20 font-semibold px-6 py-6 rounded-xl"
+                >
+                  <User className="w-5 h-5 mr-2" />
+                  Profile
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
 
-                <div className="space-y-3">
-                  <div className="flex items-center text-sm text-gray-600">
-                    <MapPin className="w-4 h-4 mr-2" />
-                    <span>{teacher?.area || "Location not set"}, {teacher?.state || ""}</span>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {stats.map((stat, index) => (
+            <Card
+              key={index}
+              className="relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+            >
+              <div className={`absolute inset-0 bg-gradient-to-br ${stat.color} opacity-5`}></div>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600 mb-1">
+                      {stat.title}
+                    </p>
+                    <p className="text-3xl font-bold text-gray-900">
+                      {stat.value}
+                    </p>
                   </div>
-                  
-                  <div className="flex items-center text-sm text-gray-600">
-                    <DollarSign className="w-4 h-4 mr-2" />
-                    <span>₹{teacher?.lesson_price || 0} per lesson</span>
+                  <div className={`${stat.bgColor} p-4 rounded-2xl`}>
+                    <stat.icon className="w-8 h-8 text-gray-700" />
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
 
-                {/* Subscription Status */}
-                <div className="mt-6 pt-6 border-t border-gray-200">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="text-sm font-medium text-gray-900">Subscription</h4>
-                    <button 
-                      onClick={() => router.push("/dashboard/teacher/subscription")}
-                      className="text-xs text-blue-600 hover:text-blue-800"
+        {/* Main Content Grid */}
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Left Column - Profile Summary */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* Profile Card */}
+            <Card className="border-0 shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-t-xl">
+                <CardTitle className="flex items-center space-x-2">
+                  <User className="w-5 h-5" />
+                  <span>Your Profile</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-6 space-y-4">
+                <div className="flex items-center space-x-3">
+                  <Mail className="w-5 h-5 text-gray-400" />
+                  <div>
+                    <p className="text-xs text-gray-500">Email</p>
+                    <p className="text-sm font-medium text-gray-900">{tutorData?.email}</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <Phone className="w-5 h-5 text-gray-400" />
+                  <div>
+                    <p className="text-xs text-gray-500">Contact</p>
+                    <p className="text-sm font-medium text-gray-900">{tutorData?.primary_contact}</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <GraduationCap className="w-5 h-5 text-gray-400" />
+                  <div>
+                    <p className="text-xs text-gray-500">Education</p>
+                    <p className="text-sm font-medium text-gray-900">
+                      {tutorData?.degree} from {tutorData?.university}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <BookOpen className="w-5 h-5 text-gray-400" />
+                  <div>
+                    <p className="text-xs text-gray-500">Teaching Level</p>
+                    <p className="text-sm font-medium text-gray-900">Class {tutorData?.class_level}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Quick Stats Card */}
+            <Card className="border-0 shadow-lg bg-gradient-to-br from-amber-50 to-orange-50">
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2 text-amber-900">
+                  <TrendingUp className="w-5 h-5" />
+                  <span>Performance</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">Success Rate</span>
+                  <span className="text-lg font-bold text-amber-900">
+                    {applications.length > 0
+                      ? Math.round(
+                          (applications.filter((a) => a.status.toLowerCase() === "accepted")
+                            .length /
+                            applications.length) *
+                            100
+                        )
+                      : 0}
+                    %
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    className="bg-gradient-to-r from-amber-500 to-orange-500 h-2 rounded-full transition-all duration-500"
+                    style={{
+                      width: `${
+                        applications.length > 0
+                          ? (applications.filter((a) => a.status.toLowerCase() === "accepted")
+                              .length /
+                              applications.length) *
+                            100
+                          : 0
+                      }%`,
+                    }}
+                  ></div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Right Column - Applications */}
+          <div className="lg:col-span-2">
+            <Card className="border-0 shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-t-xl">
+                <CardTitle className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Briefcase className="w-5 h-5" />
+                    <span>Your Applications</span>
+                  </div>
+                  <Badge className="bg-white/20 text-white border-white/30">
+                    {applications.length} Total
+                  </Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-6">
+                {appsLoading ? (
+                  <div className="flex justify-center items-center py-12">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                  </div>
+                ) : applications.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Briefcase className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                    <p className="text-gray-500 text-lg mb-2">No applications yet</p>
+                    <p className="text-gray-400 text-sm mb-6">
+                      Start applying to opportunities to see them here
+                    </p>
+                    <Button
+                      onClick={() => router.push("/dashboard/teacher/opportunities")}
+                      className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600"
                     >
-                      Manage
-                    </button>
+                      Browse Opportunities
+                    </Button>
                   </div>
-                  <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                    teacher_subscription?.name === 'Premium' 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-gray-100 text-gray-800'
-                  }`}>
-                    {teacher_subscription?.name || 'Free'}
-                  </div>
-                  {teacher_subscription?.validity && (
-                    <p className="text-xs text-gray-500 mt-1">
-                      Valid until: {formatDate(teacher_subscription.validity)}
-                    </p>
-                  )}
-                  {!teacher_subscription?.name && (
-                    <p className="text-xs text-blue-600 mt-1 cursor-pointer" 
-                       onClick={() => router.push("/dashboard/teacher/subscription")}>
-                      Upgrade to Premium →
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Recent Sessions and Subjects */}
-            <div className="lg:col-span-2 space-y-8">
-              {/* Recent Sessions */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-semibold text-gray-900">Recent Sessions</h2>
-                  <button 
-                    onClick={() => router.push("/dashboard/teacher/sessions")}
-                    className="text-sm text-blue-600 hover:text-blue-800"
-                  >
-                    View all
-                  </button>
-                </div>
-                
-                {teacher_sessions && teacher_sessions.length > 0 ? (
-                  <div className="space-y-3">
-                    {teacher_sessions.slice(0, 5).map((session, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div>
-                          <p className="font-medium text-gray-900">{session.parent_name}</p>
-                          <p className="text-sm text-gray-500">
-                            {session.subject} • {session.child_name} • Class {session.class}
-                          </p>
-                          <p className="text-xs text-gray-400">
-                            {formatDate(session.created_at)}
-                          </p>
+                ) : (
+                  <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2">
+                    {applications.map((app) => (
+                      <div
+                        key={app.id}
+                        className="border border-gray-200 rounded-xl p-5 hover:shadow-md transition-all duration-300 bg-white hover:border-blue-300"
+                      >
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-2 mb-2">
+                              <h3 className="font-semibold text-lg text-gray-900">
+                                {app.learner.guardian_name || app.learner.name}
+                              </h3>
+                              <Badge className={`${getStatusColor(app.status)} border`}>
+                                <span className="flex items-center space-x-1">
+                                  {getStatusIcon(app.status)}
+                                  <span className="capitalize">{app.status}</span>
+                                </span>
+                              </Badge>
+                            </div>
+                            <div className="grid grid-cols-2 gap-3 text-sm">
+                              <div className="flex items-center space-x-2 text-gray-600">
+                                <GraduationCap className="w-4 h-4" />
+                                <span>Grade {app.learner.grade}</span>
+                              </div>
+                              <div className="flex items-center space-x-2 text-gray-600">
+                                <BookOpen className="w-4 h-4" />
+                                <span>{app.learner.board}</span>
+                              </div>
+                              <div className="flex items-center space-x-2 text-gray-600">
+                                <MapPin className="w-4 h-4" />
+                                <span>{app.learner.area}</span>
+                              </div>
+                              <div className="flex items-center space-x-2 text-gray-600">
+                                <DollarSign className="w-4 h-4" />
+                                <span>₹{app.learner.budget}/hr</span>
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                        <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          session.admin_side_status === 'accepted' 
-                            ? 'bg-green-100 text-green-800' 
-                            : session.admin_side_status === 'pending'
-                            ? 'bg-yellow-100 text-yellow-800'
-                            : 'bg-red-100 text-red-800'
-                        }`}>
-                          {session.admin_side_status}
+                        
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          {(() => {
+                            let subjects = [];
+                            if (app.learner.subjects) {
+                              if (Array.isArray(app.learner.subjects)) {
+                                subjects = app.learner.subjects;
+                              } else if (typeof app.learner.subjects === 'string') {
+                                try {
+                                  // Handle string format like "['English', 'Maths', 'Chemistry']"
+                                  if (app.learner.subjects.startsWith('[') && app.learner.subjects.endsWith(']')) {
+                                    subjects = JSON.parse(app.learner.subjects.replace(/'/g, '"'));
+                                  } else {
+                                    // Handle comma-separated string
+                                    subjects = app.learner.subjects.split(',').map(s => s.trim());
+                                  }
+                                } catch (e) {
+                                  // Fallback to comma-separated parsing
+                                  subjects = app.learner.subjects.split(',').map(s => s.trim());
+                                }
+                              }
+                            }
+                            
+                            return subjects.slice(0, 3).map((subject, idx) => (
+                              <Badge key={idx} variant="outline" className="text-xs">
+                                {subject}
+                              </Badge>
+                            ));
+                          })()}
+                          {(() => {
+                            let totalSubjects = 0;
+                            if (app.learner.subjects) {
+                              if (Array.isArray(app.learner.subjects)) {
+                                totalSubjects = app.learner.subjects.length;
+                              } else if (typeof app.learner.subjects === 'string') {
+                                try {
+                                  if (app.learner.subjects.startsWith('[') && app.learner.subjects.endsWith(']')) {
+                                    totalSubjects = JSON.parse(app.learner.subjects.replace(/'/g, '"')).length;
+                                  } else {
+                                    totalSubjects = app.learner.subjects.split(',').length;
+                                  }
+                                } catch (e) {
+                                  totalSubjects = app.learner.subjects.split(',').length;
+                                }
+                              }
+                            }
+                            
+                            return totalSubjects > 3 && (
+                              <Badge variant="outline" className="text-xs">
+                                +{totalSubjects - 3} more
+                              </Badge>
+                            );
+                          })()}
+                        </div>
+
+                        <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                          <span className="text-xs text-gray-500">
+                            Applied on {new Date(app.applied_at).toLocaleDateString()}
+                          </span>
+                          <Badge variant="outline" className="text-xs">
+                            {app.learner.preferred_mode}
+                          </Badge>
                         </div>
                       </div>
                     ))}
                   </div>
-                ) : (
-                  <p className="text-gray-500 text-center py-8">No sessions yet</p>
                 )}
-              </div>
-
-              {/* Subjects */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-semibold text-gray-900">Your Subjects</h2>
-                  <button 
-                    onClick={() => router.push("/dashboard/teacher/subjects")}
-                    className="text-sm text-blue-600 hover:text-blue-800"
-                  >
-                    Manage
-                  </button>
-                </div>
-                
-                {teacher_subjects && teacher_subjects.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {teacher_subjects.map((subject, index) => (
-                      <div key={index} className="flex items-center p-3 bg-blue-50 rounded-lg">
-                        <BookOpen className="w-5 h-5 text-blue-600 mr-3" />
-                        <div>
-                          <p className="font-medium text-gray-900">{subject.subject_name}</p>
-                          <p className="text-sm text-gray-500">{subject.subject_code}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-gray-500 text-center py-8">No subjects added yet</p>
-                )}
-              </div>
-
-              {/* Quick Actions */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <button
-                    onClick={() => router.push("/dashboard/teacher/payments")}
-                    className="flex items-center justify-center p-4 bg-green-50 hover:bg-green-100 rounded-lg border border-green-200 transition-colors"
-                  >
-                    <DollarSign className="w-5 h-5 text-green-600 mr-2" />
-                    <span className="text-green-700 font-medium">View Payments</span>
-                  </button>
-                  
-                  <button
-                    onClick={() => router.push("/dashboard/teacher/subjects")}
-                    className="flex items-center justify-center p-4 bg-purple-50 hover:bg-purple-100 rounded-lg border border-purple-200 transition-colors"
-                  >
-                    <BookOpen className="w-5 h-5 text-purple-600 mr-2" />
-                    <span className="text-purple-700 font-medium">Edit Subjects</span>
-                  </button>
-                </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>

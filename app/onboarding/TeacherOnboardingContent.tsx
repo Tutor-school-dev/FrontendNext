@@ -122,16 +122,17 @@ export default function TeacherOnboardingContent() {
         }
       }
       
-      // 2. Upload location data
+      // 2. Upload location data using Django API
       try {
-        await axios.post(`${apiUrl}/onboarding/TEACHER/location`, {
+        const djangoUrl = `${apiUrl}/api`;
+        await axios.put(`${djangoUrl}/tutor/`, {
           latitude: formData.position.lat,
           longitude: formData.position.lng,
           area: formData.area,
           state: formData.state,
           pincode: formData.pincode
         }, { 
-          headers: { authorization: `bearer ${jwtToken}` } 
+          headers: { Authorization: `Bearer ${jwtToken}` } 
         });
       } catch (locationError) {
         console.warn("Location upload failed:", locationError);

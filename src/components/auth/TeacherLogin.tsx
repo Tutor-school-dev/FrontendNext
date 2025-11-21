@@ -15,20 +15,9 @@ export default function TeacherLogin() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const searchParams = useSearchParams();
   
-  const redirectFromJobListing = searchParams.get('redirectFromJobListing');
-  const job_id = searchParams.get('job_id');
-  
-  const { login, loading } = useTeacherLogin(
-    redirectFromJobListing || undefined, 
-    job_id || undefined
-  );
-  
-  const { handleGoogleLogin, handleFailure, loading: googleLoading } = useTeacherGoogleLogin(
-    redirectFromJobListing || undefined, 
-    job_id || undefined
-  );
+  const { login, loading } = useTeacherLogin();
+  const { handleGoogleLogin, handleFailure, loading: googleLoading } = useTeacherGoogleLogin();
 
   const handleManualLogin = (e: React.FormEvent) => {
     e.preventDefault();

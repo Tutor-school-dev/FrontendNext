@@ -3,34 +3,67 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { getApiUrl } from '@/lib/utils';
 
 export interface Job {
-  j_id: string;
-  j_title: string;
-  j_desc: string;
-  j_posted_by: string;
-  j_posted_by_number: string;
-  j_location: string;
-  j_preview: string;
-  j_active: boolean;
-  j_created_at: string;
-  j_updated_at: string;
+  id: number;
+  created_at: string;
+  learner_name: string;
+  learner_phone: string;
+  learner_email: string | null;
+  grade: string;
+  board: string;
+  state: string;
+  area: string;
+  subjects?: string;
+  mode_of_teaching?: string;
 }
 
-export function useJobListings() {
+export interface JobFilters {
+  mode_of_teaching?: string;
+  subjects?: string[];
+  radius?: number;
+  latitude?: number;
+  longitude?: number;
+}
+
+export function useJobListings(filters?: JobFilters) {
   const [jobsData, setJobsData] = useState<Job[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchJobs = async () => {
+  const fetchJobs = async (customFilters?: JobFilters) => {
     try {
       setLoading(true);
       setError(null);
-      const apiUrl = getApiUrl();
-      const response = await axios.get(`${apiUrl}/admin/pub/jobs`);
-      const activeJobs = response.data?.filter((job: Job) => job.j_active === true);
-      setJobsData(activeJobs || []);
+      
+      const activeFilters = customFilters || filters || {};
+      const params = new URLSearchParams();
+      
+      if (activeFilters.mode_of_teaching) {
+        params.append('mode_of_teaching', activeFilters.mode_of_teaching);
+      }
+      
+      if (activeFilters.subjects && activeFilters.subjects.length > 0) {
+        params.append('subjects', activeFilters.subjects.join(','));
+      }
+      
+      if (activeFilters.radius !== undefined) {
+        params.append('radius', activeFilters.radius.toString());
+      }
+      
+      if (activeFilters.latitude !== undefined) {
+        params.append('latitude', activeFilters.latitude.toString());
+      }
+      
+      if (activeFilters.longitude !== undefined) {
+        params.append('longitude', activeFilters.longitude.toString());
+      }
+      
+      const queryString = params.toString();
+      const url = `https://stagingapi.tutorschool.in/api/admin_app/jobs/${queryString ? `?${queryString}` : ''}`;
+      
+      const response = await axios.get(url);
+      setJobsData(response.data || []);
     } catch (err) {
       console.error('Failed to fetch jobs:', err);
       setError(err as Error);

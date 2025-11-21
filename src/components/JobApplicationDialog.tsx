@@ -39,8 +39,8 @@ export function JobApplicationDialog({
   const [showPassword, setShowPassword] = useState(false);
 
   // Use hooks with job application context
-  const { login, loading: loginLoading } = useTeacherLogin("fromJobListing", jobId);
-  const { handleGoogleLogin, loading: googleLoading } = useTeacherGoogleLogin("fromJobListing", jobId);
+  const { login, loading: loginLoading } = useTeacherLogin();
+  const { handleGoogleLogin, loading: googleLoading } = useTeacherGoogleLogin();
   const { SendOTP, loading: otpLoading } = useSendOTP();
 
   const handleManualLogin = async (e: React.FormEvent) => {

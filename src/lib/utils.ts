@@ -54,12 +54,12 @@ export function getDjangoAuthUrl(): string {
   const nodeEnv = process.env.NEXT_PUBLIC_NODE_ENV || process.env.NODE_ENV || 'production';
   
   if (nodeEnv === 'staging') {
-    console.log('Using Django API (staging):', 'https://stagingapi.tutorschool.in/django/api');
-    return 'https://stagingapi.tutorschool.in/django/api';
+    console.log('Using Django API (staging):', 'https://stagingapi.tutorschool.in/api');
+    return 'https://stagingapi.tutorschool.in/api';
   }
   
   // Default to production Django API
-  const prodUrl = process.env.NEXT_PUBLIC_DJANGO_AUTH_URL || 'https://api.tutorschool.in/django/api';
+  const prodUrl = process.env.NEXT_PUBLIC_DJANGO_AUTH_URL || 'https://api.tutorschool.in/api';
   console.log('Using Django API (production):', prodUrl);
   return prodUrl;
 }

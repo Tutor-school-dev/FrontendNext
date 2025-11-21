@@ -13,15 +13,8 @@ export default function TeacherSignup() {
   const [number, setNumber] = useState('');
   const [open, setOpen] = useState(false);
   const { SendOTP, loading } = useSendOTP();
-  const searchParams = useSearchParams();
   
-  const redirectFromJobListing = searchParams.get('redirectFromJobListing');
-  const job_id = searchParams.get('job_id');
-  
-  const { handleGoogleLogin, handleFailure, loading: googleLoading } = useTeacherGoogleLogin(
-    redirectFromJobListing || undefined, 
-    job_id || undefined
-  );
+  const { handleGoogleLogin, handleFailure, loading: googleLoading } = useTeacherGoogleLogin();
 
   const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/\D/g, "").slice(0, 10);

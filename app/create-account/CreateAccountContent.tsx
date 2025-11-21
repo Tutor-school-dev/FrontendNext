@@ -27,37 +27,26 @@ import { useCreateTeacherAccount } from "@/hooks/useCreateTeacherAccount";
 import HidePasswordSvg from "@/components/svg/HidePasswordSvg";
 import ShowPasswordSvg from "@/components/svg/ShowPasswordSvg";
 
-const formSchema = z
-  .object({
-    name: z.string().min(2, {
-      message: "Name must be at least 2 characters.",
-    }),
-    email: z.string().email({
-      message: "Please enter a valid email address.",
-    }),
-    p_contact: z.string().regex(/^\d{10}$/, {
-      message: "Please enter a valid 10-digit phone number.",
-    }),
-    s_contact: z
-      .string()
-      .optional()
-      .refine((value) => !value || /^\d{10}$/.test(value), {
-        message: "Please enter a valid 10-digit phone number.",
-      }),
-    password: z
-      .string()
-      .regex(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-        {
-          message:
-            "Password must be at least 8 characters long and include a combination of uppercase and lowercase letters, numbers, and symbols.",
-        }
-      ),
-  })
-  .refine((data) => !data.s_contact || data.p_contact !== data.s_contact, {
-    message: "Primary and Secondary contact should not match",
-    path: ["s_contact"],
-  });
+const formSchema = z.object({
+  name: z.string().min(2, {
+    message: "Name must be at least 2 characters.",
+  }),
+  email: z.string().email({
+    message: "Please enter a valid email address.",
+  }),
+  p_contact: z.string().regex(/^\d{10}$/, {
+    message: "Please enter a valid 10-digit phone number.",
+  }),
+  password: z
+    .string()
+    .regex(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+      {
+        message:
+          "Password must be at least 8 characters long and include a combination of uppercase and lowercase letters, numbers, and symbols.",
+      }
+    ),
+});
 
 export default function CreateAccountContent() {
   const searchParams = useSearchParams();
@@ -76,7 +65,6 @@ export default function CreateAccountContent() {
       name: "",
       email: email,
       p_contact: phone,
-      s_contact: "",
       password: "",
     },
   });
@@ -201,29 +189,6 @@ export default function CreateAccountContent() {
                   render={({ field }) => (
                     <FormItem className="w-full">
                       <FormLabel>Phone*</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="tel"
-                          maxLength={10}
-                          placeholder="10 digit number"
-                          {...field}
-                          onChange={(e) => {
-                            const value = e.target.value.replace(/\D/g, "").slice(0, 10);
-                            field.onChange(value);
-                          }}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="s_contact"
-                  render={({ field }) => (
-                    <FormItem className="w-full">
-                      <FormLabel>Secondary Phone (Optional)</FormLabel>
                       <FormControl>
                         <Input
                           type="tel"

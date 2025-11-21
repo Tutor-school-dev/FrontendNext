@@ -6,15 +6,14 @@ import { getApiUrl } from "@/lib/utils";
 // Function to fetch job data for metadata (server-side)
 async function getJobData(jobId: string) {
   try {
-    const apiUrl = getApiUrl();
-    const response = await fetch(`${apiUrl}/admin/pub/jobs`, {
+    const response = await fetch(`https://stagingapi.tutorschool.in/api/admin_app/jobs/`, {
       cache: 'no-store', // Always fetch fresh data for SEO
     });
     
     if (!response.ok) return null;
     
     const jobs = await response.json();
-    const job = jobs.find((j: any) => j.j_id === jobId);
+    const job = jobs.find((j: any) => j.id.toString() === jobId);
     return job;
   } catch (error) {
     console.error('Failed to fetch job for metadata:', error);

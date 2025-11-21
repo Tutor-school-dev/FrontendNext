@@ -1,36 +1,28 @@
 "use client";
 
 import { useEffect } from 'react';
+import { Job } from '@/hooks/useJobListings';
 
 interface JobStructuredDataProps {
-  job: {
-    j_id: string;
-    j_title: string;
-    j_desc: string;
-    j_posted_by: string;
-    j_location: string;
-    j_preview: string;
-    j_created_at: string;
-    j_updated_at: string;
-  };
+  job: Job;
 }
 
 export function JobStructuredData({ job }: JobStructuredDataProps) {
   useEffect(() => {
     // Clean HTML from description
-    const cleanDescription = job.j_desc?.replace(/<[^>]*>/g, '') || '';
+    const cleanDescription = `${job.grade} ${job.board} - ${job.subjects || 'Subject not specified'}`;
     
     const structuredData = {
       "@context": "https://schema.org",
       "@type": "JobPosting",
-      "title": job.j_title,
+      "title": job.subjects || 'Job Title',
       "description": cleanDescription,
       "identifier": {
         "@type": "PropertyValue",
         "name": "Job ID",
-        "value": job.j_id
+        "value": job.id.toString()
       },
-      "datePosted": job.j_created_at,
+      "datePosted": job.created_at,
       "validThrough": new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
       "employmentType": "CONTRACTOR",
       "hiringOrganization": {
@@ -42,7 +34,7 @@ export function JobStructuredData({ job }: JobStructuredDataProps) {
         "@type": "Place",
         "address": {
           "@type": "PostalAddress",
-          "addressLocality": job.j_location,
+          "addressLocality": job.area,
           "addressCountry": "IN"
         }
       },
@@ -64,7 +56,7 @@ export function JobStructuredData({ job }: JobStructuredDataProps) {
         "Teaching",
         "Education",
         "Tutoring",
-        job.j_preview
+        job.mode_of_teaching || 'Teaching opportunity'
       ],
       "workHours": "Flexible",
       "educationRequirements": {

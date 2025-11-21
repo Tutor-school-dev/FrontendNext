@@ -21,8 +21,8 @@ export default function Login({ predefinedFlag, redirectFromJobListing, job_id }
   const [showPassword, setShowPassword] = useState(false);
 
   // Use teacher hooks (since we're in job application context)
-  const { login, loading: manualLoading } = useTeacherLogin(redirectFromJobListing, job_id);
-  const { handleGoogleLogin, handleFailure, loading: googleLoading } = useTeacherGoogleLogin(redirectFromJobListing, job_id);
+  const { login, loading: manualLoading } = useTeacherLogin();
+  const { handleGoogleLogin, handleFailure, loading: googleLoading } = useTeacherGoogleLogin();
 
   const handleManualLogin = (e: React.FormEvent) => {
     e.preventDefault();

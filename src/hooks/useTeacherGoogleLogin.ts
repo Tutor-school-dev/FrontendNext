@@ -11,8 +11,9 @@ import { getDjangoAuthUrl } from "@/lib/utils";
 import { USER_TYPE, getUserTypeDisplay, AUTH_COOKIE, STORAGE_KEY } from "@/lib/constants";
 import type { GoogleAuthPayload, GoogleAuthResponse } from "@/types/auth";
 import { isNewUserResponse, isExistingUserResponse } from "@/types/auth";
+import { processRedirectFlow, clearRedirectFlow } from "@/lib/redirectFlows";
 
-export const useTeacherGoogleLogin = (redirectFromJobListing?: string, job_id?: string) => {
+export const useTeacherGoogleLogin = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { set_dashboard_data } = useDashboardStore();
@@ -69,20 +70,11 @@ export const useTeacherGoogleLogin = (redirectFromJobListing?: string, job_id?: 
 
         set_dashboard_data(userData, "teacher");
 
-        // Apply for job if coming from job listing
-        if (redirectFromJobListing === "fromJobListing" && job_id) {
-          console.log("Applying job...", job_id, userData.id);
-          const job_message = await apply_job(job_id, userData.id);
-          set_dashboard_data(job_message, "job_message");
-        }
-
         // Navigation logic
         if (data.go_to_dashboard) {
-          const redirect = redirectFromJobListing === "fromJobListing" 
-            ? `?redirectFromJobListing=${redirectFromJobListing}` 
-            : '';
-          
-          router.push(`/dashboard/teacher${redirect}`);
+          // Process any pending redirect flow (e.g., job application)
+          const redirectUrl = await processRedirectFlow(apply_job);
+          router.push(redirectUrl);
           return;
         }
 
@@ -94,10 +86,16 @@ export const useTeacherGoogleLogin = (redirectFromJobListing?: string, job_id?: 
 
         for (const [key, value] of Object.entries(stepNames)) {
           if (!value) {
+            // Clear redirect flow if profile incomplete
+            clearRedirectFlow();
             router.push(`/teacher-profile?step=${key}`);
             return;
           }
         }
+
+        // If profile is complete, process redirect flow
+        const redirectUrl = await processRedirectFlow(apply_job);
+        router.push(redirectUrl);
       }
 
     } catch (err: any) {

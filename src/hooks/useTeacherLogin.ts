@@ -9,8 +9,9 @@ import { useDashboardStore } from "./useDashboardStore";
 import { useApplyJob } from "./useApplyJob";
 import { getDjangoAuthUrl } from "@/lib/utils";
 import { AUTH_COOKIE, STORAGE_KEY } from "@/lib/constants";
+import { processRedirectFlow, clearRedirectFlow } from "@/lib/redirectFlows";
 
-export const useTeacherLogin = (redirectFromJobListing?: string, job_id?: string) => {
+export const useTeacherLogin = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { set_dashboard_data } = useDashboardStore();
@@ -53,23 +54,11 @@ export const useTeacherLogin = (redirectFromJobListing?: string, job_id?: string
         set_dashboard_data(data.tutor, "teacher");
       }
 
-      // Apply for job if coming from job listing
-      if (redirectFromJobListing === "fromJobListing" && job_id && data.tutor?.id) {
-        console.log("Applying job...", job_id, data.tutor.id);
-        const job_message = await apply_job(job_id, data.tutor.id);
-        
-        if (typeof window !== 'undefined') {
-          localStorage.setItem("redirectFromJobListing", "fromJobListing");
-        }
-        set_dashboard_data(job_message, "job_message");
-      }
-
-      // Navigate to dashboard
-      const redirect = redirectFromJobListing === "fromJobListing" 
-        ? `?redirectFromJobListing=${redirectFromJobListing}` 
-        : '';
-      
-      router.push(`/dashboard/teacher${redirect}`);
+      console.log('🔄 useTeacherLogin: Processing redirect flow...');
+      // Process any pending redirect flow (e.g., job application)
+      const redirectUrl = await processRedirectFlow(apply_job);
+      console.log('🎯 useTeacherLogin: Redirecting to:', redirectUrl);
+      router.push(redirectUrl);
 
     } catch (err: any) {
       console.error('Login error:', err);

@@ -78,7 +78,7 @@ export function JobPreview({ job_id, jobsData, onBack }: JobPreviewProps) {
     // User is authenticated, apply directly
     setIsApplying(true);
     try {
-      const result = await apply_job(job_id, teacher.id);
+      const result = await apply_job(job_id);
       if (result.status === 201 || result.status === 200) {
         // Show success dialog instead of just toast
         setShowSuccessDialog(true);
@@ -96,11 +96,11 @@ export function JobPreview({ job_id, jobsData, onBack }: JobPreviewProps) {
     setShowSuccessDialog(true);
   };
 
-  const job = jobsData ? jobsData.find((job) => job.j_id === job_id) : null;
+  const job = jobsData ? jobsData.find((job) => job.id.toString() === job_id) : null;
 
   useEffect(() => {
     if (job) {
-      document.title = job.j_title;
+      document.title = job.subjects || 'Job Details';
     } else {
       document.title = "Tutorschool";
     }
@@ -168,21 +168,21 @@ export function JobPreview({ job_id, jobsData, onBack }: JobPreviewProps) {
             <div className="space-y-4">
               <div className="space-y-2">
                 <Badge className="bg-accent w-fit text-accent-foreground">
-                  {job.j_preview}
+                  {job.mode_of_teaching || 'Teaching mode not specified'}
                 </Badge>
                 <h1 className="font-bold text-foreground text-4xl text-balance leading-tight">
-                  {job.j_title}
+                  {job.subjects || 'Subject not specified'}
                 </h1>
               </div>
 
               <div className="flex flex-wrap gap-4 text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <MapPin className="w-4 h-4" />
-                  <span>{job.j_location}</span>
+                  <span>{job.area}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4" />
-                  <span>Posted {getTimeAgo(job.j_created_at)}</span>
+                  <span>Posted {getTimeAgo(job.created_at)}</span>
                 </div>
               </div>
             </div>
@@ -200,7 +200,7 @@ export function JobPreview({ job_id, jobsData, onBack }: JobPreviewProps) {
               <CardContent>
                 <div className="prose-invert max-w-none prose">
                   <p className="text-muted-foreground text-pretty leading-relaxed">
-                    {stripHtml(job.j_desc)}
+                    {`${job.grade} ${job.board} - ${job.subjects || 'Subject not specified'}`}
                   </p>
                 </div>
               </CardContent>
@@ -223,23 +223,11 @@ export function JobPreview({ job_id, jobsData, onBack }: JobPreviewProps) {
                         Job Posted
                       </p>
                       <p className="text-muted-foreground text-sm">
-                        {formatDate(job.j_created_at)}
+                        {formatDate(job.created_at)}
                       </p>
                     </div>
                   </div>
-                  {job.j_updated_at !== job.j_created_at && (
-                    <div className="flex items-start gap-3">
-                      <div className="bg-accent mt-2 rounded-full w-2 h-2"></div>
-                      <div>
-                        <p className="font-medium text-foreground">
-                          Last Updated
-                        </p>
-                        <p className="text-muted-foreground text-sm">
-                          {formatDate(job.j_updated_at)}
-                        </p>
-                      </div>
-                    </div>
-                  )}
+                  {/* Updated date section hidden as no updated_at property available */}
                 </div>
               </CardContent>
             </Card>
@@ -261,7 +249,7 @@ export function JobPreview({ job_id, jobsData, onBack }: JobPreviewProps) {
                     <User className="w-4 h-4 text-muted-foreground" />
                     <div>
                       <p className="font-medium text-foreground">
-                        {job.j_posted_by}
+                        {job.learner_name}
                       </p>
                       <p className="text-muted-foreground text-sm">
                         Hiring Manager
@@ -275,7 +263,7 @@ export function JobPreview({ job_id, jobsData, onBack }: JobPreviewProps) {
                     <Phone className="w-4 h-4 text-muted-foreground" />
                     <div>
                       <p className="font-medium text-foreground">
-                        {job.j_posted_by_number}
+                        {job.learner_phone}
                       </p>
                       <p className="text-muted-foreground text-sm">
                         Phone Number
@@ -313,12 +301,12 @@ export function JobPreview({ job_id, jobsData, onBack }: JobPreviewProps) {
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Location:</span>
-                    <span className="text-foreground">{job.j_location}</span>
+                    <span className="text-foreground">{job.area}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Posted:</span>
                     <span className="text-foreground">
-                      {getTimeAgo(job.j_created_at)}
+                      {getTimeAgo(job.created_at)}
                     </span>
                   </div>
                 </div>
@@ -340,7 +328,7 @@ export function JobPreview({ job_id, jobsData, onBack }: JobPreviewProps) {
       <JobApplicationSuccessDialog
         open={showSuccessDialog}
         onOpenChange={setShowSuccessDialog}
-        jobTitle={job?.j_title}
+        jobTitle={job?.subjects || 'Job Details'}
       />
     </div>
   );

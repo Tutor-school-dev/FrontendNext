@@ -23,7 +23,9 @@ export const useUploadLocation = (fromSettings = false) => {
         return;
       }
 
-      const response = await axios.post(`${apiUrl}/onboarding/${model}/location`, {
+      // Use Django API endpoint with PUT request
+      const djangoUrl = `${apiUrl}/api`;
+      const response = await axios.put(`${djangoUrl}/tutor/`, {
         latitude: position.lat,
         longitude: position.lng,
         area: values.area,
@@ -31,7 +33,7 @@ export const useUploadLocation = (fromSettings = false) => {
         pincode: values.pincode
       }, { 
         headers: { 
-          authorization: `bearer ${authToken}` 
+          Authorization: `Bearer ${authToken}` 
         } 
       });
       

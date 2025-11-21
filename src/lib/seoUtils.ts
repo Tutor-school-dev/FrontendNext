@@ -15,15 +15,15 @@ export function generateJobSlug(job: Job): string {
       .slice(0, 100); // Limit length
   };
 
-  const titleSlug = cleanText(job.j_title);
-  const locationSlug = cleanText(job.j_location);
-  const previewSlug = cleanText(job.j_preview);
+  const titleSlug = cleanText(job.subjects || 'Subject-Not-Specified');
+  const locationSlug = cleanText(job.area);
+  const gradeSlug = cleanText(`${job.grade}-${job.board}`);
 
   // Combine parts with meaningful separators
   const parts = [
     'job-listings',
     titleSlug,
-    previewSlug,
+    gradeSlug,
     locationSlug
   ].filter(part => part && part.length > 0);
 
@@ -36,7 +36,7 @@ export function generateJobSlug(job: Job): string {
 export function generateJobUrl(job: Job, baseUrl?: string): string {
   const domain = baseUrl || (typeof window !== 'undefined' ? window.location.origin : 'https://tutorschool.vercel.app');
   const slug = generateJobSlug(job);
-  return `${domain}/${slug}?id=${job.j_id}`;
+  return `${domain}/${slug}?id=${job.id}`;
 }
 
 /**
@@ -50,18 +50,18 @@ export function extractJobIdFromUrl(searchParams: URLSearchParams): string | nul
  * Creates a job-specific page title for SEO
  */
 export function generateJobPageTitle(job: Job): string {
-  const cleanTitle = job.j_title.replace(/<[^>]*>/g, '');
-  return `${cleanTitle} - ${job.j_location} | TutorSchool`;
+  const cleanTitle = job.subjects || 'Job Details';
+  return `${cleanTitle} - ${job.area} | TutorSchool`;
 }
 
 /**
  * Creates a job-specific meta description for SEO
  */
 export function generateJobMetaDescription(job: Job): string {
-  const cleanDesc = job.j_desc?.replace(/<[^>]*>/g, '') || '';
+  const cleanDesc = `${job.grade} ${job.board} - ${job.subjects || 'Subject not specified'}`;
   const truncatedDesc = cleanDesc.length > 120 
     ? cleanDesc.substring(0, 117) + '...' 
     : cleanDesc;
   
-  return `${truncatedDesc} Apply for this ${job.j_preview} tutoring position in ${job.j_location}. Posted by ${job.j_posted_by}.`;
+  return `${truncatedDesc} Apply for this ${job.mode_of_teaching || 'teaching'} position in ${job.area}. Posted by ${job.learner_name}.`;
 }
