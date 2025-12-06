@@ -14,7 +14,8 @@ export const useSendOTP = () => {
     phoneNumber: string, 
     setOpen: (open: boolean) => void, 
     model: string,
-    isSignup: boolean = false
+    isSignup: boolean = false,
+    onOTPReceived?: (otp: string) => void
   ) => {
     if (!phoneNumber || phoneNumber.trim() === '') {
       toast.error("Please enter valid Phone Number or Register via Google");
@@ -56,6 +57,15 @@ export const useSendOTP = () => {
             duration: 10000,
           });
         }, 1000);
+        
+        // Auto-fill OTP in staging environment
+        const nodeEnv = process.env.NEXT_PUBLIC_NODE_ENV || process.env.NODE_ENV;
+        if (nodeEnv === 'staging' && onOTPReceived) {
+          setTimeout(() => {
+            onOTPReceived(otp);
+            toast.success('OTP auto-filled for staging!', { duration: 3000 });
+          }, 1500);
+        }
       }
     } catch (err: any) {
       console.error('Send OTP error:', err);

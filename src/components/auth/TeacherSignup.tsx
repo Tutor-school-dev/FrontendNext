@@ -12,7 +12,13 @@ import { useSearchParams } from "next/navigation";
 export default function TeacherSignup() {
   const [number, setNumber] = useState('');
   const [open, setOpen] = useState(false);
+  const [otpValue, setOtpValue] = useState('');
   const { SendOTP, loading } = useSendOTP();
+  
+  // Handle OTP auto-fill for staging
+  const handleOTPReceived = (otp: string) => {
+    setOtpValue(otp);
+  };
   
   const { handleGoogleLogin, handleFailure, loading: googleLoading } = useTeacherGoogleLogin();
 
@@ -48,7 +54,7 @@ export default function TeacherSignup() {
           style={{ borderRadius: "12px" }}
         />
         <LoadingButton
-          onClick={() => SendOTP(number, setOpen, "teacher", true)}
+          onClick={() => SendOTP(number, setOpen, "teacher", true, handleOTPReceived)}
           isLoading={loading}
           disabled={!number || number.length !== 10 || loading}
           className="bg-blue-950 rounded-lg h-10 text-white sm:text-base md:text-xl"
@@ -60,7 +66,8 @@ export default function TeacherSignup() {
           open={open} 
           setOpen={setOpen} 
           phoneNumber={number} 
-          model="teacher" 
+          model="teacher"
+          initialOTP={otpValue}
         />
         
         <div className="flex justify-center items-center mt-4 w-full">

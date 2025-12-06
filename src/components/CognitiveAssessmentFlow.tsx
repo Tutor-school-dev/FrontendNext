@@ -106,8 +106,8 @@ export const CognitiveAssessmentFlow: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <Card className="w-full max-w-4xl">
+    <div className="min-h-screen flex items-center justify-center">
+      <Card className="w-full max-w-4xl mx-4">
         <CardHeader className="text-center">
           <div className="flex items-center justify-center mb-4">
             <Brain className="w-8 h-8 text-blue-600 mr-2" />
@@ -690,6 +690,24 @@ const ResultsScreen: React.FC<{
     { name: 'Hypothetical', score: results.hypothetical_thinking_score },
   ];
 
+  // Debug log to check score values
+  console.log('Score data:', scoreData);
+
+  // Function to calculate percentage width for bars
+  const getBarWidth = (score: any) => {
+    const numScore = Number(score) || 0;
+    // If score is between 0-1 (decimal), treat as percentage
+    if (numScore <= 1) {
+      return Math.min(Math.max(numScore * 100, 0), 100);
+    }
+    // If score is between 0-10, convert to percentage
+    if (numScore <= 10) {
+      return Math.min(Math.max((numScore / 10) * 100, 0), 100);
+    }
+    // If score is already a percentage (0-100), use as is
+    return Math.min(Math.max(numScore, 0), 100);
+  };
+
   return (
     <div className="space-y-6">
       <div className="text-center">
@@ -702,20 +720,31 @@ const ResultsScreen: React.FC<{
       {/* Score Bars */}
       <div className="space-y-4">
         <h3 className="font-semibold text-lg">Cognitive Skills Assessment</h3>
-        {scoreData.map((item, index) => (
-          <div key={index} className="space-y-2">
-            <div className="flex justify-between">
-              <span className="text-sm font-medium">{item.name}</span>
-              <span className="text-sm text-gray-600">{item.score}/10</span>
+        <div className="max-w-full overflow-hidden">
+          {scoreData.map((item, index) => (
+            <div key={index} className="space-y-2 mb-4">
+              <div className="flex justify-between items-center gap-2 w-full">
+                <span className="text-sm font-medium flex-1 min-w-0 truncate">{item.name}</span>
+                <span className="text-sm text-gray-600 flex-shrink-0">
+                  {Number(item.score) <= 1 
+                    ? `${Math.round(Number(item.score) * 100)}%` 
+                    : Number(item.score) <= 10 
+                      ? `${item.score}/10` 
+                      : `${item.score}%`
+                  }
+                </span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                <div
+                  className="bg-gradient-to-r from-blue-500 to-purple-500 h-3 rounded-full transition-all duration-300"
+                  style={{ 
+                    width: `${getBarWidth(item.score)}%` 
+                  }}
+                />
+              </div>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-3">
-              <div
-                className="bg-gradient-to-r from-blue-500 to-purple-500 h-3 rounded-full transition-all duration-300"
-                style={{ width: `${(item.score / 10) * 100}%` }}
-              />
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
       {/* Summary Points */}
@@ -723,9 +752,9 @@ const ResultsScreen: React.FC<{
         <h3 className="font-semibold text-lg">Learning Style Summary</h3>
         <ul className="space-y-2">
           {results.summary_points.map((point, index) => (
-            <li key={index} className="flex items-start space-x-2">
+            <li key={index} className="flex items-start space-x-2 w-full">
               <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-              <span className="text-sm text-gray-700">{point}</span>
+              <span className="text-sm text-gray-700 flex-1 break-words">{point}</span>
             </li>
           ))}
         </ul>

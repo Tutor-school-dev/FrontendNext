@@ -42,12 +42,19 @@ export const useOTPRequest = () => {
         console.log(`Expires at: ${response.data.expires_at}`);
       }
       
-      return true;
+      // Return OTP for staging auto-fill
+      return {
+        success: true,
+        otp: response.data.otp || null
+      };
     } catch (err: any) {
       console.error('OTP request error:', err);
       const message = err.response?.data?.message || "Failed to send OTP. Please try again.";
       toast.error(message);
-      return false;
+      return {
+        success: false,
+        otp: null
+      };
     } finally {
       setLoading(false);
     }

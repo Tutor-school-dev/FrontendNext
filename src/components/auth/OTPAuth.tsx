@@ -7,6 +7,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp
 import { useOTPRequest } from "@/hooks/useOTPRequest";
 import { useOTPVerify } from "@/hooks/useOTPVerify";
 import { ArrowLeft } from "lucide-react";
+import { toast } from "sonner";
 
 interface OTPAuthProps {
   userType: 'teacher' | 'parent';
@@ -40,9 +41,18 @@ export default function OTPAuth({ userType, isSignup = false, signupData, onBack
     }
 
     const result = await requestOTP(phoneNumber, userType, isSignup);
-    if (result) {
+    if (result.success) {
       setShowOTPInput(true);
       setCountdown(30); // 30 seconds countdown
+      
+      // Auto-fill OTP in staging environment
+      const nodeEnv = process.env.NEXT_PUBLIC_NODE_ENV || process.env.NODE_ENV;
+      if (nodeEnv === 'staging' && result.otp) {
+        setTimeout(() => {
+          setOtp(result.otp!);
+          toast.success('OTP auto-filled for staging!', { duration: 3000 });
+        }, 1500);
+      }
     }
   };
 
@@ -63,9 +73,18 @@ export default function OTPAuth({ userType, isSignup = false, signupData, onBack
     if (countdown > 0) return;
     
     const result = await requestOTP(phoneNumber, userType, isSignup);
-    if (result) {
+    if (result.success) {
       setCountdown(30);
       setOtp(""); // Clear previous OTP
+      
+      // Auto-fill OTP in staging environment
+      const nodeEnv = process.env.NEXT_PUBLIC_NODE_ENV || process.env.NODE_ENV;
+      if (nodeEnv === 'staging' && result.otp) {
+        setTimeout(() => {
+          setOtp(result.otp!);
+          toast.success('OTP auto-filled for staging!', { duration: 3000 });
+        }, 1500);
+      }
     }
   };
 

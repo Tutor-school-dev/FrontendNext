@@ -26,9 +26,18 @@ const ParentLogin = () => {
       return;
     }
     
-    const success = await requestOTP(phoneNumber, "parent", false);
-    if (success) {
+    const result = await requestOTP(phoneNumber, "parent", false);
+    if (result.success) {
       setStep("otp");
+      
+      // Auto-fill OTP in staging environment
+      const nodeEnv = process.env.NEXT_PUBLIC_NODE_ENV || process.env.NODE_ENV;
+      if (nodeEnv === 'staging' && result.otp) {
+        setTimeout(() => {
+          setOtp(result.otp!);
+          toast.success('OTP auto-filled for staging!', { duration: 3000 });
+        }, 1500);
+      }
     }
   };
 

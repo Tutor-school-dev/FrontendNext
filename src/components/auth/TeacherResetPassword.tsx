@@ -32,7 +32,9 @@ export function TeacherResetPassword({ flag }: TeacherResetPasswordProps) {
     if (!phoneNumber || phoneNumber.length !== 10) {
       return;
     }
-    sendResetOTP(phoneNumber, setOtpSent);
+    sendResetOTP(phoneNumber, setOtpSent, (receivedOtp) => {
+      setOtp(receivedOtp);
+    });
   };
 
   const handleChangePassword = () => {

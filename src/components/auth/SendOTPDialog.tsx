@@ -10,18 +10,31 @@ import { Label } from "@/components/ui/label";
 import { LoadingButton } from "@/components/ui/LoadingButton";
 import { OTPInput } from "@/components/ui/OTPInput";
 import { useVerifyOTP } from "@/hooks/useVerifyOTP";
-import { useState } from "react";
+import React, { useState } from "react";
 
 interface SendOTPDialogProps {
   open: boolean;
   setOpen: (open: boolean) => void;
   phoneNumber: string;
   model: string;
+  initialOTP?: string;
 }
 
-export default function SendOTPDialog({ open, setOpen, phoneNumber, model }: SendOTPDialogProps) {
+export default function SendOTPDialog({ open, setOpen, phoneNumber, model, initialOTP = "" }: SendOTPDialogProps) {
   const [value, setValue] = useState("");
   const { VerifyOTP, VerifyOTPLoading } = useVerifyOTP();
+  
+  // Handle OTP auto-fill from parent component
+  React.useEffect(() => {
+    if (initialOTP && initialOTP.length === 6) {
+      setValue(initialOTP);
+    }
+  }, [initialOTP]);
+  
+  // Handle OTP auto-fill for staging
+  const handleOTPReceived = (otp: string) => {
+    setValue(otp);
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
