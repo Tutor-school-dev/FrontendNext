@@ -15,6 +15,9 @@ import Cookies from "js-cookie";
 import axios from "axios";
 import { getAppUrl, getApiUrl, getDjangoAuthUrl } from "@/lib/utils";
 import DynamicMapComponent from "@/components/DynamicMapComponent";
+import { EDUCATION_LEVELS, getAllCategories } from "@/lib/educationLevels";
+import { getAllSubjects } from "@/lib/subjects";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function ParentOnboardingContent() {
   const searchParams = useSearchParams();
@@ -30,17 +33,18 @@ export default function ParentOnboardingContent() {
     studentBoard: "",
     parentName: "",
     parentEmail: "",
-    grade: "",
+    educationLevel: "",
     subjects: [] as string[],
     budget: "1000",
     preferredMode: "",
+    city: "",
     area: "",
     state: "",
     pincode: "",
     position: null as { lat: number; lng: number } | null,
   });
 
-  const subjectOptions = ["Maths", "English", "History", "Science", "Physics", "Chemistry", "Biology"];
+  const subjectOptions = getAllSubjects();
 
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({
@@ -82,7 +86,7 @@ export default function ParentOnboardingContent() {
       }
 
       // Validate required fields
-      if (!formData.studentName || !formData.parentName || !formData.grade) {
+      if (!formData.studentName || !formData.parentName || !formData.educationLevel) {
         toast.error("Please fill in all required fields.");
         return;
       }
@@ -91,8 +95,8 @@ export default function ParentOnboardingContent() {
       const hasLocationAccess = formData.position && 
         (formData.position.lat !== 20.5937 || Math.abs(formData.position.lat - 20.5937) > 5);
       
-      if (!hasLocationAccess && (!formData.area || !formData.state || !formData.pincode)) {
-        toast.error("Please fill in your address details (Area, State, and Pincode).");
+      if (!hasLocationAccess && (!formData.city || !formData.area || !formData.state || !formData.pincode)) {
+        toast.error("Please fill in your address details (City, Area, State, and Pincode).");
         setCurrentStep(4); // Go to location step
         return;
       }
@@ -126,41 +130,42 @@ export default function ParentOnboardingContent() {
         }
       }
       
-      // 2. Upload location data (matching React repo)
-      try {
-        await axios.post(`${apiUrl}/onboarding/PARENT/location`, {
-          latitude: formData.position.lat,
-          longitude: formData.position.lng,
-          area: formData.area,
-          state: formData.state,
-          pincode: formData.pincode
-        }, { 
-          headers: { authorization: `bearer ${jwtToken}` } 
-        });
-      } catch (locationError) {
-        console.warn("Location upload failed:", locationError);
-        // Continue even if location upload fails
-      }
+      // // 2. Upload location data (matching React repo)
+      // try {
+      //   await axios.post(`${apiUrl}/onboarding/PARENT/location`, {
+      //     latitude: formData.position.lat,
+      //     longitude: formData.position.lng,
+      //     city: formData.city || "Not specified",
+      //     area: formData.area,
+      //     state: formData.state,
+      //     pincode: formData.pincode
+      //   }, { 
+      //     headers: { authorization: `bearer ${jwtToken}` } 
+      //   });
+      // } catch (locationError) {
+      //   console.warn("Location upload failed:", locationError);
+      //   // Continue even if location upload fails
+      // }
 
-      // 3. Create job listing (matching React repo)
-      try {
-        const goApiUrl = getApiUrl();
-        await axios.post(`${goApiUrl}/admin/pub/jobs`, {
-          j_title: `Class ${formData.grade}, ${formData.studentBoard} board`,
-          j_desc: `Need Tutor for Class ${formData.grade}`,
-          j_preview: `Class ${formData.grade}, ${formData.studentBoard} board`,
-          j_posted_by: formData.studentName,
-          j_posted_by_number: phoneNumber,
-          j_location: `${formData.state}, ${formData.area}, ${formData.pincode}`,
-          j_active: true
-        });
-      } catch (jobError) {
-        console.warn("Job creation failed:", jobError);
-        // Continue even if job creation fails
-      }
+      // // 3. Create job listing (matching React repo)
+      // try {
+      //   const goApiUrl = getApiUrl();
+      //   await axios.post(`${goApiUrl}/admin/pub/jobs`, {
+      //     j_title: `${formData.educationLevel}, ${formData.studentBoard} board`,
+      //     j_desc: `Need Tutor for ${formData.educationLevel}`,
+      //     j_preview: `${formData.educationLevel}, ${formData.studentBoard} board`,
+      //     j_posted_by: formData.studentName,
+      //     j_posted_by_number: phoneNumber,
+      //     j_location: `${formData.state}, ${formData.area}, ${formData.pincode}`,
+      //     j_active: true
+      //   });
+      // } catch (jobError) {
+      //   console.warn("Job creation failed:", jobError);
+      //   // Continue even if job creation fails
+      // }
       
       toast.success("Parent onboarded successfully!");
-      router.push("/dashboard/parent");
+      router.push("/cognitive-assessment");
       
     } catch (error: any) {
       console.error("Onboarding error:", error);
@@ -187,13 +192,31 @@ export default function ParentOnboardingContent() {
                 />
               </div>
               <div>
-                <Label htmlFor="grade">Grade/Class</Label>
-                <Input
-                  id="grade"
-                  value={formData.grade}
-                  onChange={(e) => handleInputChange("grade", e.target.value)}
-                  placeholder="e.g., 10th, 12th"
-                />
+                <Label htmlFor="educationLevel">Education Level</Label>
+                <Select value={formData.educationLevel} onValueChange={(value) => handleInputChange("educationLevel", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select student's education level" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-80">
+                    {getAllCategories().map((category) => (
+                      <div key={category}>
+                        <div className="px-2 py-1.5 text-xs font-semibold text-gray-600 bg-gray-50">
+                          {category}
+                        </div>
+                        {EDUCATION_LEVELS
+                          .filter(level => level.category === category)
+                          .map((level) => (
+                            <SelectItem key={level.value} value={level.value}>
+                              <div className="flex flex-col">
+                                <span>{level.label}</span>
+                                <span className="text-xs text-gray-500">{level.description}</span>
+                              </div>
+                            </SelectItem>
+                          ))}
+                      </div>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <Label htmlFor="studentBoard">Board</Label>

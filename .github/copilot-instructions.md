@@ -1,57 +1,101 @@
-# Copilot Instructions for totorbuddy
+# Copilot Instructions for TutorSchool
 
 ## Project Overview
-- **Type:** Vite + React + TypeScript SPA
-- **UI:** shadcn-ui components, Tailwind CSS
-- **Structure:**
-  - `src/` contains all app code
-    - `components/` – main UI components (atomic, reusable)
-    - `components/ui/` – shadcn-ui primitives (do not modify directly)
-    - `pages/` – top-level route views
-    - `hooks/` – custom React hooks
-    - `lib/` – shared utilities
-    - `assets/` – static images
-  - `public/` – static files (served as-is)
-  - `vite.config.ts` – Vite config
-  - `tailwind.config.ts` – Tailwind config
+- **Type:** Next.js 15 + React + TypeScript AI-powered tutor matching platform
+- **Architecture:** App Router with dual authentication flows (Tutor/Learner)
+- **UI:** shadcn/ui + Radix UI components, Tailwind CSS
+- **Backend Integration:** Django REST API with JWT authentication and environment-based routing
+- **Package Manager:** Uses Bun (bun.lockb present) but npm/yarn commands also work
+- **Build Tool:** Next.js native build system (no Vite despite earlier references)
 
-## Key Patterns & Conventions
-- **Component Structure:**
-  - Use function components with TypeScript.
-  - Prefer composition over inheritance.
-  - UI logic is separated into atomic components in `components/` and composed in `pages/`.
-- **Styling:**
-  - Use Tailwind utility classes for layout and design.
-  - Use shadcn-ui primitives for consistent UI patterns.
-- **State & Data Flow:**
-  - Use React hooks for state and effects.
-  - Custom hooks live in `src/hooks/`.
-  - Utilities in `src/lib/utils.ts`.
-- **Routing:**
-  - Top-level views/pages go in `src/pages/`.
-- **Assets:**
-  - Reference images from `src/assets/` or `public/`.
+## Project Structure
+```
+app/                     # Next.js App Router pages
+├── auth/               # Authentication flows
+├── dashboard/          # Role-specific dashboards (teacher/, parent/)  
+├── onboarding/         # Multi-step user onboarding
+├── tutor-search/       # Search and filtering pages
+└── [slug]/            # Dynamic routing for tutor profiles
+src/
+├── components/         # Reusable UI components
+│   ├── auth/          # Authentication-specific components
+│   ├── providers/     # Context providers (Query, Theme, GoogleAuth)
+│   ├── ui/           # shadcn/ui primitives (DO NOT edit directly)
+│   └── city/         # Location-specific components
+├── hooks/             # Custom React hooks for API integration
+├── lib/               # Utilities and constants
+└── types/            # TypeScript type definitions
+```
+
+## Critical Architecture Patterns
+
+### Authentication & API Integration
+- **Dual Backend Support:** Environment-based API routing (`staging` vs `production`)
+- **JWT Token Management:** Uses `js-cookie` with `AUTH_COOKIE` constants in `src/lib/constants.ts`
+- **User Types:** `Tutor`/`Learner` (mapped from legacy `Teacher`/`Parent`)
+- **State Persistence:** Combines cookies (tokens) + localStorage (user metadata)
+
+**Example API Hook Pattern:**
+```typescript
+// All API hooks follow this pattern in src/hooks/
+const response = await axios.post(`${getDjangoAuthUrl()}/auth/tutor/login/`, payload);
+Cookies.set(AUTH_COOKIE.JWT_TOKEN, data.jwt_token, { expires: 7 });
+localStorage.setItem(STORAGE_KEY.MODEL, "Tutor");
+```
+
+### State Management Strategy  
+- **Global State:** Zustand store (`useDashboardStore`) for user session data
+- **Server State:** TanStack Query for API data fetching and caching
+- **Form State:** React Hook Form + Zod validation
+- **Navigation:** `useRouter` with redirect flow handling via `src/lib/redirectFlows.ts`
+
+### Component Composition Patterns
+- **Page Components:** Live in `app/` directory, handle routing and layout
+- **Feature Components:** In `src/components/`, compose smaller UI components
+- **Authentication Guards:** Wrap protected routes with `AuthGuard` component
+- **Provider Nesting:** QueryClient > ThemeProvider > GoogleAuthProvider > TooltipProvider
+
+## Environment & Configuration
+- **API Routing:** `NEXT_PUBLIC_NODE_ENV=staging` switches to staging backend
+- **Google OAuth:** Requires `NEXT_PUBLIC_CLIENT_ID` environment variable  
+- **Base URL:** `NEXT_PUBLIC_GO_APP_URL` for production API endpoint
+- **Type Safety:** `noImplicitAny: false` allows gradual TypeScript adoption
 
 ## Developer Workflows
-- **Install dependencies:** `npm i`
-- **Start dev server:** `npm run dev`
-- **Build for production:** `npm run build`
-- **Preview production build:** `npm run preview`
-- **Lint:** `npx eslint .`
+```bash
+npm run dev          # Development server with hot reload
+npm run build        # Production build (type checking enabled)
+npm run start        # Start production server  
+npm run lint         # ESLint with Next.js configuration
+npm run preview      # Alias for npm run start
 
-## Integration & External Services
-- No backend code in this repo; all logic is client-side.
-- No API integration patterns are present by default.
-- shadcn-ui is used for UI primitives; do not edit files in `components/ui/` directly.
+# Alternative with Bun (faster)
+bun dev              # Development server
+bun install          # Install dependencies
+```
 
-## Examples
-- To add a new page: create a file in `src/pages/` and register the route in the router (if present).
-- To add a new UI component: add to `src/components/` and import where needed.
-- To use a custom hook: create in `src/hooks/` and import in components/pages.
+## Key Integration Points
+- **Django API:** All authentication endpoints route through `getDjangoAuthUrl()`
+- **Google Maps:** Leaflet integration for tutor location services
+- **Payment Flow:** Razor pay integration for subscription management
+- **File Handling:** PDF generation and display for profiles/documents
+
+## Migration Context
+- Recently migrated from Go backend to unified Django API
+- Legacy terminology (`Teacher`/`Parent`) mapped to new (`Tutor`/`Learner`)
+- Backward compatibility maintained in authentication utilities
+- See `DJANGO_AUTH_MIGRATION.md` for detailed migration patterns
+
+## Code Quality & Build Settings
+- **TypeScript:** `noImplicitAny: false` allows gradual TypeScript adoption
+- **Build:** Type checking and ESLint enabled for production (`ignoreBuildErrors: false`)
+- **Performance:** Optimized imports for lucide-react, AVIF/WebP image formats
+- **Redirects:** `/apply` → `/auth?model=teacher` (permanent redirect)
 
 ## References
-- See `README.md` for setup and editing instructions.
-- See `tailwind.config.ts` and `vite.config.ts` for build and styling config.
+- See `README.md` for setup and editing instructions
+- See `tailwind.config.ts` and `next.config.ts` for build and styling config
+- See migration docs: `DJANGO_AUTH_MIGRATION.md`, `TEACHER_ONBOARDING_CONSOLIDATION.md`
 
 ---
 

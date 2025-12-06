@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Badge } from './ui/badge';
 import { Card, CardContent } from './ui/card';
 import { Search, Filter, X, Video, Users } from 'lucide-react';
+import { SUBJECTS, getAllSubjects } from '@/lib/subjects';
 
 export interface TutorFilters {
   subject?: string[];
@@ -17,17 +18,6 @@ interface TutorFiltersComponentProps {
   loading?: boolean;
 }
 
-// Common subjects for autocomplete
-const COMMON_SUBJECTS = [
-  'Mathematics', 'English', 'Physics', 'Chemistry', 'Biology',
-  'Computer Science', 'History', 'Geography', 'Economics',
-  'Accountancy', 'Business Studies', 'Political Science',
-  'Hindi', 'Sanskrit', 'French', 'German', 'Spanish',
-  'Art', 'Music', 'Physical Education', 'Psychology',
-  'Sociology', 'Philosophy', 'Statistics', 'Calculus',
-  'Algebra', 'Geometry', 'Trigonometry'
-];
-
 const TutorFiltersComponent: React.FC<TutorFiltersComponentProps> = ({
   onFiltersChange,
   loading = false
@@ -37,7 +27,10 @@ const TutorFiltersComponent: React.FC<TutorFiltersComponentProps> = ({
   const [subjectInput, setSubjectInput] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
 
-  const filteredSuggestions = COMMON_SUBJECTS.filter(subject =>
+  // Use standardized subjects from backend API
+  const availableSubjects = getAllSubjects();
+  
+  const filteredSuggestions = availableSubjects.filter(subject =>
     subject.toLowerCase().includes(subjectInput.toLowerCase()) &&
     !subjects.includes(subject)
   );
@@ -126,7 +119,7 @@ const TutorFiltersComponent: React.FC<TutorFiltersComponentProps> = ({
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <Input
                   id="subjects"
-                  placeholder="Search subjects (e.g., Mathematics, Physics)..."
+                  placeholder="Search subjects (Mathematics, Physics, Chemistry, etc.)..."
                   value={subjectInput}
                   onChange={(e) => {
                     setSubjectInput(e.target.value);

@@ -63,8 +63,8 @@ export const useParentGoogleLogin = () => {
 
         set_dashboard_data(userData, "parent");
 
-        // Navigate to parent dashboard
-        router.push('/dashboard/parent');
+        // Navigate to cognitive assessment (will redirect to dashboard if already completed)
+        router.push('/cognitive-assessment');
       }
 
     } catch (err: any) {

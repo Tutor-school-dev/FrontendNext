@@ -27,6 +27,7 @@ import { LoadingButton } from "@/components/ui/LoadingButton";
 import { ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { EducationFormData } from "./TeacherProfileContent";
+import { EDUCATION_LEVELS, getAllCategories } from "@/lib/educationLevels";
 
 export const formSchema = z.object({
   highestQualification: z.enum([
@@ -44,9 +45,7 @@ export const formSchema = z.object({
   ]),
   otherQualification: z.string().optional(),
   university: z.string().min(2, "College name must be at least 2 characters"),
-  class: z.coerce.number()
-    .min(1, { message: "Class must be atleast 1" })
-    .max(9, { message: "Class cannot be more than 9" }),
+  educationLevel: z.string().min(1, { message: "Please select an education level" }),
   status: z.enum([
     "student",
     "aspirant",
@@ -72,7 +71,7 @@ export default function Education({ onNext, onDataChange }: EducationProps) {
       highestQualification: undefined,
       otherQualification: "",
       university: "",
-      class: undefined,
+      educationLevel: "",
       status: undefined,
       teachingMethod: undefined,
       referralSource: "",
@@ -112,14 +111,37 @@ export default function Education({ onNext, onDataChange }: EducationProps) {
           >
             <FormField
               control={form.control}
-              name="class"
+              name="educationLevel"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
-                    Till which class you can teach? <span className="text-red-500">*</span>
+                    Which educational level do you teach? <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="If you're comfortable till 9th Class, Enter 9" />
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select the education level you teach" />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-80">
+                        {getAllCategories().map((category) => (
+                          <div key={category}>
+                            <div className="px-2 py-1.5 text-xs font-semibold text-gray-600 bg-gray-50">
+                              {category}
+                            </div>
+                            {EDUCATION_LEVELS
+                              .filter(level => level.category === category)
+                              .map((level) => (
+                                <SelectItem key={level.value} value={level.value}>
+                                  <div className="flex flex-col">
+                                    <span className="font-medium">{level.label}</span>
+                                    <span className="text-xs text-gray-500">{level.description}</span>
+                                  </div>
+                                </SelectItem>
+                              ))}
+                          </div>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

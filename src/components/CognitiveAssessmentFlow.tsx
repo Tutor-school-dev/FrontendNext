@@ -1,0 +1,740 @@
+"use client";
+
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
+import { Slider } from '@/components/ui/slider';
+import { Textarea } from '@/components/ui/textarea';
+import { Brain, CheckCircle, ArrowRight, BarChart3 } from 'lucide-react';
+import { useCognitiveAssessment, AssessmentPayload, AssessmentResponse } from '@/hooks/useCognitiveAssessment';
+
+type AssessmentState = {
+  s2: { choice: "A" | "B" | "C" | null; confidence: number | null; reactionTimeMs: number | null; switchCount: number; };
+  s3: { rule: "shape" | "color" | "mixed" | null; corrections: number; timeMs: number | null; };
+  s4: { isCorrect: boolean | null; swapCount: number; };
+  s5: { answer: "yes" | "no" | "not_sure" | null; explanation: string; };
+  s6: { choice: "A" | "B" | "C" | "D" | null; reactionTimeMs: number | null; };
+};
+
+const TOTAL_SCREENS = 7;
+
+export const CognitiveAssessmentFlow: React.FC = () => {
+  const [currentScreen, setCurrentScreen] = useState(1);
+  const [assessmentState, setAssessmentState] = useState<AssessmentState>({
+    s2: { choice: null, confidence: null, reactionTimeMs: null, switchCount: 0 },
+    s3: { rule: null, corrections: 0, timeMs: null },
+    s4: { isCorrect: null, swapCount: 0 },
+    s5: { answer: null, explanation: "" },
+    s6: { choice: null, reactionTimeMs: null }
+  });
+  
+  const [results, setResults] = useState<AssessmentResponse | null>(null);
+  const [screenStartTime, setScreenStartTime] = useState<number | null>(null);
+  const { submitAssessment, loading, error, alreadyCompleted } = useCognitiveAssessment();
+  const router = useRouter();
+
+  const getProgressPercentage = () => {
+    return ((currentScreen - 1) / (TOTAL_SCREENS - 1)) * 100;
+  };
+
+  const nextScreen = () => {
+    if (currentScreen < TOTAL_SCREENS) {
+      setCurrentScreen(currentScreen + 1);
+      setScreenStartTime(performance.now());
+    }
+  };
+
+  const handleFinishAssessment = async () => {
+    const payload: AssessmentPayload = {
+      s2: {
+        choice: assessmentState.s2.choice || "C",
+        confidence: assessmentState.s2.confidence,
+        reaction_time_ms: assessmentState.s2.reactionTimeMs,
+        switch_count: assessmentState.s2.switchCount
+      },
+      s3: {
+        rule: assessmentState.s3.rule,
+        corrections: assessmentState.s3.corrections,
+        time_ms: assessmentState.s3.timeMs
+      },
+      s4: {
+        is_correct: assessmentState.s4.isCorrect,
+        swap_count: assessmentState.s4.swapCount
+      },
+      s5: {
+        answer: assessmentState.s5.answer,
+        explanation: assessmentState.s5.explanation
+      },
+      s6: {
+        choice: assessmentState.s6.choice,
+        reaction_time_ms: assessmentState.s6.reactionTimeMs
+      }
+    };
+
+    const response = await submitAssessment(payload);
+    if (response) {
+      setResults(response);
+      nextScreen();
+    }
+  };
+
+  useEffect(() => {
+    if (currentScreen >= 2 && currentScreen <= 6) {
+      setScreenStartTime(performance.now());
+    }
+  }, [currentScreen]);
+
+  if (alreadyCompleted) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardContent className="pt-6 text-center">
+            <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold mb-2">Assessment Complete</h2>
+            <p className="text-gray-600 mb-4">You've already completed your Learning Fingerprint.</p>
+            <Button onClick={() => router.push('/dashboard/parent')} className="w-full">
+              Go to Dashboard
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <Card className="w-full max-w-4xl">
+        <CardHeader className="text-center">
+          <div className="flex items-center justify-center mb-4">
+            <Brain className="w-8 h-8 text-blue-600 mr-2" />
+            <CardTitle className="text-2xl">Learning Fingerprint Assessment</CardTitle>
+          </div>
+          <Progress value={getProgressPercentage()} className="w-full" />
+          <p className="text-sm text-gray-500 mt-2">Step {currentScreen} of {TOTAL_SCREENS}</p>
+        </CardHeader>
+        <CardContent className="p-6">
+          {currentScreen === 1 && (
+            <WelcomeScreen onStart={nextScreen} />
+          )}
+          {currentScreen === 2 && (
+            <ConservationScreen 
+              state={assessmentState.s2}
+              setState={(newState) => setAssessmentState(prev => ({ ...prev, s2: newState }))}
+              screenStartTime={screenStartTime}
+              onNext={nextScreen}
+            />
+          )}
+          {currentScreen === 3 && (
+            <ClassificationScreen 
+              state={assessmentState.s3}
+              setState={(newState) => setAssessmentState(prev => ({ ...prev, s3: newState }))}
+              screenStartTime={screenStartTime}
+              onNext={nextScreen}
+            />
+          )}
+          {currentScreen === 4 && (
+            <SeriationScreen 
+              state={assessmentState.s4}
+              setState={(newState) => setAssessmentState(prev => ({ ...prev, s4: newState }))}
+              onNext={nextScreen}
+            />
+          )}
+          {currentScreen === 5 && (
+            <ReversibilityScreen 
+              state={assessmentState.s5}
+              setState={(newState) => setAssessmentState(prev => ({ ...prev, s5: newState }))}
+              onNext={nextScreen}
+            />
+          )}
+          {currentScreen === 6 && (
+            <HypotheticalScreen 
+              state={assessmentState.s6}
+              setState={(newState) => setAssessmentState(prev => ({ ...prev, s6: newState }))}
+              screenStartTime={screenStartTime}
+              onFinish={handleFinishAssessment}
+              loading={loading}
+              error={error}
+            />
+          )}
+          {currentScreen === 7 && results && (
+            <ResultsScreen 
+              results={results}
+              onComplete={() => router.push('/dashboard/parent')}
+            />
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+// Welcome Screen Component
+const WelcomeScreen: React.FC<{ onStart: () => void }> = ({ onStart }) => {
+  return (
+    <div className="text-center space-y-6">
+      <div className="w-48 h-48 mx-auto bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg flex items-center justify-center">
+        <Brain className="w-24 h-24 text-blue-600" />
+      </div>
+      <div className="space-y-4">
+        <h2 className="text-2xl font-bold text-gray-800">
+          We're about to understand how YOUR brain learns
+        </h2>
+        <p className="text-lg text-gray-600">This takes about 90 seconds</p>
+        <p className="text-sm text-gray-500 max-w-md mx-auto">
+          We'll ask you a few quick questions to create your personalized learning profile.
+        </p>
+      </div>
+      <Button onClick={onStart} size="lg" className="px-8">
+        Start Assessment
+        <ArrowRight className="w-4 h-4 ml-2" />
+      </Button>
+    </div>
+  );
+};
+
+// Conservation Screen Component
+const ConservationScreen: React.FC<{
+  state: AssessmentState['s2'];
+  setState: (state: AssessmentState['s2']) => void;
+  screenStartTime: number | null;
+  onNext: () => void;
+}> = ({ state, setState, screenStartTime, onNext }) => {
+  
+  const handleChoice = (choice: "A" | "B" | "C") => {
+    if (state.reactionTimeMs === null && screenStartTime) {
+      setState({
+        ...state,
+        choice,
+        reactionTimeMs: performance.now() - screenStartTime
+      });
+    } else if (state.choice && state.choice !== choice) {
+      setState({
+        ...state,
+        choice,
+        switchCount: state.switchCount + 1
+      });
+    } else {
+      setState({ ...state, choice });
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="text-center">
+        <h2 className="text-xl font-semibold mb-4">Water Conservation Task</h2>
+        <p className="text-gray-600 mb-6">Look at these two beakers with water:</p>
+      </div>
+      
+      {/* Visual representation of beakers */}
+      <div className="flex justify-center items-end space-x-8 mb-8">
+        <div className="text-center">
+          <div className="w-12 h-32 bg-blue-200 border-2 border-blue-400 rounded-b-lg mx-auto mb-2 relative overflow-hidden">
+            <div className="absolute bottom-0 w-full h-24 bg-blue-400"></div>
+          </div>
+          <p className="text-sm text-gray-600">Tall & Narrow</p>
+        </div>
+        <div className="text-center">
+          <div className="w-24 h-20 bg-blue-200 border-2 border-blue-400 rounded-b-lg mx-auto mb-2 relative overflow-hidden">
+            <div className="absolute bottom-0 w-full h-12 bg-blue-400"></div>
+          </div>
+          <p className="text-sm text-gray-600">Short & Wide</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <h3 className="text-lg font-medium text-center">
+          Which beaker has MORE water, or are they the same?
+        </h3>
+        
+        <RadioGroup value={state.choice || ""} onValueChange={handleChoice}>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="A" id="a" />
+            <Label htmlFor="a">A) Tall one has more</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="B" id="b" />
+            <Label htmlFor="b">B) Wide one has more</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="C" id="c" />
+            <Label htmlFor="c">C) Same amount</Label>
+          </div>
+        </RadioGroup>
+
+        {state.choice && (
+          <div className="space-y-2">
+            <Label className="text-sm">How confident are you? (1 = Not sure, 5 = Very sure)</Label>
+            <Slider
+              value={[state.confidence || 3]}
+              onValueChange={([value]) => setState({ ...state, confidence: value })}
+              max={5}
+              min={1}
+              step={1}
+              className="w-full"
+            />
+            <div className="flex justify-between text-xs text-gray-500">
+              <span>Not sure</span>
+              <span>Very sure</span>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <Button 
+        onClick={onNext} 
+        disabled={!state.choice}
+        className="w-full"
+      >
+        Next
+      </Button>
+    </div>
+  );
+};
+
+// Classification Screen Component
+const ClassificationScreen: React.FC<{
+  state: AssessmentState['s3'];
+  setState: (state: AssessmentState['s3']) => void;
+  screenStartTime: number | null;
+  onNext: () => void;
+}> = ({ state, setState, screenStartTime, onNext }) => {
+  const [shapes, setShapes] = useState([
+    { id: 1, type: 'triangle', color: 'red', group: null },
+    { id: 2, type: 'triangle', color: 'blue', group: null },
+    { id: 3, type: 'triangle', color: 'yellow', group: null },
+    { id: 4, type: 'triangle', color: 'red', group: null },
+    { id: 5, type: 'circle', color: 'red', group: null },
+    { id: 6, type: 'circle', color: 'blue', group: null },
+    { id: 7, type: 'circle', color: 'yellow', group: null },
+    { id: 8, type: 'circle', color: 'red', group: null },
+    { id: 9, type: 'square', color: 'red', group: null },
+    { id: 10, type: 'square', color: 'blue', group: null },
+    { id: 11, type: 'square', color: 'yellow', group: null },
+    { id: 12, type: 'square', color: 'red', group: null },
+  ]);
+  const [draggedShape, setDraggedShape] = useState<number | null>(null);
+
+  const assignToGroup = (shapeId: number, groupNumber: number) => {
+    // Check if this is a correction
+    const shape = shapes.find(s => s.id === shapeId);
+    const isCorrection = shape?.group !== null && shape.group !== groupNumber;
+    
+    setShapes(prev => 
+      prev.map(shape => 
+        shape.id === shapeId 
+          ? { ...shape, group: groupNumber }
+          : shape
+      )
+    );
+    
+    // Track corrections
+    if (isCorrection) {
+      setState({
+        ...state,
+        corrections: state.corrections + 1
+      });
+    }
+  };
+
+  const analyzeGrouping = () => {
+    const groups: { [key: number]: typeof shapes } = {};
+    shapes.forEach(shape => {
+      if (shape.group !== null) {
+        if (!groups[shape.group]) groups[shape.group] = [];
+        groups[shape.group].push(shape);
+      }
+    });
+
+    // Analyze the grouping rule
+    let rule: "shape" | "color" | "mixed" = "mixed";
+    const groupKeys = Object.keys(groups);
+    
+    if (groupKeys.length >= 2) {
+      const shapeGrouping = groupKeys.every(key => {
+        const group = groups[parseInt(key)];
+        return group.every(shape => shape.type === group[0].type);
+      });
+      
+      const colorGrouping = groupKeys.every(key => {
+        const group = groups[parseInt(key)];
+        return group.every(shape => shape.color === group[0].color);
+      });
+
+      if (shapeGrouping && !colorGrouping) rule = "shape";
+      else if (colorGrouping && !shapeGrouping) rule = "color";
+    }
+
+    return rule;
+  };
+
+  const handleDone = () => {
+    const rule = analyzeGrouping();
+    const timeMs = screenStartTime ? performance.now() - screenStartTime : null;
+    setState({
+      ...state,
+      rule,
+      timeMs
+    });
+    onNext();
+  };
+
+  const getShapeElement = (type: string, color: string) => {
+    const baseClass = "w-8 h-8 cursor-move";
+    const colorClass = color === 'red' ? 'text-red-500' : color === 'blue' ? 'text-blue-500' : 'text-yellow-500';
+    
+    if (type === 'triangle') {
+      return <div className={`${baseClass} ${colorClass}`}>▲</div>;
+    } else if (type === 'circle') {
+      return <div className={`${baseClass} ${colorClass} text-2xl`}>●</div>;
+    } else {
+      return <div className={`${baseClass} ${colorClass} text-2xl`}>■</div>;
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="text-center">
+        <h2 className="text-xl font-semibold mb-4">Shape Classification</h2>
+        <p className="text-gray-600 mb-6">Drag the shapes into groups that belong together:</p>
+      </div>
+
+      {/* Ungrouped shapes */}
+      <div className="border-2 border-dashed border-gray-300 p-4 rounded-lg">
+        <h3 className="text-sm font-medium mb-3 text-gray-600">Shapes to group:</h3>
+        <div className="flex flex-wrap gap-2">
+          {shapes.filter(shape => shape.group === null).map(shape => (
+            <div
+              key={shape.id}
+              draggable
+              onDragStart={() => setDraggedShape(shape.id)}
+              className="p-2 border rounded cursor-move hover:bg-gray-50"
+            >
+              {getShapeElement(shape.type, shape.color)}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Groups */}
+      <div className="grid grid-cols-3 gap-4">
+        {[1, 2, 3].map(groupNum => (
+          <div
+            key={groupNum}
+            onDrop={(e) => {
+              e.preventDefault();
+              if (draggedShape) {
+                assignToGroup(draggedShape, groupNum);
+                setDraggedShape(null);
+              }
+            }}
+            onDragOver={(e) => e.preventDefault()}
+            className="border-2 border-dashed border-blue-300 p-4 rounded-lg min-h-[120px] bg-blue-50"
+          >
+            <h4 className="text-sm font-medium mb-2 text-center">Group {groupNum}</h4>
+            <div className="flex flex-wrap gap-1 justify-center">
+              {shapes.filter(shape => shape.group === groupNum).map(shape => (
+                <div key={shape.id} className="p-1">
+                  {getShapeElement(shape.type, shape.color)}
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <Button 
+        onClick={handleDone}
+        className="w-full"
+        disabled={shapes.some(shape => shape.group === null)}
+      >
+        Done Grouping
+      </Button>
+    </div>
+  );
+};
+
+// Seriation Screen Component
+const SeriationScreen: React.FC<{
+  state: AssessmentState['s4'];
+  setState: (state: AssessmentState['s4']) => void;
+  onNext: () => void;
+}> = ({ state, setState, onNext }) => {
+  const [rods, setRods] = useState([
+    { id: 1, length: 60, order: 0 },
+    { id: 2, length: 100, order: 1 },
+    { id: 3, length: 40, order: 2 },
+    { id: 4, length: 80, order: 3 },
+    { id: 5, length: 120, order: 4 },
+  ]);
+
+  const moveRod = (fromIndex: number, toIndex: number) => {
+    const newRods = [...rods];
+    const [movedRod] = newRods.splice(fromIndex, 1);
+    newRods.splice(toIndex, 0, movedRod);
+    
+    // Update order and track swaps
+    const updatedRods = newRods.map((rod, index) => ({ ...rod, order: index }));
+    setRods(updatedRods);
+    
+    setState({
+      ...state,
+      swapCount: state.swapCount + 1
+    });
+  };
+
+  const checkCorrectOrder = () => {
+    const sortedByLength = [...rods].sort((a, b) => a.length - b.length);
+    const isCorrect = rods.every((rod, index) => rod.id === sortedByLength[index].id);
+    return isCorrect;
+  };
+
+  const handleDone = () => {
+    const isCorrect = checkCorrectOrder();
+    setState({ ...state, isCorrect });
+    onNext();
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="text-center">
+        <h2 className="text-xl font-semibold mb-4">Ordering Task</h2>
+        <p className="text-gray-600 mb-6">Drag the rods to arrange them from shortest to longest:</p>
+      </div>
+
+      <div className="flex items-end justify-center space-x-4 p-8 bg-gray-50 rounded-lg">
+        {rods.map((rod, index) => (
+          <div
+            key={rod.id}
+            draggable
+            onDragStart={(e) => {
+              e.dataTransfer.setData('text/plain', index.toString());
+            }}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={(e) => {
+              e.preventDefault();
+              const fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
+              if (fromIndex !== index) {
+                moveRod(fromIndex, index);
+              }
+            }}
+            className="cursor-move hover:opacity-70"
+          >
+            <div
+              className="w-8 bg-gradient-to-t from-amber-600 to-amber-400 rounded-t"
+              style={{ height: `${rod.length}px` }}
+            />
+            <div className="text-xs text-center mt-1 text-gray-600">{rod.id}</div>
+          </div>
+        ))}
+      </div>
+
+      <Button onClick={handleDone} className="w-full">
+        Done Ordering
+      </Button>
+    </div>
+  );
+};
+
+// Reversibility Screen Component
+const ReversibilityScreen: React.FC<{
+  state: AssessmentState['s5'];
+  setState: (state: AssessmentState['s5']) => void;
+  onNext: () => void;
+}> = ({ state, setState, onNext }) => {
+  return (
+    <div className="space-y-6">
+      <div className="text-center">
+        <h2 className="text-xl font-semibold mb-4">Reversibility Reasoning</h2>
+      </div>
+
+      <div className="bg-blue-50 p-6 rounded-lg">
+        <p className="text-lg text-gray-700 leading-relaxed">
+          Imagine: A clay ball is shaped into a pancake and then shaped back into a ball.
+        </p>
+      </div>
+
+      <div className="space-y-4">
+        <h3 className="text-lg font-medium">
+          Does the clay still have the SAME amount as before?
+        </h3>
+        
+        <RadioGroup 
+          value={state.answer || ""} 
+          onValueChange={(value) => setState({ ...state, answer: value as any })}
+        >
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="yes" id="yes" />
+            <Label htmlFor="yes">Yes, same amount</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="no" id="no" />
+            <Label htmlFor="no">No, different amount</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="not_sure" id="not_sure" />
+            <Label htmlFor="not_sure">Not sure</Label>
+          </div>
+        </RadioGroup>
+
+        {state.answer && (
+          <div className="space-y-2">
+            <Label htmlFor="explanation">Why do you think that? (Optional)</Label>
+            <Textarea
+              id="explanation"
+              value={state.explanation}
+              onChange={(e) => setState({ ...state, explanation: e.target.value })}
+              placeholder="Share your reasoning..."
+              className="min-h-[80px]"
+            />
+          </div>
+        )}
+      </div>
+
+      <Button 
+        onClick={onNext} 
+        disabled={!state.answer}
+        className="w-full"
+      >
+        Next
+      </Button>
+    </div>
+  );
+};
+
+// Hypothetical Thinking Screen Component
+const HypotheticalScreen: React.FC<{
+  state: AssessmentState['s6'];
+  setState: (state: AssessmentState['s6']) => void;
+  screenStartTime: number | null;
+  onFinish: () => void;
+  loading: boolean;
+  error: string | null;
+}> = ({ state, setState, screenStartTime, onFinish, loading, error }) => {
+  
+  const handleChoice = (choice: "A" | "B" | "C" | "D") => {
+    if (state.reactionTimeMs === null && screenStartTime) {
+      setState({
+        ...state,
+        choice,
+        reactionTimeMs: performance.now() - screenStartTime
+      });
+    } else {
+      setState({ ...state, choice });
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="text-center">
+        <h2 className="text-xl font-semibold mb-4">Hypothetical Thinking</h2>
+      </div>
+
+      <div className="bg-green-50 p-6 rounded-lg">
+        <p className="text-lg text-gray-700 leading-relaxed">
+          A plant grows taller when it gets sunlight. If we gave it twice the sunlight, what might happen?
+        </p>
+      </div>
+
+      <div className="space-y-4">
+        <RadioGroup value={state.choice || ""} onValueChange={handleChoice}>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="A" id="choice-a" />
+            <Label htmlFor="choice-a">A) Grow twice as tall</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="B" id="choice-b" />
+            <Label htmlFor="choice-b">B) Grow slightly faster</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="C" id="choice-c" />
+            <Label htmlFor="choice-c">C) Stay the same</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="D" id="choice-d" />
+            <Label htmlFor="choice-d">D) Might grow OR might not — depends on other factors</Label>
+          </div>
+        </RadioGroup>
+      </div>
+
+      {error && (
+        <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-red-700">{error}</p>
+        </div>
+      )}
+
+      <Button 
+        onClick={onFinish}
+        disabled={!state.choice || loading}
+        className="w-full"
+      >
+        {loading ? "Analyzing..." : "See My Learning Fingerprint"}
+      </Button>
+    </div>
+  );
+};
+
+// Results Screen Component
+const ResultsScreen: React.FC<{
+  results: AssessmentResponse;
+  onComplete: () => void;
+}> = ({ results, onComplete }) => {
+  const scoreData = [
+    { name: 'Conservation', score: results.conservation_score },
+    { name: 'Classification', score: results.classification_score },
+    { name: 'Seriation', score: results.seriation_score },
+    { name: 'Reversibility', score: results.reversibility_score },
+    { name: 'Hypothetical', score: results.hypothetical_thinking_score },
+  ];
+
+  return (
+    <div className="space-y-6">
+      <div className="text-center">
+        <BarChart3 className="w-12 h-12 text-blue-600 mx-auto mb-4" />
+        <h2 className="text-2xl font-semibold mb-2">Your Learning Fingerprint</h2>
+        <p className="text-gray-600">Piaget Stage: <span className="font-semibold">{results.piaget_stage}</span></p>
+        <p className="text-sm text-gray-500">Overall Score: {results.piaget_construct_score}/100</p>
+      </div>
+
+      {/* Score Bars */}
+      <div className="space-y-4">
+        <h3 className="font-semibold text-lg">Cognitive Skills Assessment</h3>
+        {scoreData.map((item, index) => (
+          <div key={index} className="space-y-2">
+            <div className="flex justify-between">
+              <span className="text-sm font-medium">{item.name}</span>
+              <span className="text-sm text-gray-600">{item.score}/10</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-3">
+              <div
+                className="bg-gradient-to-r from-blue-500 to-purple-500 h-3 rounded-full transition-all duration-300"
+                style={{ width: `${(item.score / 10) * 100}%` }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Summary Points */}
+      <div className="space-y-3">
+        <h3 className="font-semibold text-lg">Learning Style Summary</h3>
+        <ul className="space-y-2">
+          {results.summary_points.map((point, index) => (
+            <li key={index} className="flex items-start space-x-2">
+              <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+              <span className="text-sm text-gray-700">{point}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <Button onClick={onComplete} className="w-full" size="lg">
+        Continue to Dashboard
+        <ArrowRight className="w-4 h-4 ml-2" />
+      </Button>
+    </div>
+  );
+};

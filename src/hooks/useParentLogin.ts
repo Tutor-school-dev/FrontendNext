@@ -39,8 +39,8 @@ export const useParentLogin = () => {
 
       set_dashboard_data(data.parent, "parent");
 
-      // Navigate to parent dashboard
-      router.push('/dashboard/parent');
+      // Navigate to cognitive assessment (will redirect to dashboard if already completed)
+      router.push('/cognitive-assessment');
 
     } catch (err: any) {
       console.error('Login error:', err);

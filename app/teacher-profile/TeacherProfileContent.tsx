@@ -16,7 +16,7 @@ export interface EducationFormData {
   highestQualification: string;
   otherQualification?: string;
   university: string;
-  class: number;
+  educationLevel: string;
   status: string;
   teachingMethod: string;
   referralSource?: string;

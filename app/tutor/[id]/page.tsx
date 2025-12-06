@@ -154,12 +154,12 @@ export default function TutorProfile() {
               <CardContent className="p-0">
                 <div className="relative">
                   {/* Large Profile Picture Section */}
-                  <div className="relative h-80 bg-gradient-to-br from-primary/10 to-primary/5">
+                  <div className="relative h-96 sm:h-80 lg:h-96 bg-gradient-to-br from-primary/10 to-primary/5 flex justify-center items-center overflow-hidden">
                     {(tutor.profile_pic || tutor.profile_picture) ? (
                       <img
                         src={tutor.profile_pic || tutor.profile_picture}
                         alt={tutor.name}
-                        className="w-full h-full object-cover"
+                        className="max-w-full max-h-full object-contain"
                       />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-primary/80 to-primary flex items-center justify-center text-white">

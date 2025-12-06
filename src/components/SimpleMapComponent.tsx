@@ -7,6 +7,24 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { CITY_DATA, City } from "@/lib/cityData";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+// Helper functions for State → City → Area flow
+function getUniqueStates(): string[] {
+  return Array.from(new Set(Object.values(CITY_DATA).map(city => city.state))).sort();
+}
+
+function getCitiesByState(selectedState: string): City[] {
+  return Object.values(CITY_DATA)
+    .filter(city => city.state === selectedState)
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+function getAreasByCity(citySlug: string): { name: string; slug: string }[] {
+  const city = Object.values(CITY_DATA).find(city => city.slug === citySlug);
+  return city ? city.areas.sort((a, b) => a.name.localeCompare(b.name)) : [];
+}
 
 interface SimpleMapComponentProps {
   formData: any;
@@ -262,31 +280,99 @@ const SimpleMapComponent = ({ formData, setFormData }: SimpleMapComponentProps) 
           {/* Location Form Fields */}
           <div className="space-y-3">
             <div>
-              <Label htmlFor="area">
-                Area/Locality {locationDenied && <span className="text-red-500">*</span>}
-              </Label>
-              <Input
-                id="area"
-                value={formData.area || ""}
-                onChange={(e) => handleInputChange("area", e.target.value)}
-                placeholder="Enter your area/locality"
-                required={locationDenied}
-                className={locationDenied && !formData.area ? "border-red-300" : ""}
-              />
-            </div>
-            <div>
               <Label htmlFor="state">
                 State {locationDenied && <span className="text-red-500">*</span>}
               </Label>
-              <Input
-                id="state"
-                value={formData.state || ""}
-                onChange={(e) => handleInputChange("state", e.target.value)}
-                placeholder="Enter your state"
-                required={locationDenied}
-                className={locationDenied && !formData.state ? "border-red-300" : ""}
-              />
+              <Select 
+                value={formData.state || ""} 
+                onValueChange={(value) => {
+                  handleInputChange("state", value);
+                  // Clear city and area when state changes
+                  handleInputChange("city", "");
+                  handleInputChange("area", "");
+                }}
+              >
+                <SelectTrigger className={locationDenied && !formData.state ? "border-red-300" : ""}>
+                  <SelectValue placeholder="Select your state" />
+                </SelectTrigger>
+                <SelectContent className="max-h-60">
+                  {getUniqueStates().map((state) => (
+                    <SelectItem key={state} value={state}>
+                      {state}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
+            <div>
+              <Label htmlFor="city">
+                City {locationDenied && <span className="text-red-500">*</span>}
+              </Label>
+              {formData.state ? (
+                <Select 
+                  value={formData.city || ""} 
+                  onValueChange={(value) => {
+                    handleInputChange("city", value);
+                    // Clear area when city changes
+                    handleInputChange("area", "");
+                  }}
+                >
+                  <SelectTrigger className={locationDenied && !formData.city ? "border-red-300" : ""}>
+                    <SelectValue placeholder={formData.state ? "Select your city" : "Select state first"} />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-60">
+                    {getCitiesByState(formData.state).map((city) => (
+                      <SelectItem key={city.slug} value={city.slug}>
+                        {city.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Input
+                  id="city"
+                  value={formData.city || ""}
+                  onChange={(e) => handleInputChange("city", e.target.value)}
+                  placeholder="First select a state or enter city manually"
+                  required={locationDenied}
+                  className={locationDenied && !formData.city ? "border-red-300" : ""}
+                  disabled={!formData.state}
+                />
+              )}
+            </div>
+            <div>
+              <Label htmlFor="area">
+                Area/Locality {locationDenied && <span className="text-red-500">*</span>}
+              </Label>
+              {formData.city ? (
+                <Select 
+                  value={formData.area || ""} 
+                  onValueChange={(value) => handleInputChange("area", value)}
+                >
+                  <SelectTrigger className={locationDenied && !formData.area ? "border-red-300" : ""}>
+                    <SelectValue placeholder={formData.city ? "Select your area" : "Select city first"} />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-60">
+                    {getAreasByCity(formData.city).map((area) => (
+                      <SelectItem key={area.slug} value={area.slug}>
+                        {area.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Input
+                  id="area"
+                  value={formData.area || ""}
+                  onChange={(e) => handleInputChange("area", e.target.value)}
+                  placeholder="First select a city or enter area manually"
+                  required={locationDenied}
+                  className={locationDenied && !formData.area ? "border-red-300" : ""}
+                  disabled={!formData.city}
+                />
+              )}
+            </div>
+
             <div>
               <Label htmlFor="pincode">
                 Pincode {locationDenied && <span className="text-red-500">*</span>}

@@ -18,6 +18,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import axios from "axios";
+import { SUBJECTS, getAllSubjects, isValidSubject } from "@/lib/subjects";
 import { getDjangoAuthUrl } from "@/lib/utils";
 import Location from "../../../teacher-profile/Location";
 
@@ -283,13 +284,40 @@ export default function TeacherSettingsPage() {
 
   // Subject management functions
   const addSubject = () => {
-    if (newSubject.trim() && !professionalData.subjects.includes(newSubject.trim())) {
-      setProfessionalData({
-        ...professionalData,
-        subjects: [...professionalData.subjects, newSubject.trim()]
-      });
-      setNewSubject("");
+    const trimmedSubject = newSubject.trim();
+    
+    if (!trimmedSubject) {
+      toast.error("Please enter a subject");
+      return;
     }
+    
+    if (professionalData.subjects.includes(trimmedSubject)) {
+      toast.error("This subject is already added");
+      return;
+    }
+    
+    // Check if it's a valid subject from our standardized list
+    const validSubjects = getAllSubjects();
+    const isValid = validSubjects.some(subject => 
+      subject.toLowerCase() === trimmedSubject.toLowerCase()
+    );
+    
+    if (!isValid) {
+      toast.error(`Please select from available subjects: ${validSubjects.slice(0, 5).join(', ')}...`);
+      return;
+    }
+    
+    // Find the exact case match from our subjects list
+    const correctSubject = validSubjects.find(subject => 
+      subject.toLowerCase() === trimmedSubject.toLowerCase()
+    ) || trimmedSubject;
+    
+    setProfessionalData({
+      ...professionalData,
+      subjects: [...professionalData.subjects, correctSubject]
+    });
+    setNewSubject("");
+    toast.success(`${correctSubject} added successfully`);
   };
 
   const removeSubject = (index: number) => {
@@ -678,29 +706,53 @@ export default function TeacherSettingsPage() {
                       </div>
                     )}
                     
-                    {/* Add Subject Input */}
-                    <div className="flex gap-2">
-                      <Input
-                        value={newSubject}
-                        onChange={(e) => setNewSubject(e.target.value)}
-                        onKeyPress={handleKeyPress}
-                        placeholder="Add a subject (e.g., Mathematics, Physics, English)"
-                        className="flex-1"
-                      />
-                      <Button
-                        type="button"
-                        onClick={addSubject}
-                        disabled={!newSubject.trim()}
-                        variant="outline"
-                        size="sm"
-                        className="px-4"
-                      >
-                        <Plus className="w-4 h-4" />
-                      </Button>
+                    {/* Add Subject Dropdown/Input */}
+                    <div className="space-y-2">
+                      <div className="flex gap-2">
+                        <Select
+                          value=""
+                          onValueChange={(value) => {
+                            setNewSubject(value);
+                            setTimeout(() => addSubject(), 100);
+                          }}
+                        >
+                          <SelectTrigger className="flex-1">
+                            <SelectValue placeholder="Select a subject to add" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {getAllSubjects()
+                              .filter(subject => !professionalData.subjects.includes(subject))
+                              .map((subject) => (
+                                <SelectItem key={subject} value={subject}>
+                                  {subject}
+                                </SelectItem>
+                              ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="flex gap-2">
+                        <Input
+                          value={newSubject}
+                          onChange={(e) => setNewSubject(e.target.value)}
+                          onKeyPress={handleKeyPress}
+                          placeholder="Or type a custom subject"
+                          className="flex-1"
+                        />
+                        <Button
+                          type="button"
+                          onClick={addSubject}
+                          disabled={!newSubject.trim()}
+                          variant="outline"
+                          size="sm"
+                          className="px-4"
+                        >
+                          <Plus className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
                     
                     <p className="text-sm text-gray-500">
-                      Add subjects you are qualified to teach. Press Enter or click + to add.
+                      Select from the dropdown or type a custom subject. Standard subjects are recommended for better visibility.
                     </p>
                   </div>
                 </div>

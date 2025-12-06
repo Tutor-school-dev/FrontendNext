@@ -16,6 +16,8 @@ import Cookies from "js-cookie";
 import axios from "axios";
 import DynamicMapComponent from "@/components/DynamicMapComponent";
 import { getAppUrl } from "@/lib/utils";
+import { EDUCATION_LEVELS, getAllCategories } from "@/lib/educationLevels";
+import { getAllSubjects } from "@/lib/subjects";
 
 export default function TeacherOnboardingContent() {
   const router = useRouter();
@@ -32,16 +34,16 @@ export default function TeacherOnboardingContent() {
     teacherQualification: "",
     teachingExperience: "",
     subjects: [] as string[],
-    grades: [] as string[],
+    educationLevels: [] as string[],
     bio: "",
+    city: "",
     area: "",
     state: "",
     pincode: "",
     position: null as { lat: number; lng: number } | null,
   });
 
-  const subjectOptions = ["Maths", "English", "History", "Science", "Physics", "Chemistry", "Biology", "Geography", "Hindi", "Sanskrit"];
-  const gradeOptions = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
+  const subjectOptions = getAllSubjects();
 
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({
@@ -83,8 +85,8 @@ export default function TeacherOnboardingContent() {
       const hasLocationAccess = formData.position && 
         (formData.position.lat !== 20.5937 || Math.abs(formData.position.lat - 20.5937) > 5);
       
-      if (!hasLocationAccess && (!formData.area || !formData.state || !formData.pincode)) {
-        toast.error("Please fill in your address details (Area, State, and Pincode).");
+      if (!hasLocationAccess && (!formData.city || !formData.area || !formData.state || !formData.pincode)) {
+        toast.error("Please fill in your address details (City, Area, State, and Pincode).");
         setCurrentStep(5); // Go to location step
         return;
       }
@@ -128,6 +130,7 @@ export default function TeacherOnboardingContent() {
         await axios.put(`${djangoUrl}/tutor/`, {
           latitude: formData.position.lat,
           longitude: formData.position.lng,
+          city: formData.city || "Not specified",
           area: formData.area,
           state: formData.state,
           pincode: formData.pincode
@@ -280,25 +283,40 @@ export default function TeacherOnboardingContent() {
       case 4:
         return (
           <div className="space-y-4">
-            <h3 className="text-xl font-semibold">Grades You Teach</h3>
-            <p className="text-gray-600">Select all grade levels you can teach:</p>
-            <div className="grid grid-cols-4 md:grid-cols-6 gap-3">
-              {gradeOptions.map((grade) => (
-                <div key={grade} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`grade-${grade}`}
-                    checked={formData.grades.includes(grade)}
-                    onCheckedChange={(checked) => {
-                      if (checked) {
-                        handleInputChange("grades", [...formData.grades, grade]);
-                      } else {
-                        handleInputChange("grades", formData.grades.filter(g => g !== grade));
-                      }
-                    }}
-                  />
-                  <Label htmlFor={`grade-${grade}`} className="text-sm font-normal">
-                    Class {grade}
-                  </Label>
+            <h3 className="text-xl font-semibold">Educational Levels You Teach</h3>
+            <p className="text-gray-600">Select all educational levels you can teach:</p>
+            <div className="space-y-4 max-h-96 overflow-y-auto">
+              {getAllCategories().map((category) => (
+                <div key={category} className="space-y-2">
+                  <h4 className="text-sm font-semibold text-gray-700 bg-gray-50 px-3 py-2 rounded">
+                    {category}
+                  </h4>
+                  <div className="grid grid-cols-1 gap-2 pl-4">
+                    {EDUCATION_LEVELS
+                      .filter(level => level.category === category)
+                      .map((level) => (
+                        <div key={level.value} className="flex items-start space-x-2">
+                          <Checkbox
+                            id={`level-${level.value}`}
+                            checked={formData.educationLevels.includes(level.value)}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                handleInputChange("educationLevels", [...formData.educationLevels, level.value]);
+                              } else {
+                                handleInputChange("educationLevels", formData.educationLevels.filter(l => l !== level.value));
+                              }
+                            }}
+                            className="mt-1"
+                          />
+                          <div className="flex-1">
+                            <Label htmlFor={`level-${level.value}`} className="text-sm font-normal cursor-pointer">
+                              {level.label}
+                            </Label>
+                            <p className="text-xs text-gray-500 mt-1">{level.description}</p>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
                 </div>
               ))}
             </div>

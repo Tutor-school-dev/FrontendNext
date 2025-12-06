@@ -11,7 +11,7 @@ import { STORAGE_KEY } from "@/lib/constants";
 export interface TeacherDetailsPayload {
   // Basic info
   degree: string;
-  class_field: number;
+  class_field: string; // Changed to string to accept education level slugs
   university: string;
   current_status: string;
   teaching_mode: string;

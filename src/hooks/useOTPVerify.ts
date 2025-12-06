@@ -178,8 +178,11 @@ export const useOTPVerify = () => {
             }
           }
         } else {
-          // Learner/Parent dashboard
-          router.push('/dashboard/parent');
+          // Learner/Parent - check if they need cognitive assessment
+          // For now, we'll check if they have assessment results by attempting the API call
+          // If they get "already completed" error, go to dashboard
+          // If they haven't taken it, go to assessment
+          router.push('/cognitive-assessment');
           return { success: true, redirected: true };
         }
 

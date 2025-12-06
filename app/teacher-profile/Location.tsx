@@ -20,10 +20,29 @@ import { useCreateTeacherDetails } from "@/hooks/useCreateTeacherDetails";
 import { LoadingButton } from "@/components/ui/LoadingButton";
 import { ChevronRight, MapPin } from "lucide-react";
 import { EducationFormData } from "./TeacherProfileContent";
+import { CITY_DATA, City } from "@/lib/cityData";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+// Helper functions for State → City → Area flow
+function getUniqueStates(): string[] {
+  return Array.from(new Set(Object.values(CITY_DATA).map(city => city.state))).sort();
+}
+
+function getCitiesByState(selectedState: string): City[] {
+  return Object.values(CITY_DATA)
+    .filter(city => city.state === selectedState)
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+function getAreasByCity(citySlug: string): { name: string; slug: string }[] {
+  const city = Object.values(CITY_DATA).find(city => city.slug === citySlug);
+  return city ? city.areas.sort((a, b) => a.name.localeCompare(b.name)) : [];
+}
 
 const MapFormSchema = z.object({
-  area: z.string().min(1, "Area is required"),
   state: z.string().min(1, "State is required"),
+  city: z.string().min(1, "City is required"),
+  area: z.string().min(1, "Area is required"),
   pincode: z.string().min(6, "Pincode must be at least 6 characters"),
 });
 
@@ -47,8 +66,9 @@ export default function Location({ onNext, model = "teacher", fromSettings = fal
   const form = useForm({
     resolver: zodResolver(MapFormSchema),
     defaultValues: {
-      area: "",
       state: "",
+      city: "",
+      area: "",
       pincode: "",
     },
   });
@@ -118,7 +138,7 @@ export default function Location({ onNext, model = "teacher", fromSettings = fal
         degree: educationData.highestQualification === "Others" 
           ? educationData.otherQualification || educationData.highestQualification
           : educationData.highestQualification,
-        class_field: educationData.class,
+        class_field: educationData.educationLevel, // Use the education level slug directly
         university: educationData.university,
         current_status: educationData.status,
         teaching_mode: educationData.teachingMethod,
@@ -160,14 +180,33 @@ export default function Location({ onNext, model = "teacher", fromSettings = fal
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <FormField
                 control={form.control}
-                name="area"
+                name="state"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      Area/Locality <span className="text-red-500">*</span>
+                      State <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Enter your area or locality" />
+                      <Select 
+                        value={field.value} 
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          // Clear city and area when state changes
+                          form.setValue("city", "");
+                          form.setValue("area", "");
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select your state" />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-60">
+                          {getUniqueStates().map((state) => (
+                            <SelectItem key={state} value={state}>
+                              {state}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -176,19 +215,71 @@ export default function Location({ onNext, model = "teacher", fromSettings = fal
 
               <FormField
                 control={form.control}
-                name="state"
+                name="city"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      State <span className="text-red-500">*</span>
+                      City <span className="text-red-500">*</span>
                     </FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Enter your state" />
+                      <Select 
+                        value={field.value} 
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          // Clear area when city changes
+                          form.setValue("area", "");
+                        }}
+                        disabled={!form.watch("state")}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder={form.watch("state") ? "Select your city" : "Select state first"} />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-60">
+                          {getCitiesByState(form.watch("state")).map((city) => (
+                            <SelectItem key={city.slug} value={city.slug}>
+                              {city.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
+              <FormField
+                control={form.control}
+                name="area"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Area/Locality <span className="text-red-500">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Select 
+                        value={field.value} 
+                        onValueChange={field.onChange}
+                        disabled={!form.watch("city")}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder={form.watch("city") ? "Select your area" : "Select city first"} />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-60">
+                          {getAreasByCity(form.watch("city")).map((area) => (
+                            <SelectItem key={area.slug} value={area.slug}>
+                              {area.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+
 
               <FormField
                 control={form.control}
