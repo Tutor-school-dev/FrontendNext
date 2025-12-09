@@ -11,25 +11,61 @@ import { Slider } from '@/components/ui/slider';
 import { Textarea } from '@/components/ui/textarea';
 import { Brain, CheckCircle, ArrowRight, BarChart3 } from 'lucide-react';
 import { useCognitiveAssessment, AssessmentPayload, AssessmentResponse } from '@/hooks/useCognitiveAssessment';
+import {
+  ConservationTrackingState,
+  ClassificationTrackingState, 
+  SeriationTrackingState,
+  BaseTrackingState,
+  calculateRTBand,
+  calculateHBand,
+  calculateACBand,
+  calculateSBand,
+  calculateMBand,
+  calculateTPBand,
+  calculateTBand,
+  calculateCorrBand,
+  calculateIdleBand,
+  detectIdlePeriods,
+  calculateTotalHoverTime,
+  trackAnswerChange,
+  trackAction,
+  startHover,
+  endHover,
+  isSequenceCorrect,
+  countMisplacements
+} from '@/lib/cognitiveUtils';
 
 type AssessmentState = {
-  s2: { choice: "A" | "B" | "C" | null; confidence: number | null; reactionTimeMs: number | null; switchCount: number; };
-  s3: { rule: "shape" | "color" | "mixed" | null; corrections: number; timeMs: number | null; };
-  s4: { isCorrect: boolean | null; swapCount: number; };
-  s5: { answer: "yes" | "no" | "not_sure" | null; explanation: string; };
-  s6: { choice: "A" | "B" | "C" | "D" | null; reactionTimeMs: number | null; };
+  conservation: ConservationTrackingState;
+  classification: ClassificationTrackingState;
+  seriation: SeriationTrackingState;
+  reversibility: BaseTrackingState;
+  hypothetical: BaseTrackingState;
 };
 
 const TOTAL_SCREENS = 7;
 
 export const CognitiveAssessmentFlow: React.FC = () => {
   const [currentScreen, setCurrentScreen] = useState(1);
+  const createInitialTrackingState = (): BaseTrackingState => ({
+    startTime: null,
+    firstActionTime: null,
+    lastActionTime: null,
+    actionTimestamps: [],
+    answerChanges: 0,
+    currentAnswer: null,
+    hoverTimes: {},
+    hoverStartTimes: {},
+    totalHoverTime: 0,
+    idlePeriods: 0
+  });
+
   const [assessmentState, setAssessmentState] = useState<AssessmentState>({
-    s2: { choice: null, confidence: null, reactionTimeMs: null, switchCount: 0 },
-    s3: { rule: null, corrections: 0, timeMs: null },
-    s4: { isCorrect: null, swapCount: 0 },
-    s5: { answer: null, explanation: "" },
-    s6: { choice: null, reactionTimeMs: null }
+    conservation: { ...createInitialTrackingState(), correctness: null },
+    classification: { ...createInitialTrackingState(), corrections: 0, lastGroupAssignment: {} },
+    seriation: { ...createInitialTrackingState(), swaps: 0, misplacements: 0, firstCorrectTime: null, currentOrder: [], correctOrder: ['small', 'medium', 'large'] },
+    reversibility: createInitialTrackingState(),
+    hypothetical: createInitialTrackingState()
   });
   
   const [results, setResults] = useState<AssessmentResponse | null>(null);
@@ -49,32 +85,51 @@ export const CognitiveAssessmentFlow: React.FC = () => {
   };
 
   const handleFinishAssessment = async () => {
+    const { conservation, classification, seriation, reversibility, hypothetical } = assessmentState;
+    
+    // Calculate bands for each question
+    const conservationTime = conservation.startTime ? Date.now() - conservation.startTime : 0;
+    const classificationTime = classification.startTime ? Date.now() - classification.startTime : 0;
+    const seriationTime = seriation.startTime ? Date.now() - seriation.startTime : 0;
+    const reversibilityTime = reversibility.startTime ? Date.now() - reversibility.startTime : 0;
+    const hypotheticalTime = hypothetical.startTime ? Date.now() - hypothetical.startTime : 0;
+    
     const payload: AssessmentPayload = {
-      s2: {
-        choice: assessmentState.s2.choice || "C",
-        confidence: assessmentState.s2.confidence,
-        reaction_time_ms: assessmentState.s2.reactionTimeMs,
-        switch_count: assessmentState.s2.switchCount
+      question1_conservation: {
+        rt_band: conservation.firstActionTime && conservation.startTime 
+          ? calculateRTBand(conservation.firstActionTime - conservation.startTime) : 0,
+        h_band: calculateHBand(conservation.totalHoverTime),
+        ac: conservation.answerChanges,
+        correctness: conservation.correctness || false
       },
-      s3: {
-        rule: assessmentState.s3.rule,
-        corrections: assessmentState.s3.corrections,
-        time_ms: assessmentState.s3.timeMs
+      question2_classification: {
+        corr_band: calculateCorrBand(classification.corrections),
+        idle_band: calculateIdleBand(detectIdlePeriods(classification.actionTimestamps)),
+        t_band: calculateTBand(classificationTime)
       },
-      s4: {
-        is_correct: assessmentState.s4.isCorrect,
-        swap_count: assessmentState.s4.swapCount
+      question3_seriation: {
+        s_band: calculateSBand(seriation.swaps),
+        m_band: calculateMBand(seriation.misplacements),
+        tp_band: seriation.firstCorrectTime && seriation.startTime 
+          ? calculateTPBand(seriation.firstCorrectTime - seriation.startTime) : 2,
+        t_band: calculateTBand(seriationTime)
       },
-      s5: {
-        answer: assessmentState.s5.answer,
-        explanation: assessmentState.s5.explanation
+      question4_reversibility: {
+        rt_band: reversibility.firstActionTime && reversibility.startTime 
+          ? calculateRTBand(reversibility.firstActionTime - reversibility.startTime) : 0,
+        h_band: calculateHBand(reversibility.totalHoverTime),
+        ac: reversibility.answerChanges,
+        correctness: reversibility.currentAnswer === 'correct_answer' // This will be set by the actual correct answer
       },
-      s6: {
-        choice: assessmentState.s6.choice,
-        reaction_time_ms: assessmentState.s6.reactionTimeMs
+      question5_hypothetical: {
+        rt_band: hypothetical.firstActionTime && hypothetical.startTime 
+          ? calculateRTBand(hypothetical.firstActionTime - hypothetical.startTime) : 0,
+        h_band: calculateHBand(hypothetical.totalHoverTime),
+        ac: hypothetical.answerChanges
       }
     };
 
+    console.log('Assessment payload:', payload);
     const response = await submitAssessment(payload);
     if (response) {
       setResults(response);
@@ -84,7 +139,22 @@ export const CognitiveAssessmentFlow: React.FC = () => {
 
   useEffect(() => {
     if (currentScreen >= 2 && currentScreen <= 6) {
-      setScreenStartTime(performance.now());
+      const startTime = Date.now();
+      setScreenStartTime(startTime);
+      
+      // Initialize tracking state for current screen
+      const screenKey = [
+        'conservation', 'classification', 'seriation', 'reversibility', 'hypothetical'
+      ][currentScreen - 2] as keyof AssessmentState;
+      
+      setAssessmentState(prev => ({
+        ...prev,
+        [screenKey]: {
+          ...prev[screenKey],
+          startTime,
+          actionTimestamps: []
+        }
+      }));
     }
   }, [currentScreen]);
 
@@ -122,39 +192,36 @@ export const CognitiveAssessmentFlow: React.FC = () => {
           )}
           {currentScreen === 2 && (
             <ConservationScreen 
-              state={assessmentState.s2}
-              setState={(newState) => setAssessmentState(prev => ({ ...prev, s2: newState }))}
-              screenStartTime={screenStartTime}
+              state={assessmentState.conservation}
+              setState={(newState) => setAssessmentState(prev => ({ ...prev, conservation: newState }))}
               onNext={nextScreen}
             />
           )}
           {currentScreen === 3 && (
             <ClassificationScreen 
-              state={assessmentState.s3}
-              setState={(newState) => setAssessmentState(prev => ({ ...prev, s3: newState }))}
-              screenStartTime={screenStartTime}
+              state={assessmentState.classification}
+              setState={(newState) => setAssessmentState(prev => ({ ...prev, classification: newState }))}
               onNext={nextScreen}
             />
           )}
           {currentScreen === 4 && (
             <SeriationScreen 
-              state={assessmentState.s4}
-              setState={(newState) => setAssessmentState(prev => ({ ...prev, s4: newState }))}
+              state={assessmentState.seriation}
+              setState={(newState) => setAssessmentState(prev => ({ ...prev, seriation: newState }))}
               onNext={nextScreen}
             />
           )}
           {currentScreen === 5 && (
             <ReversibilityScreen 
-              state={assessmentState.s5}
-              setState={(newState) => setAssessmentState(prev => ({ ...prev, s5: newState }))}
+              state={assessmentState.reversibility}
+              setState={(newState) => setAssessmentState(prev => ({ ...prev, reversibility: newState }))}
               onNext={nextScreen}
             />
           )}
           {currentScreen === 6 && (
             <HypotheticalScreen 
-              state={assessmentState.s6}
-              setState={(newState) => setAssessmentState(prev => ({ ...prev, s6: newState }))}
-              screenStartTime={screenStartTime}
+              state={assessmentState.hypothetical}
+              setState={(newState) => setAssessmentState(prev => ({ ...prev, hypothetical: newState }))}
               onFinish={handleFinishAssessment}
               loading={loading}
               error={error}

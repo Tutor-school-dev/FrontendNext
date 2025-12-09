@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
-import { CognitiveAssessmentFlow } from '@/components/CognitiveAssessmentFlow';
+import { CognitiveAssessmentFlowNew } from '@/components/CognitiveAssessmentFlowNew';
 import { AUTH_COOKIE } from '@/lib/constants';
 
 export default function CognitiveAssessmentPage() {
@@ -56,7 +56,7 @@ export default function CognitiveAssessmentPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <CognitiveAssessmentFlow />
+      <CognitiveAssessmentFlowNew />
     </div>
   );
 }
