@@ -2,12 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { Brain, CheckCircle, ArrowRight, BarChart3 } from 'lucide-react';
+import { Brain, CheckCircle, ArrowRight } from 'lucide-react';
 import { useCognitiveAssessment, AssessmentPayload, AssessmentResponse } from '@/hooks/useCognitiveAssessment';
 import {
   ConservationTrackingState,
@@ -252,7 +253,7 @@ const WelcomeScreen: React.FC<{ onStart: () => void }> = ({ onStart }) => {
       </div>
       <div className="space-y-4">
         <h2 className="text-2xl font-bold text-gray-800">
-          We're about to understand how YOUR brain learns
+          We're about to understand how YOUR child's brain learns
         </h2>
         <p className="text-lg text-gray-600">This takes about 90 seconds</p>
         <p className="text-sm text-gray-500 max-w-md mx-auto">
@@ -348,7 +349,7 @@ const ConservationScreenNew: React.FC<{
 
       <div className="text-center mb-6">
         <p className="text-gray-700 mb-4">
-          If we pour the water from Container A into Container B, which container will have more water?
+          Which container will have more water?
         </p>
       </div>
 
@@ -404,7 +405,11 @@ const ClassificationScreenNew: React.FC<{
     { id: 'yellow-triangle', shape: 'triangle', color: 'yellow', group: 'available' }
   ];
 
-  const [shapes, setShapes] = useState(initialShapes);
+  const [shapes, setShapes] = useState(() => {
+    // Shuffle the initial shapes array to randomize order
+    const shuffled = [...initialShapes].sort(() => Math.random() - 0.5);
+    return shuffled;
+  });
   const [groups] = useState(['group1', 'group2', 'group3']);
 
   const handleDragStart = (e: React.DragEvent, shapeId: string) => {
@@ -492,12 +497,23 @@ const ClassificationScreenNew: React.FC<{
             </div>
           );
         case 'triangle':
+          // Use dark triangle on light backgrounds, light triangle on dark backgrounds
+          const getTriangleColor = (bgColor: string) => {
+            const lightColors = ['yellow', 'lime', 'cyan', 'white', 'lightgray', 'pink', 'lightblue'];
+            return lightColors.includes(bgColor.toLowerCase()) ? '#1f2937' : 'white';
+          };
+          
           return (
             <div 
-              className={`${baseClasses}`}
-              style={{ color: shape.color }}
+              className={`${baseClasses} relative`}
+              style={{ backgroundColor: shape.color }}
             >
-              ▲
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div 
+                  className="w-0 h-0 border-l-[18px] border-r-[18px] border-b-[16px] border-l-transparent border-r-transparent"
+                  style={{ borderBottomColor: getTriangleColor(shape.color) }}
+                />
+              </div>
             </div>
           );
         default:
@@ -708,7 +724,7 @@ const SeriationScreenNew: React.FC<{
       </div>
 
       <div className="text-center text-sm text-gray-500 space-y-1">
-        <p>Drag and drop to reorder the circles</p>
+        <p>Arrange these bars from shortest to longest.</p>
         <p>Current order: {currentOrder.map(item => item.charAt(0).toUpperCase()).join(' → ')}</p>
       </div>
 
@@ -990,39 +1006,45 @@ const ResultsScreenNew: React.FC<{
   };
 
   const getScoreColor = (finalScore: number) => {
-    if (finalScore >= 70) return 'bg-green-500';
-    if (finalScore >= 50) return 'bg-blue-500';
-    if (finalScore >= 30) return 'bg-yellow-500';
-    return 'bg-red-500';
+    if (finalScore >= 70) return 'bg-emerald-500';
+    if (finalScore >= 50) return 'bg-sky-500';
+    if (finalScore >= 30) return 'bg-amber-500';
+    return 'bg-rose-500';
   };
 
   return (
     <div className="space-y-8">
       <div className="text-center space-y-4">
-        <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-          <BarChart3 className="w-12 h-12 text-green-600" />
+        <div className="flex justify-center">
+          <Image 
+            src="/fingerprint.jpeg" 
+            alt="Fingerprint" 
+            width={120} 
+            height={120} 
+            className="object-contain"
+          />
         </div>
         <h2 className="text-2xl font-bold text-gray-800">Your Learning Fingerprint</h2>
         <p className="text-gray-600">Here's how your brain learns best</p>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         <h3 className="text-lg font-semibold text-gray-800">Your Learning Profile</h3>
         
         {cognitiveParameters.map((item) => (
-          <div key={item.key} className="bg-white p-5 rounded-lg border shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex justify-between items-start mb-3">
-              <span className="font-semibold text-gray-800 text-lg">{item.name}</span>
+          <div key={item.key} className="bg-gray-50/80 p-4 rounded-md border border-gray-100 shadow-sm hover:shadow-md transition-all hover:bg-white/90">
+            <div className="flex justify-between items-start mb-2">
+              <span className="font-medium text-gray-800 text-base">{item.name}</span>
               <div className="text-right">
-                <div className={`px-3 py-1 rounded-full text-sm font-medium text-white ${getScoreColor(item.parameter.final_score)}`}>
+                <div className={`px-2 py-1 rounded-md text-xs font-medium text-white ${getScoreColor(item.parameter.final_score)}`}>
                   {item.parameter.label}
                 </div>
                 <div className="text-xs text-gray-500 mt-1">{item.parameter.score_range}</div>
               </div>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
+            <div className="w-full bg-gray-200 rounded-full h-1.5 mb-2">
               <div
-                className={`h-2 rounded-full transition-all duration-700 ${getScoreColor(item.parameter.final_score)}`}
+                className={`h-1.5 rounded-full transition-all duration-700 ${getScoreColor(item.parameter.final_score)}`}
                 style={{ width: `${getBarWidth(item.parameter.final_score)}%` }}
               />
             </div>
@@ -1031,9 +1053,9 @@ const ResultsScreenNew: React.FC<{
         ))}
       </div>
 
-      <div className="bg-blue-50 p-6 rounded-lg">
+      <div className="bg-slate-50/70 p-5 rounded-md border border-slate-100">
         <h3 className="text-lg font-semibold text-gray-800 mb-3">Summary</h3>
-        <p className="text-gray-700 leading-relaxed">{results.final_summary}</p>
+        <p className="text-sm text-gray-700 leading-relaxed">{results.final_summary}</p>
       </div>
 
       <div className="flex justify-center">
