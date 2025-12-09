@@ -34,6 +34,7 @@ export interface AssessmentPayload {
     rt_band: number;         // Reaction Time Band (0, 1, 2)
     h_band: number;          // Hover Time Band (0, 1, 2)
     ac: number;              // Answer Change Count (0, 1, 2+)
+    correctness: boolean;    // Is answer correct
   };
 }
 

@@ -64,13 +64,21 @@ export const useOTPVerify = () => {
       
       // Handle new user vs existing user based on response
       if (isNewUserResponse(data)) {
-        // New user - store access_hash and redirect to onboarding
-        Cookies.set(AUTH_COOKIE.ACCESS_HASH, data.access_hash, { expires: 1 });
+        // New user - check if learner should go to quiz directly
         const displayModel = getUserTypeDisplay(data.user_type);
         localStorage.setItem(STORAGE_KEY.MODEL, displayModel);
-        router.push(`/onboarding?model=${model}`);
+        
+        if (data.user_type === 'learner') {
+          // For learners, create JWT token and go to quiz
+          Cookies.set(AUTH_COOKIE.JWT_TOKEN, data.access_hash, { expires: 7 });
+          router.push('/cognitive-assessment');
+        } else {
+          // For tutors, store access_hash and go to onboarding
+          Cookies.set(AUTH_COOKIE.ACCESS_HASH, data.access_hash, { expires: 1 });
+          router.push(`/onboarding?model=${model}`);
+        }
       } else if (isExistingUserResponse(data)) {
-        // Existing user - store tokens and redirect to dashboard
+        // Existing user - store tokens and redirect based on flags
         Cookies.set(AUTH_COOKIE.JWT_TOKEN, data.jwt_token, { expires: 7 });
         Cookies.set(AUTH_COOKIE.REFRESH_TOKEN, data.refresh, { expires: 7 });
         
@@ -84,7 +92,14 @@ export const useOTPVerify = () => {
         
         set_dashboard_data(userData, data.user_type === 'tutor' ? 'teacher' : 'parent');
         
-        router.push(data.user_type === 'tutor' ? '/dashboard/teacher' : '/dashboard/parent');
+        // Route based on go_to_quiz or go_to_dashboard flags
+        if (data.user_type === 'learner' && data.go_to_quiz) {
+          router.push('/cognitive-assessment');
+        } else if (data.go_to_dashboard) {
+          router.push(data.user_type === 'tutor' ? '/dashboard/teacher' : '/dashboard/parent');
+        } else {
+          router.push(data.user_type === 'tutor' ? '/dashboard/teacher' : '/dashboard/parent');
+        }
       }
       
     } catch (err: any) {
@@ -178,12 +193,18 @@ export const useOTPVerify = () => {
             }
           }
         } else {
-          // Learner/Parent - check if they need cognitive assessment
-          // For now, we'll check if they have assessment results by attempting the API call
-          // If they get "already completed" error, go to dashboard
-          // If they haven't taken it, go to assessment
-          router.push('/cognitive-assessment');
-          return { success: true, redirected: true };
+          // Learner/Parent - route based on go_to_quiz or go_to_dashboard flags
+          if (data.go_to_quiz) {
+            router.push('/cognitive-assessment');
+            return { success: true, redirected: true };
+          } else if (data.go_to_dashboard) {
+            router.push('/dashboard/parent');
+            return { success: true, redirected: true };
+          } else {
+            // Default fallback to dashboard
+            router.push('/dashboard/parent');
+            return { success: true, redirected: true };
+          }
         }
 
         return { success: true, data: userData };

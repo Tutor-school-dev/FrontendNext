@@ -39,6 +39,7 @@ export interface OTPVerifyExistingUserResponse {
   user_type: UserType;
   user: any; // User structure depends on user_type (teacher or parent fields)
   go_to_dashboard: boolean;
+  go_to_quiz?: boolean;
 }
 
 export type OTPVerifyResponse = OTPVerifyNewUserResponse | OTPVerifyExistingUserResponse;

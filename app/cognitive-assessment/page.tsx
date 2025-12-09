@@ -16,10 +16,11 @@ export default function CognitiveAssessmentPage() {
       if (typeof window === 'undefined') return;
 
       const jwtToken = Cookies.get(AUTH_COOKIE.JWT_TOKEN);
+      const accessHash = Cookies.get(AUTH_COOKIE.ACCESS_HASH);
       const model = localStorage.getItem('model');
 
-      // Check if user is authenticated
-      if (!jwtToken) {
+      // Check if user is authenticated (either jwt_token or access_hash for new users)
+      if (!jwtToken && !accessHash) {
         // Not authenticated - redirect to learner sign in
         router.push('/auth?model=parent');
         return;

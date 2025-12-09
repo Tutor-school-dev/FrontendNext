@@ -62,7 +62,7 @@ export const CognitiveAssessmentFlowNew: React.FC = () => {
   const [assessmentState, setAssessmentState] = useState<AssessmentState>({
     conservation: { ...createInitialTrackingState(), correctness: null },
     classification: { ...createInitialTrackingState(), corrections: 0, lastGroupAssignment: {} },
-    seriation: { ...createInitialTrackingState(), swaps: 0, misplacements: 0, firstCorrectTime: null, currentOrder: [], correctOrder: ['small', 'medium', 'large'] },
+    seriation: { ...createInitialTrackingState(), swaps: 0, misplacements: 0, firstCorrectTime: null, currentOrder: [], correctOrder: ['shortest', 'short', 'medium', 'long', 'longest'] },
     reversibility: createInitialTrackingState(),
     hypothetical: createInitialTrackingState()
   });
@@ -116,13 +116,14 @@ export const CognitiveAssessmentFlowNew: React.FC = () => {
           ? calculateRTBand(reversibility.firstActionTime - reversibility.startTime) : 0,
         h_band: calculateHBand(reversibility.totalHoverTime),
         ac: reversibility.answerChanges,
-        correctness: reversibility.currentAnswer === 'yes' // Assuming 'yes' is correct for reversibility
+        correctness: reversibility.currentAnswer === 'yes' // 'yes' is correct - clay amount stays the same
       },
       question5_hypothetical: {
         rt_band: hypothetical.firstActionTime && hypothetical.startTime 
           ? calculateRTBand(hypothetical.firstActionTime - hypothetical.startTime) : 0,
         h_band: calculateHBand(hypothetical.totalHoverTime),
-        ac: hypothetical.answerChanges
+        ac: hypothetical.answerChanges,
+        correctness: hypothetical.currentAnswer === 'D' // Option D shows formal operational thinking
       }
     };
 
@@ -577,7 +578,7 @@ const SeriationScreenNew: React.FC<{
   onNext: () => void;
 }> = ({ state, setState, onNext }) => {
   // Initialize items if not already set
-  const initialItems = ['small', 'medium', 'large'];
+  const initialItems = ['shortest', 'short', 'medium', 'long', 'longest'];
   const [currentOrder, setCurrentOrder] = useState(
     state.currentOrder.length > 0 ? state.currentOrder : [...initialItems].sort(() => Math.random() - 0.5)
   );
@@ -650,18 +651,22 @@ const SeriationScreenNew: React.FC<{
 
   const getItemSize = (item: string) => {
     switch (item) {
-      case 'small': return { width: '60px', height: '60px' };
-      case 'medium': return { width: '80px', height: '80px' };
-      case 'large': return { width: '100px', height: '100px' };
-      default: return { width: '80px', height: '80px' };
+      case 'shortest': return { width: '40px', height: '60px' };
+      case 'short': return { width: '40px', height: '100px' };
+      case 'medium': return { width: '40px', height: '140px' };
+      case 'long': return { width: '40px', height: '180px' };
+      case 'longest': return { width: '40px', height: '220px' };
+      default: return { width: '40px', height: '140px' };
     }
   };
 
   const getItemColor = (item: string) => {
     switch (item) {
-      case 'small': return 'bg-blue-300';
-      case 'medium': return 'bg-blue-500';
-      case 'large': return 'bg-blue-700';
+      case 'shortest': return 'bg-gradient-to-t from-blue-600 to-blue-400';
+      case 'short': return 'bg-gradient-to-t from-green-600 to-green-400';
+      case 'medium': return 'bg-gradient-to-t from-yellow-600 to-yellow-400';
+      case 'long': return 'bg-gradient-to-t from-orange-600 to-orange-400';
+      case 'longest': return 'bg-gradient-to-t from-red-600 to-red-400';
       default: return 'bg-gray-400';
     }
   };
@@ -675,8 +680,8 @@ const SeriationScreenNew: React.FC<{
   return (
     <div className="space-y-6">
       <div className="text-center space-y-4">
-        <h3 className="text-xl font-semibold">Seriation Task</h3>
-        <p className="text-gray-600">Arrange these circles from smallest to largest by dragging them:</p>
+        <h3 className="text-xl font-semibold">Seriation Task (Ordering)</h3>
+        <p className="text-gray-600">Arrange these rods from shortest to longest by dragging them:</p>
       </div>
 
       <div className="bg-gray-50 p-6 rounded-lg">
@@ -692,10 +697,10 @@ const SeriationScreenNew: React.FC<{
                 onDragStart={(e) => handleDragStart(e, index)}
                 onDragOver={handleDragOver}
                 onDrop={(e) => handleDrop(e, index)}
-                className={`${colorClass} rounded-full cursor-move hover:opacity-70 transition-opacity flex items-center justify-center text-white font-semibold`}
+                className={`${colorClass} rounded-lg cursor-move hover:opacity-80 hover:scale-105 transition-all duration-200 flex items-end justify-center text-white font-bold text-xs shadow-lg border border-white/20`}
                 style={size}
               >
-                {item === 'small' ? 'S' : item === 'medium' ? 'M' : 'L'}
+                <span className="mb-2">{index + 1}</span>
               </div>
             );
           })}
@@ -783,24 +788,27 @@ const ReversibilityScreenNew: React.FC<{
   return (
     <div className="space-y-6">
       <div className="text-center space-y-4">
-        <h3 className="text-xl font-semibold">Reversibility Task</h3>
-        <p className="text-gray-600">Look at this math problem:</p>
+        <h3 className="text-xl font-semibold">Reversibility Reasoning</h3>
+        <p className="text-gray-600">Watch this scenario:</p>
       </div>
 
       <div className="bg-gray-50 p-6 rounded-lg text-center">
-        <div className="text-3xl font-bold mb-4">
-          8 + 5 = 13
+        <div className="text-lg font-medium mb-4">
+          🟫 Short scenario animation:
         </div>
-        <div className="text-xl text-gray-700 mb-4">
-          If we know that 8 + 5 = 13, then what is 13 - 5?
+        <div className="space-y-2 text-gray-700">
+          <div>A clay ball → shaped into a pancake → shaped back into a ball.</div>
+        </div>
+        <div className="text-xl font-semibold mt-4 text-gray-800">
+          Does the clay still have the SAME amount as before?
         </div>
       </div>
 
       <RadioGroup value={selectedAnswer || ""} onValueChange={handleOptionSelect} className="space-y-4">
         {[
-          { id: 'yes', label: 'Yes, 13 - 5 = 8 (because we can reverse the operation)' },
-          { id: 'no', label: 'No, we need to calculate 13 - 5 separately' },
-          { id: 'unsure', label: 'I\'m not sure how they are related' }
+          { id: 'yes', label: 'Yes' },
+          { id: 'no', label: 'No' },
+          { id: 'unsure', label: 'Not sure' }
         ].map((option) => (
           <div 
             key={option.id}
@@ -896,11 +904,13 @@ const HypotheticalScreenNew: React.FC<{
 
       <div className="bg-blue-50 p-6 rounded-lg">
         <div className="text-lg font-medium mb-4 text-center">
-          🌍 Imagine a World Where...
+          🌱 Scenario:
         </div>
-        <p className="text-gray-700 text-center leading-relaxed">
-          In a world where water flows upward instead of downward, 
-          how do you think people would design houses and cities differently?
+        <p className="text-gray-700 text-center leading-relaxed mb-4">
+          "A plant grows taller when it gets sunlight.
+        </p>
+        <p className="text-xl font-semibold text-center text-gray-800">
+          If we gave it twice the sunlight, what might happen?"
         </p>
       </div>
 
@@ -908,19 +918,19 @@ const HypotheticalScreenNew: React.FC<{
         {[
           { 
             id: 'A', 
-            label: 'Houses would have roofs at the bottom to catch water, and cities would be built upside down'
+            label: 'A) Grow twice as tall'
           },
           { 
             id: 'B', 
-            label: 'Everything would stay the same because people would find ways to make water flow normally' 
+            label: 'B) Grow slightly faster' 
           },
           { 
             id: 'C', 
-            label: 'Houses would have special containers on top floors, and drainage systems would work in reverse'
+            label: 'C) Stay the same'
           },
           { 
             id: 'D', 
-            label: 'It would be impossible to live in such a world, so people would have to move somewhere else'
+            label: 'D) Might grow OR might not — depends on other factors'
           }
         ].map((option) => (
           <div 
@@ -981,8 +991,8 @@ const ResultsScreenNew: React.FC<{
 
   const getScoreColor = (finalScore: number) => {
     if (finalScore >= 70) return 'bg-green-500';
-    if (finalScore >= 50) return 'bg-yellow-500';
-    if (finalScore >= 30) return 'bg-orange-500';
+    if (finalScore >= 50) return 'bg-blue-500';
+    if (finalScore >= 30) return 'bg-yellow-500';
     return 'bg-red-500';
   };
 
@@ -996,25 +1006,27 @@ const ResultsScreenNew: React.FC<{
         <p className="text-gray-600">Here's how your brain learns best</p>
       </div>
 
-      <div className="space-y-6">
-        <h3 className="text-lg font-semibold text-gray-800">Cognitive Parameters</h3>
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold text-gray-800">Your Learning Profile</h3>
         
         {cognitiveParameters.map((item) => (
-          <div key={item.key} className="space-y-2">
-            <div className="flex justify-between items-center">
-              <span className="font-medium text-gray-700">{item.name}</span>
-              <div className="text-right text-sm">
-                <span className="font-semibold">{item.parameter.band}</span>
-                <span className="text-gray-500 ml-2">({item.parameter.label})</span>
+          <div key={item.key} className="bg-white p-5 rounded-lg border shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex justify-between items-start mb-3">
+              <span className="font-semibold text-gray-800 text-lg">{item.name}</span>
+              <div className="text-right">
+                <div className={`px-3 py-1 rounded-full text-sm font-medium text-white ${getScoreColor(item.parameter.final_score)}`}>
+                  {item.parameter.label}
+                </div>
+                <div className="text-xs text-gray-500 mt-1">{item.parameter.score_range}</div>
               </div>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-3">
+            <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
               <div
-                className={`h-3 rounded-full transition-all duration-500 ${getScoreColor(item.parameter.final_score)}`}
+                className={`h-2 rounded-full transition-all duration-700 ${getScoreColor(item.parameter.final_score)}`}
                 style={{ width: `${getBarWidth(item.parameter.final_score)}%` }}
               />
             </div>
-            <p className="text-xs text-gray-500">{item.parameter.interpretation}</p>
+            <p className="text-sm text-gray-600 leading-relaxed">{item.parameter.interpretation}</p>
           </div>
         ))}
       </div>
