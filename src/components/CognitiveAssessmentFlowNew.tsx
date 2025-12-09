@@ -496,7 +496,7 @@ const ClassificationScreenNew: React.FC<{
               ■
             </div>
           );
-        case 'triangle':
+        case 'triangle': {
           // Use dark triangle on light backgrounds, light triangle on dark backgrounds
           const getTriangleColor = (bgColor: string) => {
             const lightColors = ['yellow', 'lime', 'cyan', 'white', 'lightgray', 'pink', 'lightblue'];
@@ -516,6 +516,7 @@ const ClassificationScreenNew: React.FC<{
               </div>
             </div>
           );
+        }
         default:
           return null;
       }

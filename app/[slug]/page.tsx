@@ -2,7 +2,6 @@ import { Suspense } from "react";
 import { Metadata } from "next";
 import { redirect, notFound } from "next/navigation";
 import JobListingsContent from "../job-listings/JobListingsContent";
-import { getApiUrl } from "@/lib/utils";
 
 // Function to fetch job data for metadata (server-side)
 async function getJobData(jobId: string) {
