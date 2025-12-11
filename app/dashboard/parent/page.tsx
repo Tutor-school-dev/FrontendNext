@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { BookOpen, Users as UsersIcon, MessageCircle, GraduationCap, LogOut, Plus, Filter, SlidersHorizontal } from "lucide-react";
+import { BookOpen, Users as UsersIcon, MessageCircle, GraduationCap, LogOut, Plus, Filter, SlidersHorizontal, Brain, Sparkles } from "lucide-react";
 import Cookies from "js-cookie";
 import useTutorListing, { TutorFilters, Tutor } from "../../../src/hooks/useTutorListing";
 import TutorCard from "../../../src/components/TutorCard";
@@ -10,16 +10,20 @@ import TutorFiltersComponent from "../../../src/components/TutorFilters";
 import Pagination from "../../../src/components/Pagination";
 import { Button } from "../../../src/components/ui/button";
 import { Badge } from "../../../src/components/ui/badge";
+import useAITutorMatch from "../../../src/hooks/useAITutorMatch";
+import AIMatchModal from "../../../src/components/AIMatchModal";
 
 const TUTORS_PER_PAGE = 12;
 
 export default function ParentDashboard() {
   const router = useRouter();
   const { tutors, loading, error, total, fetchTutors } = useTutorListing();
+  const { loading: aiLoading, matches, error: aiError, fetchAIMatches } = useAITutorMatch();
   
   const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState<TutorFilters>({});
   const [showFilters, setShowFilters] = useState(false);
+  const [showAIModal, setShowAIModal] = useState(false);
 
   useEffect(() => {
     const authToken = Cookies.get("jwt_Token");
@@ -70,6 +74,11 @@ export default function ParentDashboard() {
     router.push("/");
   };
 
+  const handleAIMatch = async () => {
+    setShowAIModal(true);
+    await fetchAIMatches();
+  };
+
   const getActiveFilterCount = () => {
     let count = 0;
     if (filters.subject && filters.subject.length > 0) count++;
@@ -102,6 +111,16 @@ export default function ParentDashboard() {
             </div>
 
             <div className="flex items-center gap-3">
+              <Button
+                onClick={handleAIMatch}
+                className="bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 hover:from-purple-700 hover:via-blue-700 hover:to-cyan-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group"
+                size="sm"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
+                <Brain className="w-4 h-4 mr-2 animate-pulse" />
+                <span className="font-semibold">Find Best Tutor with AI</span>
+                <Sparkles className="w-4 h-4 ml-2 animate-bounce" />
+              </Button>
               <Button
                 variant="outline"
                 size="sm"
@@ -285,6 +304,15 @@ export default function ParentDashboard() {
           </div>
         )}
       </div>
+
+      {/* AI Match Modal */}
+      <AIMatchModal
+        isOpen={showAIModal}
+        onClose={() => setShowAIModal(false)}
+        matches={matches}
+        loading={aiLoading}
+        error={aiError}
+      />
     </div>
   );
 }

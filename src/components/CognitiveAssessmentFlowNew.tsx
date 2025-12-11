@@ -1040,7 +1040,6 @@ const ResultsScreenNew: React.FC<{
                 <div className={`px-2 py-1 rounded-md text-xs font-medium text-white ${getScoreColor(item.parameter.final_score)}`}>
                   {item.parameter.label}
                 </div>
-                <div className="text-xs text-gray-500 mt-1">{item.parameter.score_range}</div>
               </div>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-1.5 mb-2">
