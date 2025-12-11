@@ -137,14 +137,22 @@ const TutorCard: React.FC<TutorCardProps> = ({
           {/* Subjects */}
           <div className="px-4 pb-3">
             <div className="flex flex-wrap gap-2">
-              {tutor.subjects.slice(0, 3).map((subject, index) => (
-                <Badge key={index} variant="secondary" className="text-xs bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors">
-                  {subject}
-                </Badge>
-              ))}
-              {tutor.subjects.length > 3 && (
-                <Badge variant="outline" className="text-xs text-muted-foreground border-muted-foreground/30">
-                  +{tutor.subjects.length - 3} more
+              {Array.isArray(tutor.subjects) && tutor.subjects.length > 0 ? (
+                <>
+                  {tutor.subjects.slice(0, 3).map((subject, index) => (
+                    <Badge key={index} variant="secondary" className="text-xs bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors">
+                      {subject}
+                    </Badge>
+                  ))}
+                  {tutor.subjects.length > 3 && (
+                    <Badge variant="outline" className="text-xs text-muted-foreground border-muted-foreground/30">
+                      +{tutor.subjects.length - 3} more
+                    </Badge>
+                  )}
+                </>
+              ) : (
+                <Badge variant="outline" className="text-xs text-muted-foreground">
+                  No subjects specified
                 </Badge>
               )}
             </div>

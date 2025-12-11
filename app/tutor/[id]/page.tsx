@@ -41,13 +41,37 @@ export default function TutorProfile() {
   const [tutor, setTutor] = useState<Tutor | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Helper function to safely parse subjects
+  const parseSubjects = (subjects: any): string[] => {
+    if (Array.isArray(subjects)) {
+      return subjects;
+    } else if (typeof subjects === 'string') {
+      try {
+        // Handle string format like "['English', 'Maths', 'Chemistry']"
+        if (subjects.startsWith('[') && subjects.endsWith(']')) {
+          return JSON.parse(subjects.replace(/'/g, '"'));
+        } else {
+          // Handle comma-separated string
+          return subjects.split(',').map(s => s.trim()).filter(s => s.length > 0);
+        }
+      } catch (e) {
+        // Fallback to comma-separated parsing
+        return subjects.split(',').map(s => s.trim()).filter(s => s.length > 0);
+      }
+    }
+    return [];
+  };
+
   useEffect(() => {
     // Try to get tutor data from localStorage (passed from the card click)
     const tutorData = localStorage.getItem(`tutor_${tutorId}`);
     
     if (tutorData) {
       try {
-        setTutor(JSON.parse(tutorData));
+        const parsedTutor = JSON.parse(tutorData);
+        // Ensure subjects is properly parsed as an array
+        parsedTutor.subjects = parseSubjects(parsedTutor.subjects);
+        setTutor(parsedTutor);
       } catch (error) {
         console.error('Error parsing tutor data:', error);
       }
@@ -288,11 +312,15 @@ export default function TutorProfile() {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-3">
-                  {tutor.subjects.map((subject, index) => (
-                    <Badge key={index} variant="secondary" className="bg-primary/10 text-primary border-primary/20 px-3 py-2">
-                      {subject}
-                    </Badge>
-                  ))}
+                  {Array.isArray(tutor.subjects) && tutor.subjects.length > 0 ? (
+                    tutor.subjects.map((subject, index) => (
+                      <Badge key={index} variant="secondary" className="bg-primary/10 text-primary border-primary/20 px-3 py-2">
+                        {subject}
+                      </Badge>
+                    ))
+                  ) : (
+                    <div className="text-muted-foreground text-sm">No subjects specified</div>
+                  )}
                 </div>
               </CardContent>
             </Card>

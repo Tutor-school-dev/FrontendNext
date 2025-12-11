@@ -63,7 +63,7 @@ export default function useAITutorMatch() {
       }
 
       const response = await axios.get<AIMatchResponse>(
-        `${getDjangoAuthUrl()}/api/learner/match-tutors/`,
+        `${getDjangoAuthUrl()}/learner/match-tutors/`,
         {
           headers: {
             'Authorization': `Bearer ${token}`,
