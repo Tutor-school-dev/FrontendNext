@@ -11,14 +11,8 @@ export default function AuthContent() {
   const mode = searchParams.get('mode');
   const model = searchParams.get('model') || searchParams.get('flag') || searchParams.get('type');
   
-  // Store model in localStorage (matching React app pattern)
-  useEffect(() => {
-    if (model && typeof window !== 'undefined') {
-      // Use title case to match React repo pattern (Parent/Teacher)
-      const titleCaseModel = model.charAt(0).toUpperCase() + model.slice(1).toLowerCase();
-      localStorage.setItem("model", titleCaseModel);
-    }
-  }, [model]);
+  // Don't automatically store model in localStorage - only store it after successful authentication
+  // This was causing issues where visiting auth pages would set localStorage without being logged in
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);

@@ -56,3 +56,40 @@ export function isParentAuthenticated(): boolean {
   const model = getUserModel()?.toLowerCase();
   return model === "parent" || model === "learner";
 }
+
+/**
+ * Clear all authentication data from localStorage and cookies
+ */
+export function clearAuthData(): void {
+  // Clear cookies
+  Cookies.remove(AUTH_COOKIE.JWT_TOKEN);
+  Cookies.remove(AUTH_COOKIE.REFRESH_TOKEN);
+  Cookies.remove(AUTH_COOKIE.ACCESS_HASH);
+  
+  // Clear localStorage
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem(STORAGE_KEY.MODEL);
+    localStorage.removeItem(STORAGE_KEY.EMAIL);
+    localStorage.removeItem(STORAGE_KEY.NAME);
+    localStorage.removeItem(STORAGE_KEY.PHONE);
+  }
+}
+
+/**
+ * Validate current authentication state and clear stale data
+ */
+export function validateAndCleanAuth(): void {
+  if (typeof window === 'undefined') return;
+  
+  const jwtToken = Cookies.get(AUTH_COOKIE.JWT_TOKEN);
+  const model = localStorage.getItem(STORAGE_KEY.MODEL);
+  
+  // If we have localStorage data but no JWT token, clear stale data
+  if (!jwtToken && model) {
+    console.log('AuthUtils: Clearing stale localStorage data');
+    localStorage.removeItem(STORAGE_KEY.MODEL);
+    localStorage.removeItem(STORAGE_KEY.EMAIL);
+    localStorage.removeItem(STORAGE_KEY.NAME);
+    localStorage.removeItem(STORAGE_KEY.PHONE);
+  }
+}
