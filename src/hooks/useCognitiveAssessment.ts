@@ -10,7 +10,7 @@ export interface AssessmentPayload {
   question1_conservation: {
     rt_band: number;         // Reaction Time Band (0, 1, 2)
     h_band: number;          // Hover Time Band (0, 1, 2) 
-    ac: number;              // Answer Change Count (0, 1, 2+)
+    ac: number;              // Answer Change Band (0=no changes, 1=one change, 2=multiple changes)
     correctness: boolean;    // Is answer correct
   };
   question2_classification: {
@@ -27,13 +27,13 @@ export interface AssessmentPayload {
   question4_reversibility: {
     rt_band: number;         // Reaction Time Band (0, 1, 2)
     h_band: number;          // Hover Time Band (0, 1, 2)
-    ac: number;              // Answer Change Count (0, 1, 2+)
+    ac: number;              // Answer Change Band (0=no changes, 1=one change, 2=multiple changes)
     correctness: boolean;    // Is answer correct
   };
   question5_hypothetical: {
     rt_band: number;         // Reaction Time Band (0, 1, 2)
     h_band: number;          // Hover Time Band (0, 1, 2)
-    ac: number;              // Answer Change Count (0, 1, 2+)
+    ac: number;              // Answer Change Band (0=no changes, 1=one change, 2=multiple changes)
     correctness: boolean;    // Is answer correct
   };
 }

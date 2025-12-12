@@ -2,19 +2,19 @@
  * Utility functions for cognitive assessment band calculations
  */
 
-// Band calculation functions
+// Band calculation functions (matching official specifications)
 export const calculateRTBand = (reactionTimeMs: number): number => {
   const reactionTimeSec = reactionTimeMs / 1000;
-  if (reactionTimeSec <= 5) return 0;
-  if (reactionTimeSec <= 12) return 1;
-  return 2;
+  if (reactionTimeSec <= 5) return 0;   // 0-5 sec
+  if (reactionTimeSec <= 12) return 1;  // 5-12 sec  
+  return 2;                             // >12 sec
 };
 
 export const calculateHBand = (hoverTimeMs: number): number => {
   const hoverTimeSec = hoverTimeMs / 1000;
-  if (hoverTimeSec < 1) return 0;
-  if (hoverTimeSec <= 4) return 1;
-  return 2;
+  if (hoverTimeSec < 1) return 0;    // <1 sec
+  if (hoverTimeSec <= 4) return 1;   // 1-4 sec
+  return 2;                          // >4 sec
 };
 
 export const calculateACBand = (answerChanges: number): number => {
@@ -44,9 +44,9 @@ export const calculateTPBand = (timeToFirstCorrectMs: number): number => {
 
 export const calculateTBand = (totalTimeMs: number): number => {
   const totalTimeSec = totalTimeMs / 1000;
-  if (totalTimeSec < 5) return 0;
-  if (totalTimeSec <= 12) return 1;
-  return 2; // >12 seconds
+  if (totalTimeSec < 5) return 0;    // <5 sec
+  if (totalTimeSec <= 12) return 1;  // 5-12 sec
+  return 2;                          // >12 sec
 };
 
 export const calculateCorrBand = (corrections: number): number => {

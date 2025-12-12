@@ -22,16 +22,20 @@ export default function TeacherAuth() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [otpDialogOpen, setOtpDialogOpen] = useState(false);
-
+  const [otpValue, setOtpValue] = useState('');
+  
   // Get redirect params from URL if coming from job application
   const redirectFromJobListing = searchParams.get('redirect');
   const job_id = searchParams.get('job_id');
-
+  
   const { login, loading: loginLoading } = useTeacherLogin();
   const { handleGoogleLogin, loading: googleLoading } = useTeacherGoogleLogin();
   const { SendOTP, loading: otpLoading } = useSendOTP();
-
-  const handleLogin = (e: React.FormEvent) => {
+  
+  // Handle OTP auto-fill for staging
+  const handleOTPReceived = (otp: string) => {
+    setOtpValue(otp);
+  };  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) return;
     login(e, email, password);
@@ -41,7 +45,7 @@ export default function TeacherAuth() {
     if (!phoneNumber || phoneNumber.length !== 10) {
       return;
     }
-    SendOTP(phoneNumber, setOtpDialogOpen, "teacher");
+    SendOTP(phoneNumber, setOtpDialogOpen, "teacher", true, handleOTPReceived);
   };
 
   // Show loading overlay for Google login
@@ -169,7 +173,8 @@ export default function TeacherAuth() {
                 open={otpDialogOpen} 
                 setOpen={setOtpDialogOpen} 
                 phoneNumber={phoneNumber} 
-                model="teacher" 
+                model="teacher"
+                initialOTP={otpValue}
               />
               
               <div className="flex justify-center items-center mt-4 w-full">

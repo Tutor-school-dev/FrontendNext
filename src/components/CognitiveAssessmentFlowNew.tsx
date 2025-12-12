@@ -9,7 +9,7 @@ import { Progress } from '@/components/ui/progress';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Brain, CheckCircle, ArrowRight } from 'lucide-react';
-import { useCognitiveAssessment, AssessmentPayload, AssessmentResponse } from '@/hooks/useCognitiveAssessment';
+import { useCognitiveAssessment, AssessmentPayload, AssessmentResponse } from '../hooks/useCognitiveAssessment';
 import {
   ConservationTrackingState,
   ClassificationTrackingState, 
@@ -32,7 +32,7 @@ import {
   endHover,
   isSequenceCorrect,
   countMisplacements
-} from '@/lib/cognitiveUtils';
+} from '../lib/cognitiveUtils';
 
 type AssessmentState = {
   conservation: ConservationTrackingState;
@@ -92,12 +92,48 @@ export const CognitiveAssessmentFlowNew: React.FC = () => {
     const reversibilityTime = reversibility.startTime ? Date.now() - reversibility.startTime : 0;
     const hypotheticalTime = hypothetical.startTime ? Date.now() - hypothetical.startTime : 0;
     
+    // Debug logging for reaction times
+    const conservationRT = conservation.firstActionTime && conservation.startTime 
+      ? conservation.firstActionTime - conservation.startTime : 0;
+    const reversibilityRT = reversibility.firstActionTime && reversibility.startTime 
+      ? reversibility.firstActionTime - reversibility.startTime : 0;
+    const hypotheticalRT = hypothetical.firstActionTime && hypothetical.startTime 
+      ? hypothetical.firstActionTime - hypothetical.startTime : 0;
+
+    console.log('=== COGNITIVE ASSESSMENT DEBUG ===');
+    console.log('Reaction Times Debug:');
+    console.log('Conservation - StartTime:', conservation.startTime, 'FirstActionTime:', conservation.firstActionTime);
+    console.log('Conservation RT (ms):', conservationRT, 'RT Band:', calculateRTBand(conservationRT));
+    console.log('Reversibility - StartTime:', reversibility.startTime, 'FirstActionTime:', reversibility.firstActionTime);
+    console.log('Reversibility RT (ms):', reversibilityRT, 'RT Band:', calculateRTBand(reversibilityRT));
+    console.log('Hypothetical - StartTime:', hypothetical.startTime, 'FirstActionTime:', hypothetical.firstActionTime);
+    console.log('Hypothetical RT (ms):', hypotheticalRT, 'RT Band:', calculateRTBand(hypotheticalRT));
+    
+    console.log('Answer Changes Debug:');
+    console.log('Conservation AC:', conservation.answerChanges, 'AC Band:', calculateACBand(conservation.answerChanges));
+    console.log('Reversibility AC:', reversibility.answerChanges, 'AC Band:', calculateACBand(reversibility.answerChanges));
+    console.log('Hypothetical AC:', hypothetical.answerChanges, 'AC Band:', calculateACBand(hypothetical.answerChanges));
+    
+    console.log('Hover Times Debug:');
+    console.log('Conservation Hover (ms):', conservation.totalHoverTime, 'H Band:', calculateHBand(conservation.totalHoverTime));
+    console.log('Reversibility Hover (ms):', reversibility.totalHoverTime, 'H Band:', calculateHBand(reversibility.totalHoverTime));
+    console.log('Hypothetical Hover (ms):', hypothetical.totalHoverTime, 'H Band:', calculateHBand(hypothetical.totalHoverTime));
+    
+    console.log('Classification Debug:');
+    console.log('Corrections:', classification.corrections, 'Corr Band:', calculateCorrBand(classification.corrections));
+    console.log('Idle Periods:', detectIdlePeriods(classification.actionTimestamps), 'Idle Band:', calculateIdleBand(detectIdlePeriods(classification.actionTimestamps)));
+    console.log('Classification Time (ms):', classificationTime, 'T Band:', calculateTBand(classificationTime));
+    
+    console.log('Seriation Debug:');
+    console.log('Swaps:', seriation.swaps, 'S Band:', calculateSBand(seriation.swaps));
+    console.log('Misplacements:', seriation.misplacements, 'M Band:', calculateMBand(seriation.misplacements));
+    console.log('First Correct Time:', seriation.firstCorrectTime, 'TP Band:', seriation.firstCorrectTime && seriation.startTime ? calculateTPBand(seriation.firstCorrectTime - seriation.startTime) : 2);
+
     const payload: AssessmentPayload = {
       question1_conservation: {
-        rt_band: conservation.firstActionTime && conservation.startTime 
-          ? calculateRTBand(conservation.firstActionTime - conservation.startTime) : 0,
+        rt_band: calculateRTBand(conservationRT),
         h_band: calculateHBand(conservation.totalHoverTime),
-        ac: conservation.answerChanges,
+        ac: calculateACBand(conservation.answerChanges),
         correctness: conservation.correctness || false
       },
       question2_classification: {
@@ -113,21 +149,20 @@ export const CognitiveAssessmentFlowNew: React.FC = () => {
         t_band: calculateTBand(seriationTime)
       },
       question4_reversibility: {
-        rt_band: reversibility.firstActionTime && reversibility.startTime 
-          ? calculateRTBand(reversibility.firstActionTime - reversibility.startTime) : 0,
+        rt_band: calculateRTBand(reversibilityRT),
         h_band: calculateHBand(reversibility.totalHoverTime),
-        ac: reversibility.answerChanges,
+        ac: calculateACBand(reversibility.answerChanges),
         correctness: reversibility.currentAnswer === 'yes' // 'yes' is correct - clay amount stays the same
       },
       question5_hypothetical: {
-        rt_band: hypothetical.firstActionTime && hypothetical.startTime 
-          ? calculateRTBand(hypothetical.firstActionTime - hypothetical.startTime) : 0,
+        rt_band: calculateRTBand(hypotheticalRT),
         h_band: calculateHBand(hypothetical.totalHoverTime),
-        ac: hypothetical.answerChanges,
+        ac: calculateACBand(hypothetical.answerChanges),
         correctness: hypothetical.currentAnswer === 'D' // Option D shows formal operational thinking
       }
     };
 
+    console.log('FINAL PAYLOAD:', payload);
     console.log('Assessment payload:', payload);
     const response = await submitAssessment(payload);
     if (response) {
@@ -279,19 +314,13 @@ const ConservationScreenNew: React.FC<{
   const handleOptionSelect = (option: string) => {
     const now = Date.now();
     
-    // Track first action time
-    if (!state.firstActionTime) {
-      setState({
-        ...state,
-        firstActionTime: now
-      });
-    }
-
     // Track answer changes
     const { answerChanges, currentAnswer } = trackAnswerChange(state.currentAnswer, option, state.answerChanges);
     
+    // Single setState call to avoid overwriting firstActionTime
     setState({
       ...state,
+      firstActionTime: state.firstActionTime || now, // Set only if not already set
       answerChanges,
       currentAnswer,
       correctness: option === 'A', // Assuming A is correct
@@ -418,15 +447,10 @@ const ClassificationScreenNew: React.FC<{
     
     // Track action
     const now = Date.now();
-    if (!state.firstActionTime) {
-      setState({
-        ...state,
-        firstActionTime: now
-      });
-    }
     
     setState({
       ...state,
+      firstActionTime: state.firstActionTime || now,
       actionTimestamps: trackAction(state.actionTimestamps),
       lastActionTime: now
     });
@@ -609,15 +633,10 @@ const SeriationScreenNew: React.FC<{
     
     // Track first action
     const now = Date.now();
-    if (!state.firstActionTime) {
-      setState({
-        ...state,
-        firstActionTime: now
-      });
-    }
     
     setState({
       ...state,
+      firstActionTime: state.firstActionTime || now,
       actionTimestamps: trackAction(state.actionTimestamps),
       lastActionTime: now
     });
@@ -755,20 +774,13 @@ const ReversibilityScreenNew: React.FC<{
 
   const handleOptionSelect = (option: string) => {
     const now = Date.now();
-    
-    // Track first action time
-    if (!state.firstActionTime) {
-      setState({
-        ...state,
-        firstActionTime: now
-      });
-    }
 
     // Track answer changes
     const { answerChanges, currentAnswer } = trackAnswerChange(state.currentAnswer, option, state.answerChanges);
     
     setState({
       ...state,
+      firstActionTime: state.firstActionTime || now,
       answerChanges,
       currentAnswer,
       actionTimestamps: trackAction(state.actionTimestamps),
@@ -865,20 +877,13 @@ const HypotheticalScreenNew: React.FC<{
 
   const handleOptionSelect = (option: string) => {
     const now = Date.now();
-    
-    // Track first action time
-    if (!state.firstActionTime) {
-      setState({
-        ...state,
-        firstActionTime: now
-      });
-    }
 
     // Track answer changes
     const { answerChanges, currentAnswer } = trackAnswerChange(state.currentAnswer, option, state.answerChanges);
     
     setState({
       ...state,
+      firstActionTime: state.firstActionTime || now,
       answerChanges,
       currentAnswer,
       actionTimestamps: trackAction(state.actionTimestamps),
@@ -1002,15 +1007,35 @@ const ResultsScreenNew: React.FC<{
   ];
 
   const getBarWidth = (finalScore: number) => {
-    // Final scores are 10, 30, 50, 70, 90 - convert to percentage
-    return Math.min(Math.max(finalScore, 0), 100);
+    // Map final scores (10,30,50,70,90) to proper percentages (20,40,60,80,100)
+    const scoreMap: { [key: number]: number } = {
+      10: 20,   // Very Low -> 20%
+      30: 40,   // Emerging -> 40%  
+      50: 60,   // Developing -> 60%
+      70: 80,   // Proficient -> 80%
+      90: 100   // Advanced -> 100%
+    };
+    return scoreMap[finalScore] || 60; // Default to 60% if score not found
   };
 
-  const getScoreColor = (finalScore: number) => {
-    if (finalScore >= 70) return 'bg-emerald-500';
-    if (finalScore >= 50) return 'bg-sky-500';
-    if (finalScore >= 30) return 'bg-amber-500';
-    return 'bg-rose-500';
+  const getScoreColor = (parameterKey: string, finalScore: number) => {
+    // For anxiety and exploration: LOW is good (green), HIGH is bad (red)
+    const reversedParameters = ['anxiety', 'exploratory_nature'];
+    const isReversed = reversedParameters.includes(parameterKey);
+    
+    if (isReversed) {
+      // For anxiety/exploration: low scores are good (green), high scores are bad (red)
+      if (finalScore <= 30) return 'bg-emerald-500';  // Low = Good (Green)
+      if (finalScore <= 50) return 'bg-sky-500';      // Medium = Neutral (Blue)  
+      if (finalScore <= 70) return 'bg-amber-500';    // High = Caution (Yellow)
+      return 'bg-rose-500';                           // Very High = Bad (Red)
+    } else {
+      // For other parameters: high scores are good (green), low scores are bad (red)
+      if (finalScore >= 70) return 'bg-emerald-500';  // High = Good (Green)
+      if (finalScore >= 50) return 'bg-sky-500';      // Medium = Neutral (Blue)
+      if (finalScore >= 30) return 'bg-amber-500';    // Low = Caution (Yellow) 
+      return 'bg-rose-500';                           // Very Low = Bad (Red)
+    }
   };
 
   return (
@@ -1032,25 +1057,37 @@ const ResultsScreenNew: React.FC<{
       <div className="space-y-3">
         <h3 className="text-lg font-semibold text-gray-800">Your Learning Profile</h3>
         
-        {cognitiveParameters.map((item) => (
-          <div key={item.key} className="bg-gray-50/80 p-4 rounded-md border border-gray-100 shadow-sm hover:shadow-md transition-all hover:bg-white/90">
-            <div className="flex justify-between items-start mb-2">
-              <span className="font-medium text-gray-800 text-base">{item.name}</span>
-              <div className="text-right">
-                <div className={`px-2 py-1 rounded-md text-xs font-medium text-white ${getScoreColor(item.parameter.final_score)}`}>
-                  {item.parameter.label}
+        {cognitiveParameters.map((item) => {
+          const isReversedParam = ['anxiety', 'exploratory_nature'].includes(item.key);
+          return (
+            <div key={item.key} className="bg-gray-50/80 p-4 rounded-md border border-gray-100 shadow-sm hover:shadow-md transition-all hover:bg-white/90">
+              <div className="flex justify-between items-start mb-2">
+                <div className="flex items-center gap-2">
+                  <span className="font-medium text-gray-800 text-base">{item.name}</span>
+                  {isReversedParam && (
+                    <span className="text-xs text-gray-500 bg-gray-200 px-2 py-0.5 rounded-full">
+                      Lower is better
+                    </span>
+                  )}
+                </div>
+                <div className="text-right">
+                  <div className={`px-2 py-1 rounded-md text-xs font-medium text-white ${getScoreColor(item.key, item.parameter.final_score)}`}>
+                    {item.parameter.label}
+                  </div>
                 </div>
               </div>
+              <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
+                <div
+                  className={`h-2 rounded-full transition-all duration-700 ${getScoreColor(item.key, item.parameter.final_score)}`}
+                  style={{ width: `${getBarWidth(item.parameter.final_score)}%` }}
+                />
+              </div>
+              <div className="bg-white/70 p-3 rounded-md border-l-4 border-l-gray-300">
+                <p className="text-sm text-gray-700 leading-relaxed">{item.parameter.interpretation}</p>
+              </div>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-1.5 mb-2">
-              <div
-                className={`h-1.5 rounded-full transition-all duration-700 ${getScoreColor(item.parameter.final_score)}`}
-                style={{ width: `${getBarWidth(item.parameter.final_score)}%` }}
-              />
-            </div>
-            <p className="text-sm text-gray-600 leading-relaxed">{item.parameter.interpretation}</p>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="bg-slate-50/70 p-5 rounded-md border border-slate-100">
