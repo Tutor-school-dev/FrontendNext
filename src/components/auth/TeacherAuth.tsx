@@ -169,12 +169,20 @@ export default function TeacherAuth() {
                 Send OTP
               </LoadingButton>
               
+              {/* Display OTP for staging environment */}
+              {otpValue && (process.env.NEXT_PUBLIC_NODE_ENV === 'staging' || process.env.NODE_ENV === 'development') && (
+                <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded-lg text-center">
+                  <p className="font-semibold">Staging Mode - Your OTP is:</p>
+                  <p className="text-2xl font-bold tracking-wider">{otpValue}</p>
+                </div>
+              )}
+              
               <SendOTPDialog 
                 open={otpDialogOpen} 
                 setOpen={setOtpDialogOpen} 
                 phoneNumber={phoneNumber} 
                 model="teacher"
-                initialOTP={otpValue}
+                initialOTP=""
               />
               
               <div className="flex justify-center items-center mt-4 w-full">
