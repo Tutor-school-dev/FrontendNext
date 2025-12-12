@@ -60,11 +60,27 @@ export const useSendOTP = () => {
         
         // Auto-fill OTP in staging environment
         const nodeEnv = process.env.NEXT_PUBLIC_NODE_ENV || process.env.NODE_ENV;
-        if (nodeEnv === 'staging' && onOTPReceived) {
+        const apiUrl = getDjangoAuthUrl();
+        const isStaging = nodeEnv === 'staging' || apiUrl.includes('stagingapi.tutorschool.in');
+        
+        console.log('🔍 OTP Auto-fill Debug:', {
+          nodeEnv,
+          apiUrl,
+          isStaging,
+          hasOTPCallback: !!onOTPReceived,
+          model
+        });
+        
+        if (isStaging && onOTPReceived) {
+          console.log('✅ Triggering OTP auto-fill for staging...');
           setTimeout(() => {
             onOTPReceived(otp);
             toast.success('OTP auto-filled for staging!', { duration: 3000 });
           }, 1500);
+        } else if (!isStaging) {
+          console.log('❌ Not staging environment, skipping auto-fill');
+        } else if (!onOTPReceived) {
+          console.log('❌ No OTP callback provided, skipping auto-fill');
         }
       }
     } catch (err: any) {
