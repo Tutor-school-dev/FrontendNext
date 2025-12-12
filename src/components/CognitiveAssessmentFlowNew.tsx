@@ -1019,23 +1019,11 @@ const ResultsScreenNew: React.FC<{
   };
 
   const getScoreColor = (parameterKey: string, finalScore: number) => {
-    // For anxiety and exploration: LOW is good (green), HIGH is bad (red)
-    const reversedParameters = ['anxiety', 'exploratory_nature'];
-    const isReversed = reversedParameters.includes(parameterKey);
-    
-    if (isReversed) {
-      // For anxiety/exploration: low scores are good (green), high scores are bad (red)
-      if (finalScore <= 30) return 'bg-emerald-500';  // Low = Good (Green)
-      if (finalScore <= 50) return 'bg-sky-500';      // Medium = Neutral (Blue)  
-      if (finalScore <= 70) return 'bg-amber-500';    // High = Caution (Yellow)
-      return 'bg-rose-500';                           // Very High = Bad (Red)
-    } else {
-      // For other parameters: high scores are good (green), low scores are bad (red)
-      if (finalScore >= 70) return 'bg-emerald-500';  // High = Good (Green)
-      if (finalScore >= 50) return 'bg-sky-500';      // Medium = Neutral (Blue)
-      if (finalScore >= 30) return 'bg-amber-500';    // Low = Caution (Yellow) 
-      return 'bg-rose-500';                           // Very Low = Bad (Red)
-    }
+    // Use neutral blue gradient based on score intensity - no good/bad coloring
+    if (finalScore >= 70) return 'bg-blue-600';      // High intensity
+    if (finalScore >= 50) return 'bg-blue-500';      // Medium-high intensity
+    if (finalScore >= 30) return 'bg-blue-400';      // Medium-low intensity
+    return 'bg-blue-300';                            // Low intensity
   };
 
   return (
@@ -1064,11 +1052,6 @@ const ResultsScreenNew: React.FC<{
               <div className="flex justify-between items-start mb-2">
                 <div className="flex items-center gap-2">
                   <span className="font-medium text-gray-800 text-base">{item.name}</span>
-                  {isReversedParam && (
-                    <span className="text-xs text-gray-500 bg-gray-200 px-2 py-0.5 rounded-full">
-                      Lower is better
-                    </span>
-                  )}
                 </div>
                 <div className="text-right">
                   <div className={`px-2 py-1 rounded-md text-xs font-medium text-white ${getScoreColor(item.key, item.parameter.final_score)}`}>
