@@ -997,7 +997,7 @@ const ResultsScreenNew: React.FC<{
   const cognitiveParameters = [
     { key: 'confidence', name: 'Confidence', parameter: results.confidence },
     { key: 'working_memory', name: 'Working Memory', parameter: results.working_memory },
-    { key: 'anxiety', name: 'Anxiety', parameter: results.anxiety },
+    // { key: 'anxiety', name: 'Anxiety', parameter: results.anxiety },
     { key: 'precision', name: 'Precision', parameter: results.precision },
     { key: 'error_correction_ability', name: 'Error Correction', parameter: results.error_correction_ability },
     { key: 'impulsivity', name: 'Impulsivity', parameter: results.impulsivity },
