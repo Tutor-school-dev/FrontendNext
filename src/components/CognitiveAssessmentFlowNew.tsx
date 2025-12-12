@@ -214,7 +214,7 @@ export const CognitiveAssessmentFlowNew: React.FC = () => {
         <CardHeader className="text-center">
           <div className="flex items-center justify-center mb-4">
             <Brain className="w-8 h-8 text-blue-600 mr-2" />
-            <CardTitle className="text-2xl">Learning Fingerprint Assessment</CardTitle>
+            <CardTitle className="text-2xl">Cognitive Learning Fingerprint</CardTitle>
           </div>
           {currentScreen > 1 && (
             <div className="space-y-2">
