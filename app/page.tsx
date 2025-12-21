@@ -34,7 +34,7 @@ export default function HomePage() {
       <ForSchools />
       <AIFeatures />
       <ContactCTA />
-      <CityFooter />
+      {/* <CityFooter /> */}
       <Footer />
     </div>
   );

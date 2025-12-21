@@ -73,6 +73,10 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
 }
 
 export default async function CityPage({ params }: CityPageProps) {
+  // Temporarily disabled to prevent SEO issues with incomplete pages
+  notFound();
+  
+  /* 
   const resolvedParams = await params;
   
   // Validate city slug
@@ -91,4 +95,5 @@ export default async function CityPage({ params }: CityPageProps) {
       <CityLandingPage city={cityData} />
     </main>
   );
+  */
 }
