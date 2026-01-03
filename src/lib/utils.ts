@@ -27,7 +27,7 @@ export function getApiUrl(): string {
   }
   
   // Default to production API
-  const prodUrl = process.env.NEXT_PUBLIC_GO_APP_URL || 'https://api.tutorschool.in';
+  const prodUrl = process.env.NEXT_PUBLIC_GO_APP_URL || 'https://stagingapi.tutorschool.in';
   console.log('Using production API:', prodUrl);
   return prodUrl;
 }
@@ -43,7 +43,7 @@ export function getAppUrl(): string {
   }
   
   // Default to production API
-  return process.env.NEXT_PUBLIC_APP_URL || 'https://api.tutorschool.in';
+  return process.env.NEXT_PUBLIC_APP_URL || 'https://stagingapi.tutorschool.in';
 }
 
 /**
@@ -59,7 +59,7 @@ export function getDjangoAuthUrl(): string {
   }
   
   // Default to production Django API
-  const prodUrl = process.env.NEXT_PUBLIC_DJANGO_AUTH_URL || 'https://api.tutorschool.in/api';
+  const prodUrl = process.env.NEXT_PUBLIC_DJANGO_AUTH_URL || 'https://stagingapi.tutorschool.in/api';
   console.log('Using Django API (production):', prodUrl);
   return prodUrl;
 }
