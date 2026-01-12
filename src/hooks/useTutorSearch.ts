@@ -6,9 +6,9 @@ import { Tutor } from './useTutorListing';
 export interface TutorSearchFilters {
   subjects?: string;
   mode_of_teaching?: 'ONLINE' | 'OFFLINE' | 'BOTH';
+  class_level?: string;
   city?: string;
   area?: string;
-  class_level?: string;
 }
 
 export interface TutorSearchResponse {
@@ -36,6 +36,10 @@ export const useTutorSearch = () => {
         params.append('mode_of_teaching', filters.mode_of_teaching);
       }
       
+      if (filters.class_level) {
+        params.append('class_level', filters.class_level);
+      }
+      
       if (filters.city) {
         params.append('city', filters.city);
       }
@@ -43,13 +47,9 @@ export const useTutorSearch = () => {
       if (filters.area) {
         params.append('area', filters.area);
       }
-      
-      if (filters.class_level) {
-        params.append('class_level', filters.class_level);
-      }
 
       const response = await axios.get<TutorSearchResponse>(
-        `${getDjangoAuthUrl()}/tutor/all?${params.toString()}`,
+        `${getDjangoAuthUrl()}/tutor/public/all?${params.toString()}`,
         {
           headers: {
             'Content-Type': 'application/json',

@@ -12,7 +12,8 @@ export interface Tutor {
   introduction?: string;
   teaching_desc?: string;
   lesson_price?: string;
-  teaching_mode: 'ONLINE' | 'OFFLINE';
+  teaching_mode?: 'ONLINE' | 'OFFLINE';
+  mode_of_teaching?: 'ONLINE' | 'OFFLINE' | 'BOTH';
   current_status?: string;
   subjects: string[];
   university?: string;
@@ -20,9 +21,12 @@ export interface Tutor {
   class_level?: string;
   area?: string;
   state?: string;
+  city?: string;
   experience_years?: string;
   rating?: number;
   total_reviews?: number;
+  is_verified?: boolean;
+  availability?: string;
 }
 
 export interface TutorListingResponse {

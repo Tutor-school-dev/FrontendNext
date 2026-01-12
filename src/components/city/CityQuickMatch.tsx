@@ -21,12 +21,14 @@ export default function CityQuickMatch({ city }: CityQuickMatchProps) {
   const [selectedArea, setSelectedArea] = useState('ANY_AREA');
 
   const handleGetTutorOptions = () => {
+    // Determine the area slug - use selected area or 'all' if none selected
+    const areaSlug = selectedArea && selectedArea.trim() && selectedArea !== 'ANY_AREA' 
+      ? selectedArea 
+      : 'all';
+    
+    // Build query params for optional filters
     const params = new URLSearchParams();
     
-    // Add city parameter
-    params.set('city', city.slug);
-    
-    // Add other parameters if selected and not 'ANY_' values
     if (selectedEducationLevel && selectedEducationLevel.trim() && selectedEducationLevel !== 'ANY_LEVEL') {
       params.set('class_level', selectedEducationLevel);
     }
@@ -39,12 +41,12 @@ export default function CityQuickMatch({ city }: CityQuickMatchProps) {
       params.set('mode_of_teaching', selectedMode);
     }
     
-    if (selectedArea && selectedArea.trim() && selectedArea !== 'ANY_AREA') {
-      params.set('area', selectedArea);
-    }
+    // Navigate to new route format: /[city]/tutors-in-[area]
+    const url = params.toString() 
+      ? `/${city.slug}/tutors-in-${areaSlug}?${params.toString()}`
+      : `/${city.slug}/tutors-in-${areaSlug}`;
     
-    // Navigate to tutor search results
-    router.push(`/tutor-search?${params.toString()}`);
+    router.push(url);
   };
 
   return (

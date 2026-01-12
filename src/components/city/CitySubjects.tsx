@@ -1,5 +1,4 @@
 import { City } from '@/lib/cityData';
-import Link from 'next/link';
 
 interface CitySubjectsProps {
   city: City;
@@ -31,15 +30,14 @@ export default function CitySubjects({ city }: CitySubjectsProps) {
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {subjects.map((subject, index) => (
-            <Link
+            <div
               key={index}
-              href={`/locations/${city.slug}?subject=${subject.toLowerCase().replace(' tutors', '').replace(' ', '-')}`}
-              className="block p-4 text-center border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors duration-200"
+              className="block p-4 text-center border border-gray-200 rounded-lg"
             >
-              <span className="text-blue-600 font-medium hover:text-blue-800">
+              <span className="text-blue-600 font-medium">
                 {subject} in {city.name}
               </span>
-            </Link>
+            </div>
           ))}
         </div>
       </div>

@@ -14,7 +14,6 @@ import ForSchools from "@/components/ForSchools";
 import AIFeatures from "@/components/AIFeatures";
 import ContactCTA from "@/components/ContactCTA";
 import Footer from "@/components/Footer";
-import CityFooter from "@/components/city/CityFooter";
 
 export default function HomePage() {
   return (
@@ -34,7 +33,6 @@ export default function HomePage() {
       <ForSchools />
       <AIFeatures />
       <ContactCTA />
-      <CityFooter />
       <Footer />
     </div>
   );

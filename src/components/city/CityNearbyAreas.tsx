@@ -1,5 +1,4 @@
 import { City } from '@/lib/cityData';
-import Link from 'next/link';
 
 interface CityNearbyAreasProps {
   city: City;
@@ -20,15 +19,14 @@ export default function CityNearbyAreas({ city }: CityNearbyAreasProps) {
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {city.areas.map((area) => (
-            <Link
+            <div
               key={area.slug}
-              href={`/locations/${city.slug}?area=${area.slug}`}
-              className="block p-4 text-center border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors duration-200"
+              className="block p-4 text-center border border-gray-200 rounded-lg"
             >
-              <span className="text-blue-600 font-medium hover:text-blue-800">
+              <span className="text-blue-600 font-medium">
                 {area.name} Tutors
               </span>
-            </Link>
+            </div>
           ))}
         </div>
       </div>

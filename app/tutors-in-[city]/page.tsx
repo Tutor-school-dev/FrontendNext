@@ -13,15 +13,15 @@ interface CityPageProps {
 export async function generateStaticParams() {
   const cities = [
     'bengaluru',
-    'new-delhi', 
-    'mumbai',
-    'hyderabad',
-    'pune',
-    'chennai',
-    'jaipur',
-    'lucknow',
-    'indore',
-    'kolkata'
+    // 'new-delhi', 
+    // 'mumbai',
+    // 'hyderabad',
+    // 'pune',
+    // 'chennai',
+    // 'jaipur',
+    // 'lucknow',
+    // 'indore',
+    // 'kolkata'
   ];
 
   return cities.map((city) => ({

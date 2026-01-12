@@ -2,6 +2,8 @@ import { Suspense } from "react";
 import { Metadata } from "next";
 import { redirect, notFound } from "next/navigation";
 import JobListingsContent from "../job-listings/JobListingsContent";
+import { getCityBySlug, generateCityMetadata, isValidCitySlug } from '@/lib/cityData';
+import CityLandingPage from '@/components/city/CityLandingPage';
 
 // Function to fetch job data for metadata (server-side)
 async function getJobData(jobId: string) {
@@ -21,7 +23,7 @@ async function getJobData(jobId: string) {
   }
 }
 
-// Generate dynamic metadata based on job ID
+// Generate dynamic metadata based on job ID or city
 export async function generateMetadata({ 
   params,
   searchParams 
@@ -32,7 +34,44 @@ export async function generateMetadata({
   const resolvedParams = await params;
   const resolvedSearchParams = await searchParams;
   
-  // Only handle job-listings slugs
+  // Check if this is a city page
+  if (isValidCitySlug(resolvedParams.slug)) {
+    const cityData = getCityBySlug(resolvedParams.slug);
+    
+    if (cityData) {
+      const metadata = generateCityMetadata(cityData);
+      
+      return {
+        title: metadata.title,
+        description: metadata.description,
+        keywords: metadata.keywords,
+        openGraph: {
+          title: metadata.title,
+          description: metadata.description,
+          type: 'website',
+          locale: 'en_US',
+          images: [
+            {
+              url: '/tutorschool-icon.png',
+              width: 1200,
+              height: 630,
+              alt: `TutorSchool - Find tutors in ${cityData.name}`,
+            },
+          ],
+        },
+        twitter: {
+          card: 'summary_large_image',
+          title: metadata.title,
+          description: metadata.description,
+        },
+        alternates: {
+          canonical: `/${resolvedParams.slug}`,
+        },
+      };
+    }
+  }
+  
+  // Handle job-listings slugs
   if (!resolvedParams.slug.startsWith('job-listings-')) {
     return {
       title: "Page Not Found | TutorSchool",
@@ -103,6 +142,19 @@ interface PageProps {
 export default async function SlugPage({ params, searchParams }: PageProps) {
   const resolvedParams = await params;
   const resolvedSearchParams = await searchParams;
+  
+  // Check if this is a city page first
+  if (isValidCitySlug(resolvedParams.slug)) {
+    const cityData = getCityBySlug(resolvedParams.slug);
+    
+    if (cityData) {
+      return (
+        <main className="min-h-screen">
+          <CityLandingPage city={cityData} />
+        </main>
+      );
+    }
+  }
   
   // Extract job ID (handle both string and array cases)
   let jobId = resolvedSearchParams.id;

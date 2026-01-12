@@ -1,5 +1,4 @@
 import { getAllCities, generateCityURL } from '@/lib/cityData';
-import Link from 'next/link';
 
 export default function CityFooter() {
   const cities = getAllCities();
@@ -18,17 +17,14 @@ export default function CityFooter() {
 
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           {cities.map((city) => (
-            <Link
+            <div
               key={city.slug}
-              href={generateCityURL(city.slug)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block p-3 text-center border border-gray-700 rounded-lg hover:border-blue-400 hover:bg-gray-800 transition-colors duration-200"
+              className="block p-3 text-center border border-gray-700 rounded-lg"
             >
-              <span className="text-blue-400 font-medium hover:text-blue-300">
+              <span className="text-blue-400 font-medium">
                 Tutors in {city.name}
               </span>
-            </Link>
+            </div>
           ))}
         </div>
       </div>

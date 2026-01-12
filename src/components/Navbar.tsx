@@ -6,7 +6,11 @@ import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import tutorSchoolLogo from "@/assets/tutorschool.jpeg";
 
-const Navbar = () => {
+interface NavbarProps {
+  hideMenuItems?: boolean;
+}
+
+const Navbar = ({ hideMenuItems = false }: NavbarProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const scrollToSection = (sectionId: string) => {
@@ -64,50 +68,54 @@ const Navbar = () => {
           
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-6">
-            <button 
-              onClick={() => scrollToSection('courses')}
-              className="text-sm font-medium text-foreground hover:text-primary transition-colors"
-            >
-              Courses
-            </button>
-            <button 
-              onClick={() => scrollToSection('parents')}
-              className="text-sm font-medium text-foreground hover:text-primary transition-colors"
-            >
-              For Parents
-            </button>
-            <button 
-              onClick={() => scrollToSection('teachers')}
-              className="text-sm font-medium text-foreground hover:text-primary transition-colors"
-            >
-              For Teachers
-            </button>
-            <button 
-              onClick={() => scrollToSection('schools')}
-              className="text-sm font-medium text-foreground hover:text-primary transition-colors"
-            >
-              For Schools
-            </button>
-            <button 
-              onClick={() => scrollToSection('ai')}
-              className="text-sm font-medium text-foreground hover:text-primary transition-colors"
-            >
-              AI Features
-            </button>
-            <a 
-              href="/job-listings"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm font-medium text-foreground hover:text-primary transition-colors"
-            >
-              Job Listings
-            </a>
-            <button 
-              onClick={() => handleExternalLink('https://tutorschool.in/blog')}
-              className="text-sm font-medium text-foreground hover:text-primary transition-colors"
-            >
-              Blogs
-            </button>
+            {!hideMenuItems && (
+              <>
+                <button 
+                  onClick={() => scrollToSection('courses')}
+                  className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+                >
+                  Courses
+                </button>
+                <button 
+                  onClick={() => scrollToSection('parents')}
+                  className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+                >
+                  For Parents
+                </button>
+                <button 
+                  onClick={() => scrollToSection('teachers')}
+                  className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+                >
+                  For Teachers
+                </button>
+                <button 
+                  onClick={() => scrollToSection('schools')}
+                  className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+                >
+                  For Schools
+                </button>
+                <button 
+                  onClick={() => scrollToSection('ai')}
+                  className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+                >
+                  AI Features
+                </button>
+                <a 
+                  href="/job-listings"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+                >
+                  Job Listings
+                </a>
+                <button 
+                  onClick={() => handleExternalLink('https://tutorschool.in/blog')}
+                  className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+                >
+                  Blogs
+                </button>
+              </>
+            )}
           </div>
           
           {/* Desktop Action Buttons */}
@@ -144,48 +152,52 @@ const Navbar = () => {
         {isMobileMenuOpen && (
           <div className="md:hidden border-t bg-background/95 backdrop-blur">
             <div className="px-2 pt-2 pb-3 space-y-1">
-              <button 
-                onClick={() => scrollToSection('courses')}
-                className="block w-full text-left px-3 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-gray-50 rounded-md transition-colors"
-              >
-                Courses
-              </button>
-              <button 
-                onClick={() => scrollToSection('parents')}
-                className="block w-full text-left px-3 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-gray-50 rounded-md transition-colors"
-              >
-                For Parents
-              </button>
-              <button 
-                onClick={() => scrollToSection('teachers')}
-                className="block w-full text-left px-3 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-gray-50 rounded-md transition-colors"
-              >
-                For Teachers
-              </button>
-              <button 
-                onClick={() => scrollToSection('schools')}
-                className="block w-full text-left px-3 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-gray-50 rounded-md transition-colors"
-              >
-                For Schools
-              </button>
-              <button 
-                onClick={() => scrollToSection('ai')}
-                className="block w-full text-left px-3 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-gray-50 rounded-md transition-colors"
-              >
-                AI Features
-              </button>
-              <button 
-                onClick={() => handleExternalLink('/job-listings')}
-                className="block w-full text-left px-3 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-gray-50 rounded-md transition-colors"
-              >
-                Job Listings
-              </button>
-              <button 
-                onClick={() => handleExternalLink('https://tutorschool.in/blog')}
-                className="block w-full text-left px-3 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-gray-50 rounded-md transition-colors"
-              >
-                Blogs
-              </button>
+              {!hideMenuItems && (
+                <>
+                  <button 
+                    onClick={() => scrollToSection('courses')}
+                    className="block w-full text-left px-3 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-gray-50 rounded-md transition-colors"
+                  >
+                    Courses
+                  </button>
+                  <button 
+                    onClick={() => scrollToSection('parents')}
+                    className="block w-full text-left px-3 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-gray-50 rounded-md transition-colors"
+                  >
+                    For Parents
+                  </button>
+                  <button 
+                    onClick={() => scrollToSection('teachers')}
+                    className="block w-full text-left px-3 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-gray-50 rounded-md transition-colors"
+                  >
+                    For Teachers
+                  </button>
+                  <button 
+                    onClick={() => scrollToSection('schools')}
+                    className="block w-full text-left px-3 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-gray-50 rounded-md transition-colors"
+                  >
+                    For Schools
+                  </button>
+                  <button 
+                    onClick={() => scrollToSection('ai')}
+                    className="block w-full text-left px-3 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-gray-50 rounded-md transition-colors"
+                  >
+                    AI Features
+                  </button>
+                  <button 
+                    onClick={() => handleExternalLink('/job-listings')}
+                    className="block w-full text-left px-3 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-gray-50 rounded-md transition-colors"
+                  >
+                    Job Listings
+                  </button>
+                  <button 
+                    onClick={() => handleExternalLink('https://tutorschool.in/blog')}
+                    className="block w-full text-left px-3 py-2 text-base font-medium text-foreground hover:text-primary hover:bg-gray-50 rounded-md transition-colors"
+                  >
+                    Blogs
+                  </button>
+                </>
+              )}
               
               {/* Mobile Action Buttons */}
               <div className="pt-4 pb-2 space-y-2">

@@ -9,6 +9,7 @@ import CityPricing from './CityPricing';
 import CityTestimonials from './CityTestimonials';
 import CityFAQ from './CityFAQ';
 import CityCTA from './CityCTA';
+import Footer from '@/components/Footer';
 
 interface CityLandingPageProps {
   city: City;
@@ -43,9 +44,9 @@ export default function CityLandingPage({ city }: CityLandingPageProps) {
       
       {/* FAQ */}
       <CityFAQ city={city} />
-      
-      {/* Final CTA */}
-      <CityCTA city={city} />
+            
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }

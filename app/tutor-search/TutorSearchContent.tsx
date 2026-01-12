@@ -55,16 +55,18 @@ export default function TutorSearchContent() {
     };
 
     fetchTutors();
-  }, [searchTutors]);
+  }, [filters.subjects, filters.mode_of_teaching, filters.city, filters.area, filters.class_level]);
 
   const handleFilterChange = (key: keyof TutorSearchFilters, value: string) => {
-    const newFilters = { ...filters, [key]: value };
+    // Convert 'all' to empty string for internal logic
+    const processedValue = value === 'all' ? '' : value;
+    const newFilters = { ...filters, [key]: processedValue };
     setFilters(newFilters);
     
     // Update URL params
     const params = new URLSearchParams();
     Object.entries(newFilters).forEach(([k, v]) => {
-      if (value && value.trim()) params.set(key, value);
+      if (v && v.trim()) params.set(k, v);
     });
     
     router.push(`/tutor-search?${params.toString()}`);
@@ -161,12 +163,12 @@ export default function TutorSearchContent() {
                   <label className="text-sm font-medium text-gray-700 mb-2 block">
                     Subject
                   </label>
-                  <Select value={filters.subjects} onValueChange={(value) => handleFilterChange('subjects', value)}>
+                  <Select value={filters.subjects || 'all'} onValueChange={(value) => handleFilterChange('subjects', value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select subject" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Subjects</SelectItem>
+                      <SelectItem value="all">All Subjects</SelectItem>
                       {getAllSubjects().map((subject) => (
                         <SelectItem key={subject} value={subject}>
                           {subject}
@@ -181,12 +183,12 @@ export default function TutorSearchContent() {
                   <label className="text-sm font-medium text-gray-700 mb-2 block">
                     Education Level
                   </label>
-                  <Select value={filters.class_level} onValueChange={(value) => handleFilterChange('class_level', value)}>
+                  <Select value={filters.class_level || 'all'} onValueChange={(value) => handleFilterChange('class_level', value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select level" />
                     </SelectTrigger>
                     <SelectContent className="max-h-60">
-                      <SelectItem value="">All Levels</SelectItem>
+                      <SelectItem value="all">All Levels</SelectItem>
                       {EDUCATION_LEVELS.map((level) => (
                         <SelectItem key={level.value} value={level.value}>
                           {level.label}
@@ -218,12 +220,12 @@ export default function TutorSearchContent() {
                   <label className="text-sm font-medium text-gray-700 mb-2 block">
                     City
                   </label>
-                  <Select value={filters.city} onValueChange={(value) => handleFilterChange('city', value)}>
+                  <Select value={filters.city || 'all'} onValueChange={(value) => handleFilterChange('city', value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select city" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Cities</SelectItem>
+                      <SelectItem value="all">All Cities</SelectItem>
                       {Object.values(CITY_DATA).map((city) => (
                         <SelectItem key={city.slug} value={city.slug}>
                           {city.name}
@@ -239,12 +241,12 @@ export default function TutorSearchContent() {
                     <label className="text-sm font-medium text-gray-700 mb-2 block">
                       Area
                     </label>
-                    <Select value={filters.area} onValueChange={(value) => handleFilterChange('area', value)}>
+                    <Select value={filters.area || 'all'} onValueChange={(value) => handleFilterChange('area', value)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select area" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">All Areas</SelectItem>
+                        <SelectItem value="all">All Areas</SelectItem>
                         {selectedCity.areas.map((area) => (
                           <SelectItem key={area.slug} value={area.slug}>
                             {area.name}
@@ -273,9 +275,17 @@ export default function TutorSearchContent() {
                 <div className="mx-auto h-12 w-12 text-gray-400 mb-4">
                   <Users className="h-full w-full" />
                 </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No tutors found</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  {filters.city && selectedCity ? 
+                    `No tutors available in ${selectedCity.name}${selectedArea ? `, ${selectedArea.name}` : ''}` : 
+                    'No tutors found'
+                  }
+                </h3>
                 <p className="text-gray-600 mb-4">
-                  Try adjusting your search filters to find more tutors.
+                  {filters.city ? 
+                    'We don\'t have any tutors in this area yet. Try expanding your search or check back soon!' :
+                    'Try adjusting your search filters to find more tutors.'
+                  }
                 </p>
                 <Button onClick={clearFilters} variant="outline">
                   Clear Filters

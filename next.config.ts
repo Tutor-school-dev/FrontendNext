@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
+  outputFileTracingRoot: process.cwd(),
   async redirects() {
     return [
       {
@@ -14,6 +15,7 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react'],
   },
+  transpilePackages: ['@radix-ui'],
   images: {
     remotePatterns: [
       {
