@@ -234,7 +234,7 @@ data.user.name → localStorage
 NEXT_PUBLIC_NODE_ENV=staging
 
 # Production
-NEXT_PUBLIC_DJANGO_AUTH_URL=https://api.tutorschool.in/django/api/auth
+NEXT_PUBLIC_DJANGO_AUTH_URL=https://stagingapi.tutorschool.in/django/api/auth
 ```
 
 ### CORS Configuration
