@@ -43,5 +43,5 @@ export function getAppUrl(): string {
   }
   
   // Default to production API
-  return process.env.NEXT_PUBLIC_APP_URL || 'https://api.tutorschool.in';
+  return process.env.NEXT_PUBLIC_APP_URL;
 }
