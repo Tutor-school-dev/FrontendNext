@@ -24,7 +24,7 @@ export default function TeacherSubscriptionContent() {
     {
       id: 1,
       name: "Basic Plan",
-      price: 1,
+      price: 299,
       features: [
         "Apply for up to 2 tuitions",
         "Free pedagogy training & certification",
