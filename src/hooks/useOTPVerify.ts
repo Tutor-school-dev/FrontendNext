@@ -69,9 +69,9 @@ export const useOTPVerify = () => {
         localStorage.setItem(STORAGE_KEY.MODEL, displayModel);
         
         if (data.user_type === 'learner') {
-          // For learners, create JWT token and go to quiz
-          Cookies.set(AUTH_COOKIE.JWT_TOKEN, data.access_hash, { expires: 7 });
-          router.push('/cognitive-assessment');
+          // New learner - store access_hash and go to info collection first
+          Cookies.set(AUTH_COOKIE.ACCESS_HASH, data.access_hash, { expires: 1 });
+          router.push('/onboarding?model=parent');
         } else {
           // For tutors, store access_hash and go to onboarding
           Cookies.set(AUTH_COOKIE.ACCESS_HASH, data.access_hash, { expires: 1 });
@@ -92,13 +92,16 @@ export const useOTPVerify = () => {
         
         set_dashboard_data(userData, data.user_type === 'tutor' ? 'teacher' : 'parent');
         
-        // Route based on go_to_quiz or go_to_dashboard flags
-        if (data.user_type === 'learner' && data.go_to_quiz) {
-          router.push('/cognitive-assessment');
-        } else if (data.go_to_dashboard) {
-          router.push(data.user_type === 'tutor' ? '/dashboard/teacher' : '/dashboard/parent');
+        if (data.user_type === 'learner') {
+          // All learners go through info collection first
+          router.push('/onboarding?model=parent');
         } else {
-          router.push(data.user_type === 'tutor' ? '/dashboard/teacher' : '/dashboard/parent');
+          // Tutors: route based on profile completion flags
+          if (data.go_to_dashboard) {
+            router.push('/dashboard/teacher');
+          } else {
+            router.push('/dashboard/teacher');
+          }
         }
       }
       
@@ -148,8 +151,12 @@ export const useOTPVerify = () => {
         Cookies.set(AUTH_COOKIE.ACCESS_HASH, data.access_hash, { expires: 1 });
         const displayModel = getUserTypeDisplay(data.user_type);
         localStorage.setItem(STORAGE_KEY.MODEL, displayModel);
-        const email = signupData?.email || '';
-        router.push(`/create-account?model=${userType}&email=${email}`);
+        if (data.user_type === 'learner') {
+          router.push('/onboarding?model=parent');
+        } else {
+          const email = signupData?.email || '';
+          router.push(`/create-account?model=${userType}&email=${email}`);
+        }
         return { success: true, needsRegistration: true };
       }
 
@@ -173,36 +180,26 @@ export const useOTPVerify = () => {
 
         set_dashboard_data(userData, data.user_type === 'tutor' ? 'teacher' : 'parent');
 
-        // Navigate based on user type and profile completion
-        if (data.user_type === 'tutor') {
-          // Check profile completion status for tutors
-          if (data.go_to_dashboard) {
-            router.push('/dashboard/teacher');
-            return { success: true, redirected: true };
-          }
+        if (data.user_type === 'learner') {
+          // All learners go through info collection first
+          router.push('/onboarding?model=parent');
+          return { success: true, redirected: true };
+        }
 
-          const stepNames = {
-            basic_done: userData.basic_done,
-            location_done: userData.location_done
-          };
+        // Tutors: check profile completion
+        if (data.go_to_dashboard) {
+          router.push('/dashboard/teacher');
+          return { success: true, redirected: true };
+        }
 
-          for (const [key, value] of Object.entries(stepNames)) {
-            if (!value) {
-              router.push(`/teacher-profile?step=${key}`);
-              return { success: true, redirected: true };
-            }
-          }
-        } else {
-          // Learner/Parent - route based on go_to_quiz or go_to_dashboard flags
-          if (data.go_to_quiz) {
-            router.push('/cognitive-assessment');
-            return { success: true, redirected: true };
-          } else if (data.go_to_dashboard) {
-            router.push('/dashboard/parent');
-            return { success: true, redirected: true };
-          } else {
-            // Default fallback to dashboard
-            router.push('/dashboard/parent');
+        const stepNames = {
+          basic_done: userData.basic_done,
+          location_done: userData.location_done
+        };
+
+        for (const [key, value] of Object.entries(stepNames)) {
+          if (!value) {
+            router.push(`/teacher-profile?step=${key}`);
             return { success: true, redirected: true };
           }
         }

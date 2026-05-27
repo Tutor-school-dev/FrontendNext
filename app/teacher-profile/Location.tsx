@@ -144,6 +144,7 @@ export default function Location({ onNext, model = "teacher", fromSettings = fal
         teaching_mode: educationData.teachingMethod,
         referral: educationData.referralSource || "",
         // Location info from this form
+        city: values.city,
         area: values.area,
         latitude: position.lat,
         longitude: position.lng,

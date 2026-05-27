@@ -3,13 +3,14 @@
 import { useState, useRef } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { getAppUrl } from "@/lib/utils";
+import { getDjangoAuthUrl } from "@/lib/utils";
 
 export const usePaymentStatus = () => {
   const [paymentStatus, setPaymentStatus] = useState('LOADING');
   const [orderId, setOrderId] = useState('');
   const [amount, setAmount] = useState('');
   const timeoutId = useRef<NodeJS.Timeout | null>(null);
+  const pollStartTime = useRef<number | null>(null);
 
   const checkPaymentStatus = async (signal?: AbortSignal) => {
     const orderIdFromStorage = typeof window !== 'undefined' 
@@ -21,11 +22,14 @@ export const usePaymentStatus = () => {
       return;
     }
 
-    const startTime = Date.now();
+    // Track start time across recursive polling calls
+    if (pollStartTime.current === null) {
+      pollStartTime.current = Date.now();
+    }
 
     try {
       // Stop polling after 5 minutes
-      if (Date.now() - startTime >= 5 * 60 * 1000) {
+      if (Date.now() - pollStartTime.current >= 5 * 60 * 1000) {
         setPaymentStatus("WAITING");
         if (typeof window !== 'undefined') {
           localStorage.removeItem('order_id');
@@ -34,10 +38,11 @@ export const usePaymentStatus = () => {
         if (timeoutId.current) {
           clearTimeout(timeoutId.current);
         }
+        pollStartTime.current = null;
         return;
       }
 
-      const apiUrl = getAppUrl();
+      const apiUrl = getDjangoAuthUrl();
       const jwtToken = Cookies.get("jwt_Token");
       
       if (!jwtToken) {
@@ -45,11 +50,10 @@ export const usePaymentStatus = () => {
         return;
       }
 
-      const response = await axios.put(
-        `${apiUrl}/payment/status/${orderIdFromStorage}`, 
-        {},
+      const response = await axios.get(
+        `${apiUrl}/subscriptions/payment-status/${orderIdFromStorage}/`,
         {
-          headers: { authorization: `bearer ${jwtToken}` },
+          headers: { Authorization: `Bearer ${jwtToken}` },
           signal,
         }
       );
@@ -62,6 +66,7 @@ export const usePaymentStatus = () => {
           localStorage.removeItem('order_id');
           localStorage.removeItem('tier_id');
         }
+        pollStartTime.current = null;
         return;
       }
 
@@ -73,6 +78,7 @@ export const usePaymentStatus = () => {
           localStorage.removeItem('order_id');
           localStorage.removeItem('tier_id');
         }
+        pollStartTime.current = null;
         setPaymentStatus("FAILED");
         return;
       }
@@ -97,6 +103,7 @@ export const usePaymentStatus = () => {
       clearTimeout(timeoutId.current);
       timeoutId.current = null;
     }
+    pollStartTime.current = null;
   };
 
   return { 

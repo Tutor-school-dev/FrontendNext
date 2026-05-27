@@ -42,7 +42,7 @@ export const useParentGoogleLogin = () => {
         Cookies.set(AUTH_COOKIE.ACCESS_HASH, data.access_hash, { expires: 1 });
         const displayModel = getUserTypeDisplay(data.user_type);
         localStorage.setItem(STORAGE_KEY.MODEL, displayModel);
-        toast.info("Account creation required. Please complete registration.");
+        router.push('/onboarding?model=parent');
         return;
       }
 
@@ -63,8 +63,8 @@ export const useParentGoogleLogin = () => {
 
         set_dashboard_data(userData, "parent");
 
-        // Navigate to cognitive assessment (will redirect to dashboard if already completed)
-        router.push('/cognitive-assessment');
+        // Navigate to info collection before cognitive assessment
+        router.push('/onboarding?model=parent');
       }
 
     } catch (err: any) {

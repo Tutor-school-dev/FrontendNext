@@ -56,7 +56,7 @@ export const useTeacherSubscription = () => {
       }
 
       // Redirect to payment gateway
-      const paymentUrl = response.data.url;
+      const paymentUrl = response.data.payment_url;
       window.location.href = paymentUrl;
       
     } catch (err: any) {

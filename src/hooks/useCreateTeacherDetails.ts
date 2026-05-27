@@ -17,12 +17,14 @@ export interface TeacherDetailsPayload {
   teaching_mode: string;
   referral: string;
   // Location info
+  city: string;
   area: string;
   latitude: number;
   longitude: number;
   pincode: string;
   state: string;
 }
+
 
 export const useCreateTeacherDetails = () => {
   const [loading, setLoading] = useState(false);

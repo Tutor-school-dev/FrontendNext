@@ -27,12 +27,11 @@ export default function AuthGuard({ children, redirectAuthenticatedUsers = false
       
       // Only redirect if user has both valid JWT token and model
       if (jwtToken && model && redirectAuthenticatedUsers) {
-        // User is logged in and we're on an auth page, redirect to dashboard
-        const dashboardPath = model.toLowerCase() === "parent" || model.toLowerCase() === "learner" 
-          ? "/dashboard/parent" 
-          : "/dashboard/teacher";
-        console.log("AuthGuard redirecting to:", dashboardPath);
-        router.push(dashboardPath);
+        // Learners always go through info collection before dashboard
+        const isLearner = model.toLowerCase() === "parent" || model.toLowerCase() === "learner";
+        const redirectPath = isLearner ? "/onboarding?model=parent" : "/dashboard/teacher";
+        console.log("AuthGuard redirecting to:", redirectPath);
+        router.push(redirectPath);
       }
     };
 

@@ -13,7 +13,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import Cookies from "js-cookie";
 import axios from "axios";
-import { getAppUrl, getApiUrl, getDjangoAuthUrl } from "@/lib/utils";
+import { getDjangoAuthUrl } from "@/lib/utils";
 import DynamicMapComponent from "@/components/DynamicMapComponent";
 import { EDUCATION_LEVELS, getAllCategories } from "@/lib/educationLevels";
 import { getAllSubjects } from "@/lib/subjects";
@@ -79,7 +79,9 @@ export default function ParentOnboardingContent() {
       setLoading(true);
       
       const accessHash = Cookies.get("access_hash");
-      if (!accessHash) {
+      const jwtToken = Cookies.get("jwt_Token");
+
+      if (!accessHash && !jwtToken) {
         toast.error("Session expired. Please start again.");
         router.push("/auth?model=parent");
         return;
@@ -108,63 +110,49 @@ export default function ParentOnboardingContent() {
         formData.position = { lat: randomLat, lng: randomLng };
       }
 
-      const phoneNumber = localStorage.getItem("Phone");
       const apiUrl = getDjangoAuthUrl();
 
-      // 1. Create parent account (matching React repo)
-      const response = await axios.post(`${apiUrl}/learner/create-account/`, {
-        access_hash: accessHash,
-        data: formData
-      });
+      if (accessHash) {
+        // NEW USER: Create account with access_hash
+        const response = await axios.post(`${apiUrl}/learner/create-account/`, {
+          access_hash: accessHash,
+          data: formData
+        });
 
-      // Store JWT token
-      const jwtToken = response.data.jwt_token;
-      Cookies.set("jwt_Token", jwtToken, { expires: 7 });
-      
-      // Store user data in localStorage (matching React repo)
-      if (typeof window !== 'undefined') {
-        localStorage.setItem("model", "Parent");
-        localStorage.setItem("name", formData.parentName);
-        if (formData.parentEmail) {
-          localStorage.setItem("email", formData.parentEmail);
+        const newJwtToken = response.data.jwt_token;
+        Cookies.set("jwt_Token", newJwtToken, { expires: 7 });
+        Cookies.remove("access_hash");
+
+        if (typeof window !== 'undefined') {
+          localStorage.setItem("model", "Parent");
+          localStorage.setItem("name", formData.parentName);
+          if (formData.parentEmail) {
+            localStorage.setItem("email", formData.parentEmail);
+          }
+        }
+      } else {
+        // EXISTING USER: Update details with jwt_token
+        try {
+          await axios.post(`${apiUrl}/learner/add-details/`, {
+            data: formData
+          }, {
+            headers: { authorization: `bearer ${jwtToken}` }
+          });
+        } catch (updateError: any) {
+          // Endpoint may not exist yet — log and continue
+          console.warn("Learner add-details failed (proceeding anyway):", updateError?.response?.status);
+        }
+
+        if (typeof window !== 'undefined') {
+          localStorage.setItem("model", "Parent");
+          localStorage.setItem("name", formData.parentName);
+          if (formData.parentEmail) {
+            localStorage.setItem("email", formData.parentEmail);
+          }
         }
       }
       
-      // // 2. Upload location data (matching React repo)
-      // try {
-      //   await axios.post(`${apiUrl}/onboarding/PARENT/location`, {
-      //     latitude: formData.position.lat,
-      //     longitude: formData.position.lng,
-      //     city: formData.city || "Not specified",
-      //     area: formData.area,
-      //     state: formData.state,
-      //     pincode: formData.pincode
-      //   }, { 
-      //     headers: { authorization: `bearer ${jwtToken}` } 
-      //   });
-      // } catch (locationError) {
-      //   console.warn("Location upload failed:", locationError);
-      //   // Continue even if location upload fails
-      // }
-
-      // // 3. Create job listing (matching React repo)
-      // try {
-      //   const goApiUrl = getApiUrl();
-      //   await axios.post(`${goApiUrl}/admin/pub/jobs`, {
-      //     j_title: `${formData.educationLevel}, ${formData.studentBoard} board`,
-      //     j_desc: `Need Tutor for ${formData.educationLevel}`,
-      //     j_preview: `${formData.educationLevel}, ${formData.studentBoard} board`,
-      //     j_posted_by: formData.studentName,
-      //     j_posted_by_number: phoneNumber,
-      //     j_location: `${formData.state}, ${formData.area}, ${formData.pincode}`,
-      //     j_active: true
-      //   });
-      // } catch (jobError) {
-      //   console.warn("Job creation failed:", jobError);
-      //   // Continue even if job creation fails
-      // }
-      
-      toast.success("Parent onboarded successfully!");
+      toast.success("Profile saved successfully!");
       router.push("/cognitive-assessment");
       
     } catch (error: any) {

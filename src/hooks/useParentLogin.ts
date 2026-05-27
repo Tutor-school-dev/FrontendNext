@@ -39,8 +39,8 @@ export const useParentLogin = () => {
 
       set_dashboard_data(data.parent, "parent");
 
-      // Navigate to cognitive assessment (will redirect to dashboard if already completed)
-      router.push('/cognitive-assessment');
+      // Navigate through info collection before cognitive assessment
+      router.push('/onboarding?model=parent');
 
     } catch (err: any) {
       console.error('Login error:', err);
